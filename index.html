@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>親子工作坊_Vibe Coding | 學習難點診斷室</title>
+    <style>
+    /* 1. 品牌色彩與設定 */
+    :root {
+        --goai-blue: #022169;       /* 官網專屬核心深藍色 */
+        --goai-blue-hover: #12338f; /* 懸停時的藍色 */
+        --goai-yellow: #fecf13;     /* 亮黃色 */
+        --goai-green: #3d7a3a;      /* 已複製草綠色 */
+        --card-green: #00cd7a;      /* 卡片裝飾綠 */
+        --goai-orange: #ff8b12;     /* 官方橘色 */
+        --white: #ffffff;
+        --grey: #f4f6fa;
+    }
+
+    body { 
+        font-family: "PingFang HK", "Helvetica Neue", "Microsoft JhengHei", sans-serif; 
+        margin: 0; 
+        background: var(--grey); 
+        color: #1a202c; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        -webkit-font-smoothing: antialiased;
+        padding-bottom: 60px;
+    }
+
+    /* 2. 頂部 Banner 區域 */
+    header { 
+        width: 100%; 
+        background: var(--goai-blue); 
+        color: var(--white); 
+        padding: 40px 20px; 
+        box-sizing: border-box; 
+        position: relative;
+        overflow: hidden;
+        border-bottom-left-radius: 32px;
+        border-bottom-right-radius: 32px;
+        box-shadow: 0 4px 15px rgba(2, 33, 105, 0.1);
+    }
+
+    .header-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 40px; 
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header-logo {
+        height: 240px; 
+        width: auto;
+        display: block;
+        filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.2)); 
+    }
+
+    .header-text {
+        text-align: left; 
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    header h1 { 
+        margin: 0; 
+        font-size: 2.5rem; 
+        font-weight: 900;
+        letter-spacing: 1px; 
+    }
+    header p { 
+        margin: 0; 
+        color: #e2e8f0; 
+        font-size: 2.5rem;
+        font-weight: 900; 
+        line-height: 1.4; 
+    }
+    .highlight-yellow {
+        color: var(--goai-yellow);
+        font-weight: bold;
+    }
+
+    .cartoon-shape {
+        position: absolute;
+        border-radius: 30px;
+        padding: 8px 18px;
+        font-size: 13px;
+        font-weight: bold;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+        z-index: 1;
+    }
+    .shape-monster1 { left: 3%; top: 20%; background: var(--card-green); color: white; transform: rotate(-8deg); }
+    .shape-monster2 { right: 3%; bottom: 20%; background: var(--goai-orange); color: white; transform: rotate(10deg); }
+
+    /* 3. 主導航欄 */
+    .main-nav { 
+        display: flex; 
+        flex-direction: column; 
+        background: transparent; 
+        width: 95%; 
+        max-width: 1200px; 
+        gap: 14px; 
+        padding: 30px 0 10px 0;
+    }
+    
+    .nav-item {
+        background: var(--white);
+        border: 2px solid #e2e8f0;
+        border-radius: 20px; 
+        padding: 24px;
+        text-align: center;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        color: var(--goai-blue);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+    .nav-item h2 { margin: 0 0 6px 0; font-size: 1.4rem; font-weight: 800; }
+    .nav-item p { margin: 0; font-size: 0.85rem; color: #718096; font-weight: 400; }
+    
+    .nav-item:hover:not(.active) {
+        transform: translateY(-2px);
+        border-color: var(--goai-blue);
+        background-color: #f0f4ff;
+    }
+    .nav-item.active { 
+        background-color: var(--goai-blue) !important; 
+        color: var(--white) !important; 
+        border-color: var(--goai-blue) !important;
+        box-shadow: 0 8px 20px rgba(10, 34, 102, 0.18);
+    }
+    .nav-item.active p { color: #cbd5e1 !important; }
+
+    /* 任務說明區 */
+    .info-box {
+        width: 95%;
+        max-width: 1200px;
+        background: var(--white);
+        border-left: 6px solid var(--card-green);
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        box-sizing: border-box;
+    }
+    .info-box h4 { margin: 0 0 6px 0; color: var(--goai-blue); font-size: 1.1rem; font-weight: 800; }
+    .info-box p { margin: 0; font-size: 0.9rem; color: #4a5568; line-height: 1.5; }
+
+    /* 主要題目內容區塊 */
+    .main-container { width: 95%; max-width: 1200px; margin-top: 25px; display: none; flex-direction: column; gap: 30px; }
+    .main-container.active { display: flex; }
+
+    .column {
+        background: var(--white); 
+        padding: 30px; 
+        border-radius: 24px; 
+        box-shadow: 0 10px 25px rgba(10, 34, 102, 0.03); 
+        box-sizing: border-box;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    
+    .card-yellow { border-top: 8px solid var(--goai-yellow); }
+    .card-blue { border-top: 8px solid var(--goai-blue); }
+    .card-green { border-top: 8px solid var(--card-green); }
+    .card-orange { border-top: 8px solid var(--goai-orange); }
+
+    .column h3 { 
+        margin-top: 0; 
+        color: var(--goai-blue); 
+        font-size: 1.35rem; 
+        font-weight: 800;
+        border-bottom: 2px solid #f1f5f9; 
+        padding-bottom: 15px; 
+        margin-bottom: 20px;
+    }
+
+    /* 網格選擇按鈕樣式 */
+    .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .selection-grid.large-cards { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+    .grid-btn {
+        background: var(--white);
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 15px;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        box-sizing: border-box;
+    }
+    .grid-btn .badge {
+        font-size: 10px;
+        font-weight: bold;
+        background: #edf2f7;
+        color: #4a5568;
+        padding: 2px 6px;
+        border-radius: 4px;
+        width: fit-content;
+    }
+    .grid-btn .title { font-weight: 800; font-size: 1rem; color: #2d3748; }
+    .grid-btn .desc { font-size: 0.8rem; color: #718096; line-height: 1.3; }
+
+    .grid-btn:hover:not(.active) { border-color: var(--goai-blue); background: #f7fafc; }
+    .grid-btn.active {
+        border-color: var(--goai-blue);
+        background: #f0f4ff;
+        box-shadow: inset 0 0 0 1px var(--goai-blue);
+    }
+    .grid-btn.active .title { color: var(--goai-blue); }
+
+    /* Vibe Coding 任務區塊 */
+    .vibe-step-box {
+        background: #f8fafc;
+        border: 2px solid #cbd5e1;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    .vibe-step-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--goai-blue);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .prompt-text { 
+        height: 130px; 
+        overflow-y: auto; 
+        font-size: 0.95rem; 
+        white-space: pre-wrap; 
+        color: #334155; 
+        line-height: 1.6; 
+        font-family: monospace;
+        background: #ffffff;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+    .vibe-challenge-list {
+        margin: 0;
+        padding-left: 20px;
+        color: #4a5568;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    /* 行動按鈕 */
+    .copy-btn { 
+        width: 100%; 
+        height: 46px; 
+        background: var(--goai-blue); 
+        color: white; 
+        border: 2px solid var(--goai-blue); 
+        border-radius: 50px; 
+        cursor: pointer; 
+        font-size: 1rem; 
+        font-weight: 700; 
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(10, 34, 102, 0.12);
+        box-sizing: border-box;
+        margin-top: 10px;
+    }
+    .copy-btn:hover:not(:disabled) { 
+        background: var(--goai-blue-hover); 
+        border-color: var(--goai-blue-hover);
+        transform: translateY(-2px); 
+        box-shadow: 0 6px 18px rgba(10, 34, 102, 0.2);
+    }
+    .copy-btn:disabled { background: #e2e8f0; border-color: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
+
+    .copied { 
+        background: var(--goai-green) !important; 
+        border-color: var(--goai-green) !important; 
+        color: var(--white) !important;
+        box-shadow: none !important; 
+        transform: none !important;
+    }
+
+    /* RWD 響應式 */
+    @media (max-width: 768px) {
+        header { padding: 25px 15px; }
+        .header-container { flex-direction: column; text-align: center; gap: 15px; }
+        .header-logo { height: 90px !important; margin: 0 auto; }
+        .header-text { text-align: center; }
+        header h1 { font-size: 1.8rem; }
+        header p { font-size: 1.8rem; }
+
+        .cartoon-shape {
+            position: relative;  
+            display: inline-block;
+            margin: 5px;
+            left: auto !important; right: auto !important; top: auto !important; bottom: auto !important;
+            transform: none !important;
+        }
+    }
+
+    @media (min-width: 800px) {
+        .main-nav { flex-direction: row; gap: 20px; }
+        .nav-item { flex: 1; border-radius: 20px; }
+    }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="cartoon-shape shape-monster1">🤖 AI 學習</div>
+    <div class="cartoon-shape shape-monster2">✨ 親子共創</div>
+    <div class="header-container">
+        <img src="logo.jpg" alt="GOAI Logo" class="header-logo">
+        <div class="header-text">
+            <h1>親子工作坊_<span class="highlight-yellow">Vibe Coding</span></h1>
+            <p>學習難點診斷室</p>
+        </div>
+    </div>
+</header>
+
+<div class="info-box">
+    <h4>💡 Vibe Coding 玩法介紹</h4>
+    <p>第一步：請先選擇小學或中學。第二步：家長與孩子一同選擇合適的年級內容。我們將會在最下方為您展開三個 Vibe Coding 逐步過關任務！</p>
+</div>
+
+<nav class="main-nav">
+    <div class="nav-item" id="nav-PRIMARY" onclick="switchSection('PRIMARY')">
+        <h2>🎒 小學 </h2>
+        <p>適合小一至小六，啟蒙與趣味正向激勵機制</p>
+    </div>
+    <div class="nav-item" id="nav-SECONDARY" onclick="switchSection('SECONDARY')">
+        <h2>🎓 中學 </h2>
+        <p>適合中一至中六，聚焦考試重點與抗壓訓練</p>
+    </div>
+    <div class="nav-item" id="nav-SHARE" onclick="switchSection('SHARE')">
+        <h2>🎮 試玩區 </h2>
+        <p>提交自己作品，或試玩其他人作品</p>
+    </div>
+</nav>
+
+<main class="main-container" id="quiz-container">
+    
+    <section class="column card-yellow">
+        <h3 id="grade-title">0. 請選擇你就讀的年級 (Grade)</h3>
+        <div class="selection-grid" id="grid-grades"></div>
+    </section>
+
+    <section class="column card-blue">
+        <h3>1. 【重災區】哪一個「核心學科」最讓你產生挫敗感？</h3>
+        <div class="selection-grid large-cards" id="grid-q1"></div>
+    </section>
+
+    <section class="column card-green">
+        <h3 id="title-q2">2. 【大腦症狀】遇到這個難點，你的反應是怎樣的？</h3>
+        <div class="selection-grid large-cards" id="grid-q2"></div>
+    </section>
+
+    <section class="column card-orange">
+        <h3 id="title-q3">3. 【遊戲類型】你想用什麼方式來進行互動？</h3>
+        <div class="selection-grid large-cards" id="grid-q3"></div>
+    </section>
+
+    <section class="column card-blue">
+        <h3 id="title-q4">4. 【畫面風格】你希望遊戲看起來是怎樣的？</h3>
+        <div class="selection-grid large-cards" id="grid-q4"></div>
+    </section>
+
+    <section class="column card-yellow" style="margin-bottom: 40px;">
+        <h3>🚀 你的專屬 Vibe Coding 互動任務卡面已解鎖！</h3>
+        <p style="color: #4a5568; font-size: 0.95rem; margin-top: -10px; margin-bottom: 20px;">請家長與小朋友跟隨以下三個步驟，體驗氛圍編程的魅力：</p>
+        
+        <div class="vibe-step-box">
+            <div class="vibe-step-title">🎯 任務一：基礎版（貼入 Gemini Canvas）</div>
+            <div class="prompt-text" id="prompt-step1">請先完成上方所有選項...</div>
+            <button class="copy-btn" id="btn-copy-1" onclick="copyText('prompt-step1', 'btn-copy-1')" disabled>複製任務一提示詞</button>
+        </div>
+
+        <div class="vibe-step-box">
+            <div class="vibe-step-title">🔥 任務二：加入特別功能（等 Canvas 出現遊戲後，對著它說）</div>
+            <div class="prompt-text" id="prompt-step2">請先完成上方所有選項...</div>
+            <button class="copy-btn" id="btn-copy-2" onclick="copyText('prompt-step2', 'btn-copy-2')" disabled>複製任務二提示詞</button>
+        </div>
+
+        <div class="vibe-step-box" style="background: #fffdf5; border-color: var(--goai-yellow);">
+            <div class="vibe-step-title">✨ 任務三：自由大挑戰！</div>
+            <p style="font-size: 0.95rem; color: #4a5568; margin: 0 0 10px 0;">嘗試直接用廣東話/日常中文，命令 Gemini 幫你們修改。例如試試看這樣對它說：</p>
+            <ul class="vibe-challenge-list">
+                <li>🎨 <strong>視覺修改：</strong>「幫我將背景顏色改粉紅色啲！」或「字體幫我放大一倍，我看不太到。」</li>
+                <li>⚙️ <strong>難度微調：</strong>「這個太難玩了，幫我將原本的 3 條命（愛心）改成 5 條命！」</li>
+                <li>📝 <strong>內容擴充：</strong>「除了原本的題目，幫我加多 5 條更難的進階題目進去！」</li>
+            </ul>
+        </div>
+    </section>
+</main>
+    
+<main class="main-container" id="share-container">
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        
+        <section class="column card-orange" style="flex: 1; min-width: 300px; padding: 25px; box-sizing: border-box;">
+            <h3>📤 提交我的作品</h3>
+            <p style="color: #4a5568; font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px;">
+                將你的 Gemini Canvas 連結分享給大家！
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <input type="text" id="uploadDate" placeholder="日期 (例如: 20260730)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
+                <input type="number" id="uploadNum" placeholder="班別學號 (例如: 5B03)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
+                <input type="url" id="uploadUrl" placeholder="貼上 Gemini 分享連結 (https://...)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
+                <button id="submitBtn" onclick="uploadMyWork()" style="background: var(--goai-orange); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s;">
+                    ✨ 發佈作品
+                </button>
+            </div>
+        </section>
+
+        <section class="column card-green" style="flex: 1; min-width: 300px; padding: 25px; box-sizing: border-box;">
+            <h3>🎮 試玩其他人作品</h3>
+            <p style="color: #4a5568; font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px;">
+                想試玩其他人的作品？輸入日期及班別學號！
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <input type="text" id="playDate" placeholder="日期 (例如 : 20260730)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
+                <input type="number" id="playNum" placeholder="班別學號 (例如: 5B05)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
+                <button onclick="playOtherWork()" style="background: var(--card-green); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-top: 50px;">
+                    🚀 立即開啟遊戲
+                </button>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<script>
+// --- 資料庫定義 ---
+const primaryGrades = ['小一', '小二', '小三', '小四', '小五', '小六'];
+const secondaryGrades = ['中一', '中二', '中三', '中四', '中五', '中六'];
+
+const primaryQ1 = [
+    { id: 'A1', title: '中文同音錯別字', desc: '分不清「補/捕」、「已/己」', category: '中文科' },
+    { id: 'A2', title: '中文成語填充', desc: '成語運用及書寫不正確，例如填字或句子填充', category: '中文科' },
+    { id: 'A3', title: '英文單字拼寫牆', desc: '單字太長、字母順序老是記錯', category: '英文科' },
+    { id: 'A4', title: '英文文法時態', desc: '分不清 Present Tense 和 Past Tense', category: '英文科' },
+    { id: 'A5', title: '基礎九九乘法表', desc: '7、8、9 的乘法常常轉不過彎，要想很久', category: '數學科' },
+    { id: 'A6', title: '數學圖形與面積', desc: '周界、長方形/正方形面積公式常記錯', category: '數學科' },
+    { id: 'A7', title: '分數與小數加減', desc: '通分母換算、小數點位移容易搞錯', category: '數學科' },
+    { id: 'A8', title: '科學先後順序混亂', desc: '植物生長階段、水循環的先後步驟記不清', category: '人文與科學' },
+    { id: 'A9', title: '太陽系八大行星', desc: '八大行星的排列順序與體積大小事實', category: '人文與科學' },
+];
+
+const secondaryQ1 = [
+    { id: 'A1', title: '文言文虛詞辨析', desc: '辨析「之、以、而」在不同課文句子的字義', category: '中文科' },
+    { id: 'A2', title: '名句修辭手法', desc: '名句與「借代、層遞、誇張」等修辭配對', category: '中文科' },
+    { id: 'A3', title: '高中學術詞彙', desc: 'Academic Word List 拼寫與 Noun/Verb/Adj 轉換', category: '英文科' },
+    { id: 'A4', title: '高級語法與句型', desc: 'Active/Passive Voice、Conditional Sentence 條件句', category: '英文科' },
+    { id: 'A5', title: '代數與方程', desc: '二次方程 Quadratic Equation、因式分解', category: '數學科' },
+    { id: 'A6', title: '幾何與三角學', desc: 'Trigonometry 的 sin, cos, tan 公式與圓特性', category: '數學科' },
+    { id: 'A7', title: '地理概念與術語', desc: '板塊運動、氣候分類等專有名詞定義及辨識', category: '人文與科科' },
+    { id: 'A8', title: '物理與化學公式', desc: 'F=ma 等物理公式、化學元素週期表與方程式平衡', category: '人文與科學' },
+    { id: 'A9', title: '生物專有名詞', desc: '人體系統、細胞分裂與遺傳學的英文名詞與定義配對', category: '人文與科學' },
+];
+
+const primaryQ2 = [
+    { id: 'B1', title: '瞬間斷電', desc: '盯著題目看 5 秒，大腦直接一片空白' },
+    { id: 'B2', title: '暴躁小怪獸', desc: '心裡好煩燥，好想立刻把書本合上' },
+    { id: 'B3', title: '睡眠怪來訪', desc: '平時很有精神，一打開這一頁就極度想睡' },
+    { id: 'B4', title: '二選一黑洞', desc: '覺得 A 也對、B 也對，每次猜答案都猜錯' },
+    { id: 'B5', title: '三秒記憶', desc: '剛剛背完，翻到下一頁立刻忘得一乾二淨' },
+    { id: 'B6', title: '視線模糊', desc: '字幕好像會動，密密麻麻完全看不進去' }
+];
+
+const primaryQ3 = [
+    { id: 'C1', title: '瘋狂接接樂', desc: '用滑鼠/左右鍵移動籃子，接住掉下來的正確答案' },
+    { id: 'C2', title: '問答比賽', desc: '畫面出現題目，下方有四個選項按鈕，限時內點選正確答案即可得分' },
+    { id: 'C3', title: '連連看大配對', desc: '左邊是題目/字詞，右邊是答案/解釋，用滑鼠連線將正確的組合配對起來' },
+    { id: 'C4', title: '貪食蛇遊戲', desc: '控制一條蛇在畫面上移動，吃掉正確的字母或數字變長' },
+    { id: 'C5', title: '填字解謎', desc: '遊戲盤面由多組橫向與縱向的空格組成，詞語之間會在相同的字母或漢字上相交' },
+    { id: 'C6', title: '密室逃脫解謎', desc: '出現一條題目，選對鑰匙才能打開下一關的門' },
+    { id: 'C7', title: '迷宮大冒險', desc: '控制主角在迷宮中移動，沿途避開死胡同，走向寫著正確答案的出口' },
+    { id: 'C8', title: '翻卡記憶賽', desc: '有多張蓋著的卡片，翻開兩張圖案或字詞相同的卡片即可消除並得分' },
+    { id: 'C9', title: '幸運大轉盤', desc: '轉動輪盤觸發搶答，在時限內答對才能獲得金幣' }
+];
+
+const primaryQ4 = [
+    { id: 'D1', title: '太空星際風格', desc: '深邃的星空背景，主角是一艘火箭' },
+    { id: 'D2', title: '糖果派對風格', desc: '繽紛的粉系色彩，像糖果屋一樣' },
+    { id: 'D3', title: '魔法學院風格', desc: '羊皮紙背景，搭配魔杖與金色線條' },
+    { id: 'D4', title: '萌寵養成風格', desc: '畫面角落有一隻小動物，答對時會高興跳舞' },
+    { id: 'D5', title: '玩具總動員風格', desc: '畫面元素都是積木、蠟筆和玩具風格' },
+    { id: 'D6', title: '熱血動漫風格', desc: '粗黑線條、高飽和度色彩，答對時出現「擊破！」特效' },
+    { id: 'D7', title: '遊樂園狂歡風格', desc: '充滿氣球、旋轉木馬等歡樂元素的背景' },
+    { id: 'D8', title: '吉卜力動畫風', desc: '充滿吉卜力動畫的手繪大自然與溫馨色彩' },
+    { id: 'D9', title: '夢幻水彩風格', desc: '柔和淡雅的水彩暈染背景，視覺放鬆舒適' }
+];
+
+const secondaryQ2 = [
+    { id: 'B1', title: '習得性無助', desc: '覺得自己可能一輩子都學不會這個了，產生放棄心態' },
+    { id: 'B2', title: '專注力渙散', desc: '試圖集中精神，但每隔 2 分鐘就會忍不住想拿起手機看社交媒體' },
+    { id: 'B3', title: '資訊超載', desc: '課本字數太多、重點太密，大腦像記憶體不足一樣無法消化' },
+    { id: 'B4', title: '粗心大意', desc: '概念完全懂，但每次考試不是寫錯正負號就是漏掉單位，白白扣分' },
+    { id: 'B5', title: '完美主義者', desc: '因為害怕寫錯，導致遲遲不敢動筆開始做第一條題' },
+    { id: 'B6', title: '三秒記憶', desc: '臨考前瘋狂死記硬背，進考場一緊張全部忘光' }
+];
+
+const secondaryQ3 = [
+    { id: 'C1', title: '問答比賽', desc: '畫面出現題目，下方有四個選項按鈕，限時內點選正確答案即可得分' },
+    { id: 'C2', title: '瘋狂接接樂', desc: '正確答案/公式從天上掉下來，移動籃子去接住它' },
+    { id: 'C3', title: '填字解謎', desc: '遊戲盤面由多組橫向與縱向的空格組成，詞語之間會在相同的字母或漢字上相交' },
+    { id: 'C4', title: '密室逃脫解謎', desc: '出現一條長題目，必須在四個寶箱中選對答案才能開啟下一關' },
+    { id: 'C5', title: '連連看大配對', desc: '左邊是題目/字詞，右邊是答案/解釋，用滑鼠連線將正確的組合配對起來' },
+    { id: 'C6', title: '迷宮大冒險', desc: '控制主角在迷宮中移動，沿途避開死胡同，走向寫著正確答案的出口' },
+    { id: 'C7', title: '貪食蛇遊戲', desc: '控制一條蛇在畫面上移動，吃掉正確的關鍵字來變長' },
+    { id: 'C8', title: '翻卡記憶賽', desc: '有多張蓋著的卡片，翻開兩張圖案或字詞相同的卡片即可消除並得分' },
+    { id: 'C9', title: '幸運大轉盤', desc: '轉動輪盤觸發隨機事件，在時限內搶答成功獲得金幣' }
+];
+
+const secondaryQ4 = [
+    { id: 'D1', title: '未來科技感', desc: '黑色的背景，搭配發光的螢光藍、螢光粉紅線條' },
+    { id: 'D2', title: '極簡主義', desc: '只有黑與白，沒有多餘干擾，像高端科技產品的介面' },
+    { id: 'D3', title: '像素復古風', desc: '像懷舊的 8-bit / 16-bit 復古遊戲風格' },
+    { id: 'D4', title: '太空星際冒險', desc: '深邃的星空背景，流星劃過，主角是一艘火箭' },
+    { id: 'D5', title: '熱血動漫', desc: '粗黑線條、高飽和度色彩，答對時會出現大大的「擊破！」特效' },
+    { id: 'D6', title: '吉卜力療癒風', desc: '具有宮崎駿動畫既視感，充滿陽光、綠意與溫暖手繪感' },
+    { id: 'D7', title: '魔法學院風', desc: '羊皮紙質感的背景，搭配金色線條與魔杖動畫' },
+    { id: 'D8', title: '寫意水彩風格', desc: '利用 CSS 濾鏡與淡雅水彩材質，呈現詩意、減壓的視覺' },
+    { id: 'D9', title: '治癒系大自然', desc: '粉綠色、粉藍色，搭配森林、落葉或海洋的舒適背景' }
+];
+
+// --- 運作狀態盤 ---
+let currentSection = null; 
+let state = { grade: null, q1: null, q2: null, q3: null, q4: null };
+
+function switchSection(section) {
+    currentSection = section;
+    state = { grade: null, q1: null, q2: null, q3: null, q4: null }; 
+
+    document.getElementById('nav-PRIMARY').className = section === 'PRIMARY' ? 'nav-item active' : 'nav-item';
+    document.getElementById('nav-SECONDARY').className = section === 'SECONDARY' ? 'nav-item active' : 'nav-item';
+    document.getElementById('nav-SHARE').className = section === 'SHARE' ? 'nav-item active' : 'nav-item';
+
+    const quizContainer = document.getElementById('quiz-container');
+    const shareContainer = document.getElementById('share-container');
+
+if (section === 'SHARE') {
+        quizContainer.classList.remove('active');
+        shareContainer.classList.add('active');
+        loadDatabase(); // 切換過來時更新一下資料庫
+    } else {
+        shareContainer.classList.remove('active');
+        quizContainer.classList.add('active');
+
+if (section === 'PRIMARY') {
+            document.getElementById('title-q2').innerText = "2. 【大腦症狀】遇到這個難點，你的反應是怎樣的？";
+            document.getElementById('title-q3').innerText = "3. 【遊戲類型】你想用什麼方式來進行互動？";
+            document.getElementById('title-q4').innerText = "4. 【畫面風格】你希望遊戲看起來是怎樣的？";
+        } else {
+            document.getElementById('title-q2').innerText = "2. 【大腦症狀】遇到這個難點，你的反應是怎樣的？";
+            document.getElementById('title-q3').innerText = "3. 【遊戲類型】你想用什麼方式來進行互動？";
+            document.getElementById('title-q4').innerText = "4. 【畫面風格】你希望遊戲看起來是怎樣的？";
+        }
+    
+        buildGradeGrid();
+        buildQ1Grid();
+        buildDynamicGrid('q2', section === 'PRIMARY' ? primaryQ2 : secondaryQ2);
+        buildDynamicGrid('q3', section === 'PRIMARY' ? primaryQ3 : secondaryQ3);
+        buildDynamicGrid('q4', section === 'PRIMARY' ? primaryQ4 : secondaryQ4);
+        updatePrompt();
+    }
+}
+
+function buildGradeGrid() {
+    const container = document.getElementById('grid-grades');
+    container.innerHTML = '';
+    const list = currentSection === 'PRIMARY' ? primaryGrades : secondaryGrades;
+    document.getElementById('grade-title').innerText = currentSection === 'PRIMARY' ? '0. 請選擇小學年級 (Primary Grade)' : '0. 請選擇中學年級 (Secondary Grade)';
+
+    list.forEach(g => {
+        const btn = document.createElement('div');
+        btn.className = 'grid-btn';
+        btn.innerHTML = `<div class="title" style="text-align:center; width:100%; padding: 5px 0;">${g}</div>`;
+        btn.onclick = () => {
+            state.grade = g;
+            highlightActive('grid-grades', btn);
+            updatePrompt();
+        };
+        container.appendChild(btn);
+    });
+}
+
+function buildQ1Grid() {
+    const container = document.getElementById('grid-q1');
+    container.innerHTML = '';
+    const list = currentSection === 'PRIMARY' ? primaryQ1 : secondaryQ1;
+
+    list.forEach(item => {
+        const btn = document.createElement('div');
+        btn.className = 'grid-btn';
+        btn.innerHTML = `
+            <div class="badge">${item.category}</div>
+            <div class="title">[${item.id}] ${item.title}</div>
+            <div class="desc">${item.desc}</div>
+        `;
+        btn.onclick = () => {
+            state.q1 = item;
+            highlightActive('grid-q1', btn);
+            updatePrompt();
+        };
+        container.appendChild(btn);
+    });
+}
+
+function buildDynamicGrid(stepId, dataList) {
+    const container = document.getElementById(`grid-${stepId}`);
+    container.innerHTML = '';
+
+    dataList.forEach(item => {
+        const btn = document.createElement('div');
+        btn.className = 'grid-btn';
+        btn.innerHTML = `
+            <div class="title"><span style="color:var(--goai-orange)">[${item.id}]</span> ${item.title}</div>
+            <div class="desc">${item.desc}</div>
+        `;
+        btn.onclick = () => {
+            state[stepId] = item;
+            highlightActive(`grid-${stepId}`, btn);
+            updatePrompt();
+        };
+        container.appendChild(btn);
+    });
+}
+
+function highlightActive(containerId, activeBtn) {
+    const children = document.getElementById(containerId).children;
+    for (let i = 0; i < children.length; i++) {
+        children[i].classList.remove('active');
+    }
+    activeBtn.classList.add('active');
+}
+
+// --- 【核心重構部分】分段式 Prompt 生成邏輯 ---
+function updatePrompt() {
+    const step1Box = document.getElementById('prompt-step1');
+    const step2Box = document.getElementById('prompt-step2');
+    const btn1 = document.getElementById('btn-copy-1');
+    const btn2 = document.getElementById('btn-copy-2');
+
+    if (!state.grade || !state.q1 || !state.q2 || !state.q3 || !state.q4) {
+        step1Box.innerText = "請先完成上方所有選項，提示詞將在此自動生成...";
+        step2Box.innerText = "請先完成上方所有選項，提示詞將在此自動生成...";
+        btn1.disabled = true;
+        btn2.disabled = true;
+        return;
+    }
+
+    const typeLabel = currentSection === 'PRIMARY' ? '小學' : '中學';
+
+    // 1. 任務一提示詞：聚焦於首版骨架生成（模仿第二個 Prompt 的極簡直擊風格）
+    const promptStep1 = `我是一名【${state.grade}】的學生，我在學習【${state.q1.title}】時遇到了學習困難（具體情況：${state.q1.desc}）。
+請在 Gemini Canvas 中幫我編寫一個全網頁自包含的單一 HTML 檔案，遊戲類型是【${state.q3.title}】（玩法：${state.q3.desc}），風格是【${state.q4.title}】（風格：${state.q4.desc}）。
+請直接給我建立一個互動遊戲網頁，讓我可以直接在 Canvas 中點擊運行試玩！`;
+
+    // 2. 任務二提示詞：聚焦於 Vibe Coding 互動修改（根據大腦症狀動態調整）
+    const bid = state.q2.id;
+    const idNum = parseInt(bid.replace(/\D/g, ''), 10);
+    const isCalmMode = [1, 3, 6].includes(idNum); // 斷電、睡眠怪、超載、模糊等需要溫和陪伴的症狀
+
+    let promptStep2 = `我想為遊戲加上「特別功能」：
+當我遇到這個難點，心裡會出現【${state.q2.title}】的反應（表現：${state.q2.desc}）。
+請幫我更新剛才的遊戲，並加入：\n`;
+
+    if (isCalmMode) {
+        promptStep2 += `1. 【溫和陪伴】：答錯時遊戲要立即停下來，不要扣分。
+2. 【大字引導】：用超大字體彈出正確答案同溫和提示，陪我慢慢學。`;
+    } else {
+        promptStep2 += `1. 【答對大慶祝】：答對時畫面要彈出超大鼓勵字句（例如：太棒了！成功擊碎難點！）並伴隨星星或煙花特效！
+2. 【連擊加分】：加入答對連續加分倍增（Combo）功能！`;
+    }
+    promptStep2 += `\n\n請直接幫我更新整份遊戲，讓我試玩。`;
+
+    // 寫入畫面
+    step1Box.innerText = promptStep1;
+    step2Box.innerText = promptStep2;
+    btn1.disabled = false;
+    btn2.disabled = false;
+}
+
+// 統一的複製處理函數
+function copyText(elementId, btnId) {
+    const textStr = document.getElementById(elementId).innerText;
+    try {
+        const proxyArea = document.createElement("textarea");
+        proxyArea.value = textStr;
+        proxyArea.style.position = "fixed";
+        proxyArea.style.top = "0"; proxyArea.style.left = "0";
+        proxyArea.style.width = "1px"; proxyArea.style.height = "1px";
+        proxyArea.style.padding = "0"; proxyArea.style.border = "none";
+        proxyArea.style.outline = "none"; proxyArea.style.background = "transparent";
+        
+        document.body.appendChild(proxyArea);
+        proxyArea.focus();
+        proxyArea.select();
+        
+        const success = document.execCommand('copy');
+        proxyArea.remove();
+        
+        if (success) {
+            const btn = document.getElementById(btnId);
+            const originalText = btn.innerText;
+            btn.innerText = "👍 複製成功！快貼入 Gemini 對話框";
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove('copied');
+            }, 3000);
+        }
+    } catch (err) {
+        console.error("無法完成複製：", err);
+    }
+}
+
+// --- 填入你部署 Google Apps Script 後獲得嘅網址 ---
+const GOOGLE_SHEET_API = "";
+let appDatabase = {};
+
+// 載入資料庫
+function loadDatabase() {
+    if (GOOGLE_SHEET_API.includes("請將你嘅")) return; // 如果未入 API 就略過
+    fetch(GOOGLE_SHEET_API)
+        .then(response => response.json())
+        .then(data => { appDatabase = data; })
+        .catch(error => console.error("載入失敗：", error));
+}
+
+// 學生上傳作品
+function uploadMyWork() {
+    const date = document.getElementById('uploadDate').value.trim();
+    const num = document.getElementById('uploadNum').value.trim();
+    const url = document.getElementById('uploadUrl').value.trim();
+    const btn = document.getElementById('submitBtn');
+
+    if (!date || !num || !url) {
+        alert("請填寫完整：日期、號碼同連結！");
+        return;
+    }
+
+    btn.innerText = "⏳ 努力上傳中...";
+    btn.disabled = true;
+
+    fetch(GOOGLE_SHEET_API, {
+        method: "POST",
+        body: JSON.stringify({ date: date, num: num, url: url }),
+        headers: { "Content-Type": "text/plain;charset=utf-8" }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            alert("🎉 發佈成功！其他同學現在可以試玩你的作品啦！");
+            document.getElementById('uploadUrl').value = '';
+            loadDatabase();
+        }
+    })
+    .catch(error => alert("發佈失敗，請稍後再試！"))
+    .finally(() => {
+        btn.innerText = "✨ 發佈作品";
+        btn.disabled = false;
+    });
+}
+
+// 試玩其他人作品
+function playOtherWork() {
+    const date = document.getElementById('playDate').value.trim();
+    const num = document.getElementById('playNum').value.trim();
+
+    if (!date || !num) {
+        alert("請輸入完整的「日期」同「作品號碼」！");
+        return;
+    }
+
+    if (appDatabase[date] && appDatabase[date][num]) {
+        window.open(appDatabase[date][num], '_blank');
+        document.getElementById('playNum').value = '';
+    } else {
+        alert("找不到對應的作品 😢\n請確認同學已經發佈，或者檢查號碼是否正確！");
+        loadDatabase(); // 重新拉取睇下係咪啱啱交
+    }
+}
+</script>
+
+</body>
+</html>
