@@ -411,7 +411,7 @@
             </p>
             <div style="display: flex; flex-direction: column; gap: 12px;">
                 <input type="text" id="uploadDate" placeholder="日期 (例如: 20260730)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
-                <input type="number" id="uploadNum" placeholder="班別學號 (例如: 5B03)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
+                <input type="text" id="uploadNum" placeholder="班別學號 (例如: 5B03)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
                 <input type="url" id="uploadUrl" placeholder="貼上 Gemini 分享連結 (https://...)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
                 <button id="submitBtn" onclick="uploadMyWork()" style="background: var(--goai-orange); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s;">
                     ✨ 發佈作品
@@ -426,7 +426,7 @@
             </p>
             <div style="display: flex; flex-direction: column; gap: 12px;">
                 <input type="text" id="playDate" placeholder="日期 (例如 : 20260730)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
-                <input type="number" id="playNum" placeholder="班別學號 (例如: 5B05)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
+                <input type="text" id="playNum" placeholder="班別學號 (例如: 5B05)" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
                 <button onclick="playOtherWork()" style="background: var(--card-green); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-top: 50px;">
                     🚀 立即開啟遊戲
                 </button>
@@ -460,18 +460,18 @@ const secondaryQ1 = [
     { id: 'A4', title: '高級語法與句型', desc: 'Active/Passive Voice、Conditional Sentence 條件句', category: '英文科' },
     { id: 'A5', title: '代數與方程', desc: '二次方程 Quadratic Equation、因式分解', category: '數學科' },
     { id: 'A6', title: '幾何與三角學', desc: 'Trigonometry 的 sin, cos, tan 公式與圓特性', category: '數學科' },
-    { id: 'A7', title: '地理概念與術語', desc: '板塊運動、氣候分類等專有名詞定義及辨識', category: '人文與科科' },
+    { id: 'A7', title: '地理概念與術語', desc: '板塊運動、氣候分類等專有名詞定義及辨識', category: '人文與科學' },
     { id: 'A8', title: '物理與化學公式', desc: 'F=ma 等物理公式、化學元素週期表與方程式平衡', category: '人文與科學' },
     { id: 'A9', title: '生物專有名詞', desc: '人體系統、細胞分裂與遺傳學的英文名詞與定義配對', category: '人文與科學' },
 ];
 
 const primaryQ2 = [
-    { id: 'B1', title: '瞬間斷電', desc: '盯著題目看 5 秒，大腦直接一片空白' },
-    { id: 'B2', title: '暴躁小怪獸', desc: '心裡好煩燥，好想立刻把書本合上' },
-    { id: 'B3', title: '睡眠怪來訪', desc: '平時很有精神，一打開這一頁就極度想睡' },
+    { id: 'B1', title: '瞬間斷電', desc: '盯著題目看 5 秒，大腦直接一片空白', calm: true },
+    { id: 'B2', title: '暴躁小怪獸', desc: '心裡好煩躁，好想立刻把書本合上' },
+    { id: 'B3', title: '睡眠怪來訪', desc: '平時很有精神，一打開這一頁就極度想睡', calm: true },
     { id: 'B4', title: '二選一黑洞', desc: '覺得 A 也對、B 也對，每次猜答案都猜錯' },
     { id: 'B5', title: '三秒記憶', desc: '剛剛背完，翻到下一頁立刻忘得一乾二淨' },
-    { id: 'B6', title: '視線模糊', desc: '字幕好像會動，密密麻麻完全看不進去' }
+    { id: 'B6', title: '視線模糊', desc: '字幕好像會動，密密麻麻完全看不進去', calm: true }
 ];
 
 const primaryQ3 = [
@@ -499,9 +499,9 @@ const primaryQ4 = [
 ];
 
 const secondaryQ2 = [
-    { id: 'B1', title: '習得性無助', desc: '覺得自己可能一輩子都學不會這個了，產生放棄心態' },
+    { id: 'B1', title: '習得性無助', desc: '覺得自己可能一輩子都學不會這個了，產生放棄心態', calm: true },
     { id: 'B2', title: '專注力渙散', desc: '試圖集中精神，但每隔 2 分鐘就會忍不住想拿起手機看社交媒體' },
-    { id: 'B3', title: '資訊超載', desc: '課本字數太多、重點太密，大腦像記憶體不足一樣無法消化' },
+    { id: 'B3', title: '資訊超載', desc: '課本字數太多、重點太密，大腦像記憶體不足一樣無法消化', calm: true },
     { id: 'B4', title: '粗心大意', desc: '概念完全懂，但每次考試不是寫錯正負號就是漏掉單位，白白扣分' },
     { id: 'B5', title: '完美主義者', desc: '因為害怕寫錯，導致遲遲不敢動筆開始做第一條題' },
     { id: 'B6', title: '三秒記憶', desc: '臨考前瘋狂死記硬背，進考場一緊張全部忘光' }
@@ -664,10 +664,8 @@ function updatePrompt() {
 請在 Gemini Canvas 中幫我編寫一個全網頁自包含的單一 HTML 檔案，遊戲類型是【${state.q3.title}】（玩法：${state.q3.desc}），風格是【${state.q4.title}】（風格：${state.q4.desc}）。
 請直接給我建立一個互動遊戲網頁，讓我可以直接在 Canvas 中點擊運行試玩！`;
 
-    // 2. 任務二提示詞：聚焦於 Vibe Coding 互動修改（根據大腦症狀動態調整）
-    const bid = state.q2.id;
-    const idNum = parseInt(bid.replace(/\D/g, ''), 10);
-    const isCalmMode = [1, 3, 6].includes(idNum); // 斷電、睡眠怪、超載、模糊等需要溫和陪伴的症狀
+    // 2. 任務二：按症狀本身決定溫和陪伴（唔好用 B1/B3/B6 題號，小學中學同一號意思唔同）
+    const isCalmMode = Boolean(state.q2.calm);
 
     let promptStep2 = `我想為遊戲加上「特別功能」：
 當我遇到這個難點，心裡會出現【${state.q2.title}】的反應（表現：${state.q2.desc}）。
@@ -729,7 +727,7 @@ let appDatabase = {};
 
 // 載入資料庫
 function loadDatabase() {
-    if (GOOGLE_SHEET_API.includes("請將你嘅")) return; // 如果未入 API 就略過
+    if (!GOOGLE_SHEET_API) return;
     fetch(GOOGLE_SHEET_API)
         .then(response => response.json())
         .then(data => { appDatabase = data; })
@@ -745,6 +743,11 @@ function uploadMyWork() {
 
     if (!date || !num || !url) {
         alert("請填寫完整：日期、號碼同連結！");
+        return;
+    }
+
+    if (!GOOGLE_SHEET_API) {
+        alert("作品分享尚未開放，請稍後再試。");
         return;
     }
 
