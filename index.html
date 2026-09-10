@@ -26,20 +26,21 @@
         flex-direction: column;
         align-items: center;
         -webkit-font-smoothing: antialiased;
-        padding-bottom: 60px;
+        padding-bottom: 0;
     }
 
     /* 2. 頂部 Banner 區域 */
     header {
-        width: 100%;
+        width: 95%;
+        max-width: 1200px;
         background: var(--goai-blue);
         color: var(--white);
-        padding: 14px 20px;
+        padding: 40px 24px;
         box-sizing: border-box;
         position: relative;
         overflow: hidden;
-        border-bottom-left-radius: 24px;
-        border-bottom-right-radius: 24px;
+        margin-top: 16px;
+        border-radius: 32px;
         box-shadow: 0 4px 15px rgba(2, 33, 105, 0.1);
     }
 
@@ -47,13 +48,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 20px;
-        max-width: 1200px;
+        gap: 40px;
+        max-width: 100%;
         margin: 0 auto;
     }
 
     .header-logo {
-        height: 88px;
+        height: 240px;
         width: auto;
         display: block;
         filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.2));
@@ -68,7 +69,7 @@
 
     header h1 {
         margin: 0;
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: 900;
         letter-spacing: 1px;
         line-height: 1.25;
@@ -386,12 +387,24 @@
         transform: none !important;
     }
 
+    .site-footer {
+        width: 100%;
+        margin-top: 48px;
+        padding: 28px 20px;
+        background: #f7f8fb;
+        color: #8a9099;
+        font-size: 13px;
+        text-align: center;
+        line-height: 1.6;
+        box-sizing: border-box;
+    }
+
     @media (max-width: 768px) {
-        header { padding: 12px 15px; }
-        .header-container { flex-direction: column; text-align: center; gap: 8px; }
-        .header-logo { height: 64px !important; margin: 0 auto; }
+        header { padding: 25px 15px; }
+        .header-container { flex-direction: column; text-align: center; gap: 15px; }
+        .header-logo { height: 90px !important; margin: 0 auto; }
         .header-text { text-align: center; }
-        header h1 { font-size: 1.45rem; }
+        header h1 { font-size: 1.8rem; }
         .dialogue { font-size: 1.15rem; }
         .copy-line { flex-direction: column; align-items: stretch; }
         .copy-btn-sm { width: 100%; }
@@ -843,6 +856,10 @@ renderExampleButtons("examples-q3", examplesQ3, "answer-q3");
 renderPlayChoices();
 updatePrompt();
 </script>
+
+<footer class="site-footer">
+    © 2026 CLEAR, The Chinese University of Hong Kong · Parent–Child Workshop
+</footer>
 
 </body>
 </html>
