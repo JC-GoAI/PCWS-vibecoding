@@ -234,6 +234,39 @@
         margin: 0 0 14px 0;
     }
 
+    .tip-box {
+        background: #fffbeb;
+        border: 1.5px solid #f6e05e;
+        border-radius: 14px;
+        padding: 12px 14px 14px;
+        margin: 0 0 16px 0;
+    }
+    .tip-head {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: #b7791f;
+        margin-bottom: 8px;
+    }
+    .tip-bulb {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .tip-bulb svg { width: 20px; height: 20px; display: block; }
+    .tip-box p {
+        font-size: 0.9rem;
+        color: #4a5568;
+        line-height: 1.6;
+        margin: 0;
+    }
+    .tip-box p + p { margin-top: 8px; }
+
     .answer-box {
         width: 100%;
         min-height: 96px;
@@ -452,7 +485,7 @@
 <main class="main-container active" id="quiz-container">
 
     <section class="column card-blue">
-        <h3>一、功課難點</h3>
+        <h3>學習難點</h3>
         <div class="role-row">
             <span class="role-badge">家長問</span>
             <span class="role-badge">子女答</span>
@@ -462,17 +495,25 @@
             <div class="parent-icon" aria-hidden="true">
                 <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
             </div>
-            <p class="dialogue">家長問：「最近邊樣功課最令你想合本書？」</p>
+            <p class="dialogue">家長問：「最近邊樣功課令你覺得好難？」</p>
         </div>
-        <p class="hint">請子女說出一句完整的話，可一併說出年級。家長覆述：「即係你最怕……係咪？」確認後再填入。此題為必填，約十字以上即可解鎖提示詞。</p>
-        <p class="hint">若回答太短，家長可再問：「具體係記唔到，定係計錯？」或「可唔可以舉一條你最怕嘅題？」</p>
+        <div class="tip-box">
+            <div class="tip-head">
+                <span class="tip-bulb" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M9 21h6v1H9v-1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#fecf13"/><path d="M9 21h6M10 18h4" stroke="#b7791f" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </span>
+                <span>小提示</span>
+            </div>
+            <p>請子女說出一句完整的話，可一併說出年級。家長覆述：「即係你最怕……係咪？」確認後再填入。此題為必填，約十字以上即可解鎖提示詞。</p>
+            <p>若回答太短，家長可再問：「具體係記唔到，定係計錯？」或「可唔可以舉一條你最怕嘅題？」</p>
+        </div>
         <textarea class="answer-box" id="answer-q1" maxlength="300" placeholder="請把子女的原句寫在這裡" oninput="updatePrompt()"></textarea>
         <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
         <div class="selection-grid large-cards" id="examples-q1"></div>
     </section>
 
     <section class="column card-orange">
-        <h3>二、想怎樣玩</h3>
+        <h3>玩法</h3>
         <div class="role-row">
             <span class="role-badge">家長問</span>
             <span class="role-badge">兩人一起答</span>
@@ -482,9 +523,17 @@
             <div class="parent-icon" aria-hidden="true">
                 <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
             </div>
-            <p class="dialogue">家長問：「如果你用遊戲嚟練呢樣，你想點樣玩？」</p>
+            <p class="dialogue">家長問：「如果可以用遊戲嚟練習，你會想點樣玩？」</p>
         </div>
-        <p class="hint">請子女自由描述，家長不要急於糾正。覆述例子：「即係你想有個籃接啱嘅答案，接錯就唔好扣好多分，係咪？」此題可留空；留空時，提示詞會採用大按鈕問答遊戲作為後備。</p>
+        <div class="tip-box">
+            <div class="tip-head">
+                <span class="tip-bulb" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M9 21h6v1H9v-1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#fecf13"/><path d="M9 21h6M10 18h4" stroke="#b7791f" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </span>
+                <span>小提示</span>
+            </div>
+            <p>請子女自由描述，家長不要急於糾正。覆述例子：「即係你想有個籃接啱嘅答案，接錯就唔好扣好多分，係咪？」此題可留空；留空時，提示詞會採用大按鈕問答遊戲作為後備。</p>
+        </div>
         <textarea class="answer-box" id="answer-q2" maxlength="300" placeholder="請把兩人一起說好的玩法寫在這裡（可留空）" oninput="updatePrompt()"></textarea>
         <p class="chip-label">完全說不出時，可先選一種感覺（仍可改寫）</p>
         <div class="selection-grid large-cards" id="choice-q2"></div>
@@ -505,7 +554,15 @@
             </div>
             <p class="dialogue">家長問：「答錯嗰下，你想遊戲點對你？兇少少逼你再試，定溫柔啲慢慢教？」</p>
         </div>
-        <p class="hint">請用子女自己的字句填寫。家長可以分享，但不可代答：「我細個學呢樣嘅時候都……你而家想遊戲點幫你？」此題可留空；留空時，提示詞會要求遊戲不責罵、用大字顯示正確答案，並再給一次機會。</p>
+        <div class="tip-box">
+            <div class="tip-head">
+                <span class="tip-bulb" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M9 21h6v1H9v-1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#fecf13"/><path d="M9 21h6M10 18h4" stroke="#b7791f" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </span>
+                <span>小提示</span>
+            </div>
+            <p>請用子女自己的字句填寫。家長可以分享，但不可代答：「我細個學呢樣嘅時候都……你而家想遊戲點幫你？」此題可留空；留空時，提示詞會要求遊戲不責罵、用大字顯示正確答案，並再給一次機會。</p>
+        </div>
         <textarea class="answer-box" id="answer-q3" maxlength="300" placeholder="請把子女希望被對待的方式寫在這裡（可留空）" oninput="updatePrompt()"></textarea>
         <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
         <div class="selection-grid large-cards" id="examples-q3"></div>
@@ -513,24 +570,31 @@
 
     <section class="column card-yellow" style="margin-bottom: 40px;">
         <h3>提示詞與修改遊戲</h3>
-        <p class="hint">請家長讀出下列提示詞，子女可改動空格中的兩個字，確認後再複製到 Gemini Canvas。</p>
 
         <div class="vibe-step-box">
-            <div class="vibe-step-title">任務一：貼入 Gemini Canvas，做出第一個可玩版本</div>
-            <div class="prompt-text" id="prompt-step1">請先完成第一題（功課難點），提示詞將在此自動生成。</div>
+            <div class="vibe-step-title">任務一：複製下面的提示詞，並貼到Gemini Canvas</div>
+            <div class="prompt-text" id="prompt-step1">提示詞將在此自動生成。</div>
             <button class="copy-btn" id="btn-copy-1" onclick="copyText('prompt-step1', 'btn-copy-1')" disabled>複製任務一提示詞</button>
         </div>
 
         <div class="vibe-step-box" style="background: #fffdf5; border-color: var(--goai-yellow);">
             <div class="vibe-step-title">任務二：第一版出現後，用自己的話修改</div>
-            <p class="hint">請先試玩約三十秒。先由子女說一句要改的內容，家長照原文輸入，不要改寫成華麗提示詞。然後家長說一句自己想加的內容，並先問子女是否同意。</p>
+            <div class="tip-box">
+                <div class="tip-head">
+                    <span class="tip-bulb" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M9 21h6v1H9v-1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#fecf13"/><path d="M9 21h6M10 18h4" stroke="#b7791f" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    </span>
+                    <span>小提示</span>
+                </div>
+                <p>請先試玩約三十秒。然後由子女說一句要改的內容，家長照原文輸入，不要改寫成精準的提示詞。之後家長說一句自己想加的內容，並詢問子女是否同意。</p>
+            </div>
             <div class="dialogue-card">
                 <div class="parent-icon" aria-hidden="true">
                     <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
                 </div>
                 <p class="dialogue">家長問子女：「玩完三十秒，你最想改邊一樣？顏色、難度，定題目？」</p>
             </div>
-            <p class="chip-label">句式開頭（請自己把句子說完）</p>
+            <p class="chip-label">句式開頭（請自行把句子完成）</p>
             <div class="copy-line">
                 <span class="sentence" id="revise-1">「幫我將 ______ 改成 ______。」</span>
                 <button class="copy-btn copy-btn-sm" id="btn-revise-1" onclick="copyText('revise-1', 'btn-revise-1', '已複製')">複製此句</button>
@@ -712,7 +776,7 @@ function updatePrompt() {
     const answers = getAnswers();
 
     if (answers.q1.replace(/\s/g, "").length < MIN_Q1_LEN) {
-        step1Box.innerText = "請先完成第一題（功課難點），提示詞將在此自動生成。";
+        step1Box.innerText = "提示詞將在此自動生成。";
         btn1.disabled = true;
         return;
     }
