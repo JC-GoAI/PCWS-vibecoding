@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>親子工作坊_Vibe Coding | 親子對話，一起 Vibe Coding</title>
+    <title>親子工作坊_Vibe Coding</title>
     <style>
     /* 1. 品牌色彩與設定 */
     :root {
@@ -34,12 +34,12 @@
         width: 100%;
         background: var(--goai-blue);
         color: var(--white);
-        padding: 40px 20px;
+        padding: 14px 20px;
         box-sizing: border-box;
         position: relative;
         overflow: hidden;
-        border-bottom-left-radius: 32px;
-        border-bottom-right-radius: 32px;
+        border-bottom-left-radius: 24px;
+        border-bottom-right-radius: 24px;
         box-shadow: 0 4px 15px rgba(2, 33, 105, 0.1);
     }
 
@@ -47,13 +47,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 40px;
+        gap: 20px;
         max-width: 1200px;
         margin: 0 auto;
     }
 
     .header-logo {
-        height: 240px;
+        height: 88px;
         width: auto;
         display: block;
         filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.2));
@@ -68,16 +68,10 @@
 
     header h1 {
         margin: 0;
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 900;
         letter-spacing: 1px;
-    }
-    header p {
-        margin: 0;
-        color: #e2e8f0;
-        font-size: 2.5rem;
-        font-weight: 900;
-        line-height: 1.4;
+        line-height: 1.25;
     }
     .highlight-yellow {
         color: var(--goai-yellow);
@@ -93,8 +87,8 @@
         box-shadow: 0 6px 0 rgba(0,0,0,0.15);
         z-index: 1;
     }
-    .shape-monster1 { left: 3%; top: 20%; background: var(--card-green); color: white; transform: rotate(-8deg); }
-    .shape-monster2 { right: 3%; bottom: 20%; background: var(--goai-orange); color: white; transform: rotate(10deg); }
+    .shape-monster1 { left: 3%; top: 18%; background: var(--card-green); color: white; transform: rotate(-8deg); }
+    .shape-monster2 { right: 3%; bottom: 16%; background: var(--goai-orange); color: white; transform: rotate(10deg); }
 
     /* 3. 主導航欄 */
     .main-nav {
@@ -104,7 +98,7 @@
         width: 95%;
         max-width: 1200px;
         gap: 14px;
-        padding: 30px 0 10px 0;
+        padding: 20px 0 6px 0;
     }
 
     .nav-item {
@@ -200,12 +194,36 @@
         border-radius: 999px;
     }
 
+    .dialogue-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        background: #fffdf5;
+        border: 3px solid var(--goai-yellow);
+        border-radius: 18px;
+        padding: 16px 18px;
+        margin: 0 0 16px 0;
+        box-shadow: 0 6px 0 rgba(254, 207, 19, 0.28);
+    }
+    .parent-icon {
+        flex-shrink: 0;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: var(--goai-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 0 rgba(2, 33, 105, 0.2);
+    }
+    .parent-icon svg { width: 32px; height: 32px; display: block; }
     .dialogue {
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: #2d3748;
-        line-height: 1.6;
-        margin: 0 0 10px 0;
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--goai-blue);
+        line-height: 1.55;
+        margin: 0;
+        padding-top: 6px;
     }
     .hint {
         font-size: 0.9rem;
@@ -305,12 +323,22 @@
         border-radius: 8px;
         border: 1px solid #e2e8f0;
     }
-    .vibe-challenge-list {
-        margin: 0;
-        padding-left: 20px;
-        color: #4a5568;
-        font-size: 0.95rem;
-        line-height: 1.7;
+    .copy-line {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #ffffff;
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+    }
+    .copy-line .sentence {
+        flex: 1;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #2d3748;
+        line-height: 1.5;
     }
 
     .copy-btn {
@@ -339,6 +367,17 @@
     }
     .copy-btn:disabled { background: #e2e8f0; border-color: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
 
+    .copy-btn.copy-btn-sm {
+        width: auto;
+        min-width: 96px;
+        height: 40px;
+        padding: 0 16px;
+        margin-top: 0;
+        flex-shrink: 0;
+        font-size: 0.9rem;
+        border-radius: 40px;
+    }
+
     .copied {
         background: var(--goai-green) !important;
         border-color: var(--goai-green) !important;
@@ -348,12 +387,14 @@
     }
 
     @media (max-width: 768px) {
-        header { padding: 25px 15px; }
-        .header-container { flex-direction: column; text-align: center; gap: 15px; }
-        .header-logo { height: 90px !important; margin: 0 auto; }
+        header { padding: 12px 15px; }
+        .header-container { flex-direction: column; text-align: center; gap: 8px; }
+        .header-logo { height: 64px !important; margin: 0 auto; }
         .header-text { text-align: center; }
-        header h1 { font-size: 1.8rem; }
-        header p { font-size: 1.8rem; }
+        header h1 { font-size: 1.45rem; }
+        .dialogue { font-size: 1.15rem; }
+        .copy-line { flex-direction: column; align-items: stretch; }
+        .copy-btn-sm { width: 100%; }
 
         .cartoon-shape {
             position: relative;
@@ -379,22 +420,9 @@
         <img src="logo.jpg" alt="GOAI Logo" class="header-logo">
         <div class="header-text">
             <h1>親子工作坊_<span class="highlight-yellow">Vibe Coding</span></h1>
-            <p>親子對話，一起 Vibe Coding</p>
         </div>
     </div>
 </header>
-
-<div class="info-box">
-    <h4>工作坊進行方式</h4>
-    <p>今日重點不是挑選卡片，而是家長與子女互相傾聽，再用自己的句子請人工智能幫忙製作遊戲。請依下列五步進行：</p>
-    <ol>
-        <li>家長先讀出問題。</li>
-        <li>子女用一句話回答。</li>
-        <li>家長覆述剛才聽到的內容，請子女確認或修正。</li>
-        <li>把這句話填入空格（仍可自行改寫）。</li>
-        <li>複製最下方的提示詞，貼到 Gemini Canvas，做出第一個可玩版本後，再用自己的話修改。</li>
-    </ol>
-</div>
 
 <nav class="main-nav">
     <div class="nav-item active" id="nav-WORKSHOP" role="button" tabindex="0" onclick="switchSection('WORKSHOP')" onkeydown="navKey(event, 'WORKSHOP')">
@@ -416,7 +444,12 @@
             <span class="role-badge">子女答</span>
             <span class="role-badge">家長覆述</span>
         </div>
-        <p class="dialogue">家長問：「最近邊樣功課最令你想合本書？」</p>
+        <div class="dialogue-card">
+            <div class="parent-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
+            </div>
+            <p class="dialogue">家長問：「最近邊樣功課最令你想合本書？」</p>
+        </div>
         <p class="hint">請子女說出一句完整的話，可一併說出年級。家長覆述：「即係你最怕……係咪？」確認後再填入。此題為必填，約十字以上即可解鎖提示詞。</p>
         <p class="hint">若回答太短，家長可再問：「具體係記唔到，定係計錯？」或「可唔可以舉一條你最怕嘅題？」</p>
         <textarea class="answer-box" id="answer-q1" maxlength="300" placeholder="請把子女的原句寫在這裡" oninput="updatePrompt()"></textarea>
@@ -431,7 +464,12 @@
             <span class="role-badge">兩人一起答</span>
             <span class="role-badge">家長覆述</span>
         </div>
-        <p class="dialogue">家長問：「如果你用遊戲嚟練呢樣，你想點樣玩？」</p>
+        <div class="dialogue-card">
+            <div class="parent-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
+            </div>
+            <p class="dialogue">家長問：「如果你用遊戲嚟練呢樣，你想點樣玩？」</p>
+        </div>
         <p class="hint">請子女自由描述，家長不要急於糾正。覆述例子：「即係你想有個籃接啱嘅答案，接錯就唔好扣好多分，係咪？」此題可留空；留空時，提示詞會採用大按鈕問答遊戲作為後備。</p>
         <textarea class="answer-box" id="answer-q2" maxlength="300" placeholder="請把兩人一起說好的玩法寫在這裡（可留空）" oninput="updatePrompt()"></textarea>
         <p class="chip-label">完全說不出時，可先選一種感覺（仍可改寫）</p>
@@ -447,7 +485,12 @@
             <span class="role-badge">子女答</span>
             <span class="role-badge">家長可分享一句</span>
         </div>
-        <p class="dialogue">家長問：「答錯嗰下，你想遊戲點對你？兇少少逼你再試，定溫柔啲慢慢教？」</p>
+        <div class="dialogue-card">
+            <div class="parent-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
+            </div>
+            <p class="dialogue">家長問：「答錯嗰下，你想遊戲點對你？兇少少逼你再試，定溫柔啲慢慢教？」</p>
+        </div>
         <p class="hint">請用子女自己的字句填寫。家長可以分享，但不可代答：「我細個學呢樣嘅時候都……你而家想遊戲點幫你？」此題可留空；留空時，提示詞會要求遊戲不責罵、用大字顯示正確答案，並再給一次機會。</p>
         <textarea class="answer-box" id="answer-q3" maxlength="300" placeholder="請把子女希望被對待的方式寫在這裡（可留空）" oninput="updatePrompt()"></textarea>
         <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
@@ -467,14 +510,29 @@
         <div class="vibe-step-box" style="background: #fffdf5; border-color: var(--goai-yellow);">
             <div class="vibe-step-title">任務二：第一版出現後，用自己的話修改</div>
             <p class="hint">請先試玩約三十秒。先由子女說一句要改的內容，家長照原文輸入，不要改寫成華麗提示詞。然後家長說一句自己想加的內容，並先問子女是否同意。</p>
-            <p class="dialogue">家長問子女：「玩完三十秒，你最想改邊一樣？顏色、難度，定題目？」</p>
+            <div class="dialogue-card">
+                <div class="parent-icon" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
+                </div>
+                <p class="dialogue">家長問子女：「玩完三十秒，你最想改邊一樣？顏色、難度，定題目？」</p>
+            </div>
             <p class="chip-label">句式開頭（請自己把句子說完）</p>
-            <ul class="vibe-challenge-list">
-                <li>「幫我將 ______ 改成 ______。」</li>
-                <li>「太難／太容易，請 ______。」</li>
-                <li>「加一個 ______，當我答對就 ______。」</li>
-                <li>「題目改成關於 ______，出 5 題。」</li>
-            </ul>
+            <div class="copy-line">
+                <span class="sentence" id="revise-1">「幫我將 ______ 改成 ______。」</span>
+                <button class="copy-btn copy-btn-sm" id="btn-revise-1" onclick="copyText('revise-1', 'btn-revise-1', '已複製')">複製此句</button>
+            </div>
+            <div class="copy-line">
+                <span class="sentence" id="revise-2">「太難／太容易，請 ______。」</span>
+                <button class="copy-btn copy-btn-sm" id="btn-revise-2" onclick="copyText('revise-2', 'btn-revise-2', '已複製')">複製此句</button>
+            </div>
+            <div class="copy-line">
+                <span class="sentence" id="revise-3">「加一個 ______，當我答對就 ______。」</span>
+                <button class="copy-btn copy-btn-sm" id="btn-revise-3" onclick="copyText('revise-3', 'btn-revise-3', '已複製')">複製此句</button>
+            </div>
+            <div class="copy-line">
+                <span class="sentence" id="revise-4">「題目改成關於 ______，出 5 題。」</span>
+                <button class="copy-btn copy-btn-sm" id="btn-revise-4" onclick="copyText('revise-4', 'btn-revise-4', '已複製')">複製此句</button>
+            </div>
         </div>
     </section>
 </main>
@@ -662,12 +720,13 @@ function updatePrompt() {
     btn1.disabled = false;
 }
 
-function copyText(elementId, btnId) {
+function copyText(elementId, btnId, successLabel) {
     const textStr = document.getElementById(elementId).innerText;
+    const doneLabel = successLabel || "已複製，請貼入 Gemini 對話框";
     function markCopied() {
         const btn = document.getElementById(btnId);
         const originalText = btn.innerText;
-        btn.innerText = "已複製，請貼入 Gemini 對話框";
+        btn.innerText = doneLabel;
         btn.classList.add("copied");
         setTimeout(function () {
             btn.innerText = originalText;
