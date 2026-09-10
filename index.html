@@ -267,68 +267,6 @@
     }
     .tip-box p + p { margin-top: 8px; }
 
-    .column-question {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(240px, 34%);
-        column-gap: 16px;
-        align-items: start;
-        overflow: visible;
-        padding-right: 48px;
-        transition: box-shadow 0.25s ease;
-    }
-    .column-question h3 {
-        grid-column: 1;
-        grid-row: 1;
-        margin-bottom: 12px;
-    }
-    .column-question .role-row {
-        grid-column: 1;
-        grid-row: 2;
-    }
-    .column-question > .dialogue-card,
-    .column-question > .answer-box,
-    .column-question > .chip-label,
-    .column-question > .selection-grid {
-        grid-column: 1 / -1;
-    }
-    .column-question > .tip-box {
-        grid-column: 2;
-        grid-row: 1 / span 2;
-        position: relative;
-        background: #fff8b8;
-        border: 1px solid #f0e08a;
-        border-radius: 3px;
-        padding: 18px 14px 14px;
-        margin: 4px 0 8px 0;
-        width: 100%;
-        box-sizing: border-box;
-        box-shadow: 2px 4px 0 rgba(0, 0, 0, 0.06), 0 8px 18px rgba(0, 0, 0, 0.08);
-        transform: rotate(2.5deg);
-        transform-origin: top right;
-        z-index: 1;
-        overflow: visible;
-        word-break: break-word;
-    }
-    .column-question > .tip-box::before {
-        content: "";
-        position: absolute;
-        top: -8px;
-        left: 50%;
-        width: 58px;
-        height: 14px;
-        background: rgba(255, 255, 255, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-        transform: translateX(-50%) rotate(-2deg);
-    }
-    .column-question > .tip-box p {
-        font-size: 0.8rem;
-        line-height: 1.5;
-    }
-    .column-question.card-blue > .tip-box { transform: rotate(2.5deg); }
-    .column-question.card-orange > .tip-box { transform: rotate(-2deg); }
-    .column-question.card-green > .tip-box { transform: rotate(3deg); }
-
     .answer-box {
         width: 100%;
         min-height: 96px;
@@ -504,15 +442,6 @@
         .dialogue { font-size: 1.15rem; }
         .copy-line { flex-direction: column; align-items: stretch; }
         .copy-btn-sm { width: 100%; }
-        .column-question {
-            display: flex;
-            flex-direction: column;
-            padding-right: 30px;
-        }
-        .column-question > .tip-box {
-            transform: none !important;
-            margin: 0 0 14px 0;
-        }
 
         .cartoon-shape {
             position: relative;
@@ -555,18 +484,8 @@
 
 <main class="main-container active" id="quiz-container">
 
-    <section class="column column-question card-blue">
+    <section class="column card-blue">
         <h3>學習難點</h3>
-        <div class="tip-box">
-            <div class="tip-head">
-                <span class="tip-bulb" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none"><path d="M9 21h6v1H9v-1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#fecf13"/><path d="M9 21h6M10 18h4" stroke="#b7791f" stroke-width="1.6" stroke-linecap="round"/></svg>
-                </span>
-                <span>小提示</span>
-            </div>
-            <p>請子女說出一句完整的話，可一併說出年級。家長覆述：「即係你最怕……係咪？」確認後再填入。此題為必填，約十字以上即可解鎖提示詞。</p>
-            <p>若回答太短，家長可再問：「具體係記唔到，定係計錯？」或「可唔可以舉一條你最怕嘅題？」</p>
-        </div>
         <div class="role-row">
             <span class="role-badge">家長問</span>
             <span class="role-badge">子女答</span>
@@ -578,13 +497,6 @@
             </div>
             <p class="dialogue">家長問：「最近邊樣功課令你覺得好難？」</p>
         </div>
-        <textarea class="answer-box" id="answer-q1" maxlength="300" placeholder="請把子女的原句寫在這裡" oninput="updatePrompt()"></textarea>
-        <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
-        <div class="selection-grid large-cards" id="examples-q1"></div>
-    </section>
-
-    <section class="column column-question card-orange">
-        <h3>玩法</h3>
         <div class="tip-box">
             <div class="tip-head">
                 <span class="tip-bulb" aria-hidden="true">
@@ -592,8 +504,16 @@
                 </span>
                 <span>小提示</span>
             </div>
-            <p>請子女自由描述，家長不要急於糾正。覆述例子：「即係你想有個籃接啱嘅答案，接錯就唔好扣好多分，係咪？」此題可留空；留空時，提示詞會採用大按鈕問答遊戲作為後備。</p>
+            <p>請子女說出一句完整的話，可一併說出年級。家長覆述：「即係你最怕……係咪？」確認後再填入。此題為必填，約十字以上即可解鎖提示詞。</p>
+            <p>若回答太短，家長可再問：「具體係記唔到，定係計錯？」或「可唔可以舉一條你最怕嘅題？」</p>
         </div>
+        <textarea class="answer-box" id="answer-q1" maxlength="300" placeholder="請把子女的原句寫在這裡" oninput="updatePrompt()"></textarea>
+        <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
+        <div class="selection-grid large-cards" id="examples-q1"></div>
+    </section>
+
+    <section class="column card-orange">
+        <h3>玩法</h3>
         <div class="role-row">
             <span class="role-badge">家長問</span>
             <span class="role-badge">兩人一起答</span>
@@ -605,15 +525,6 @@
             </div>
             <p class="dialogue">家長問：「如果可以用遊戲嚟練習，你會想點樣玩？」</p>
         </div>
-        <textarea class="answer-box" id="answer-q2" maxlength="300" placeholder="請把兩人一起說好的玩法寫在這裡（可留空）" oninput="updatePrompt()"></textarea>
-        <p class="chip-label">完全說不出時，可先選一種感覺（仍可改寫）</p>
-        <div class="selection-grid large-cards" id="choice-q2"></div>
-        <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
-        <div class="selection-grid large-cards" id="examples-q2"></div>
-    </section>
-
-    <section class="column column-question card-green">
-        <h3>態度</h3>
         <div class="tip-box">
             <div class="tip-head">
                 <span class="tip-bulb" aria-hidden="true">
@@ -621,8 +532,17 @@
                 </span>
                 <span>小提示</span>
             </div>
-            <p>請用子女自己的字句填寫。家長可以分享，但不可代答：「我細個學呢樣嘅時候都……你而家想遊戲點幫你？」此題可留空；留空時，提示詞會要求遊戲不責罵、用大字顯示正確答案，並再給一次機會。</p>
+            <p>請子女自由描述，家長不要急於糾正。覆述例子：「即係你想有個籃接啱嘅答案，接錯就唔好扣好多分，係咪？」此題可留空；留空時，提示詞會採用大按鈕問答遊戲作為後備。</p>
         </div>
+        <textarea class="answer-box" id="answer-q2" maxlength="300" placeholder="請把兩人一起說好的玩法寫在這裡（可留空）" oninput="updatePrompt()"></textarea>
+        <p class="chip-label">完全說不出時，可先選一種感覺（仍可改寫）</p>
+        <div class="selection-grid large-cards" id="choice-q2"></div>
+        <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
+        <div class="selection-grid large-cards" id="examples-q2"></div>
+    </section>
+
+    <section class="column card-green">
+        <h3>態度</h3>
         <div class="role-row">
             <span class="role-badge">家長問</span>
             <span class="role-badge">子女答</span>
@@ -633,6 +553,15 @@
                 <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
             </div>
             <p class="dialogue">家長問：「答錯嗰下，你想遊戲點對你？兇少少逼你再試，定溫柔啲慢慢教？」</p>
+        </div>
+        <div class="tip-box">
+            <div class="tip-head">
+                <span class="tip-bulb" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M9 21h6v1H9v-1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#fecf13"/><path d="M9 21h6M10 18h4" stroke="#b7791f" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </span>
+                <span>小提示</span>
+            </div>
+            <p>請用子女自己的字句填寫。家長可以分享，但不可代答。此題可留空；留空時，提示詞會要求遊戲不責罵、用大字顯示正確答案，並再給一次機會。</p>
         </div>
         <textarea class="answer-box" id="answer-q3" maxlength="300" placeholder="請把子女希望被對待的方式寫在這裡（可留空）" oninput="updatePrompt()"></textarea>
         <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
