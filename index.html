@@ -31,16 +31,16 @@
 
     /* 2. 頂部 Banner 區域 */
     header {
-        width: 95%;
-        max-width: 1200px;
+        width: 100%;
+        max-width: none;
         background: var(--goai-blue);
         color: var(--white);
         padding: 36px 32px;
         box-sizing: border-box;
         position: relative;
         overflow: hidden;
-        margin-top: 16px;
-        border-radius: 32px;
+        margin-top: 0;
+        border-radius: 0 0 32px 32px;
         box-shadow: 0 4px 15px rgba(2, 33, 105, 0.1);
     }
 
@@ -49,7 +49,8 @@
         align-items: center;
         justify-content: center;
         gap: 28px;
-        max-width: 100%;
+        width: 100%;
+        max-width: 1200px;
         margin: 0 auto;
     }
 
@@ -439,7 +440,7 @@
 
 <nav class="main-nav">
     <div class="nav-item active" id="nav-WORKSHOP" role="button" tabindex="0" onclick="switchSection('WORKSHOP')" onkeydown="navKey(event, 'WORKSHOP')">
-        <h2>工作坊</h2>
+        <h2>親子共創</h2>
         <p>三道對話題，用自己的話說出要做的遊戲</p>
     </div>
     <div class="nav-item" id="nav-SHARE" role="button" tabindex="0" onclick="switchSection('SHARE')" onkeydown="navKey(event, 'SHARE')">
