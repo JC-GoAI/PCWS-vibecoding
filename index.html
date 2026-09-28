@@ -258,9 +258,7 @@ const MAKE = {
         {
             id: "chi",
             title: "中文作文思考教練",
-            blurb: "引導構思、詞彙和大綱，不代寫文章。",
-            choiceLabel: "預設文體",
-            choices: ["記敘文", "描寫文", "說明文"]
+            blurb: "引導構思、詞彙和大綱，不代寫文章。"
         },
         {
             id: "eng",
@@ -452,7 +450,7 @@ const MAKE = {
 let state = loadState();
 
 function loadState() {
-    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", makeId: "", grade: "", option: "", copyMsg: "", lockError: "", showHelperPrompt: false };
+    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", makeId: "", copyMsg: "", lockError: "" };
     try {
         const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "{}");
         if (saved.activity === "prompt" || saved.activity === "helper" || saved.activity === "make") base.activity = saved.activity;
@@ -468,8 +466,6 @@ function loadState() {
         const themes = MAKE[base.band] || [];
         if (themes.some(function (t) { return t.id === saved.makeId; })) {
             base.makeId = saved.makeId;
-            base.grade = saved.grade || "";
-            base.option = saved.option || "";
         }
     } catch (e) {}
     return base;
@@ -483,9 +479,7 @@ function saveState() {
         page: state.page,
         playMode: state.playMode,
         playId: state.playId,
-        makeId: state.makeId,
-        grade: state.grade,
-        option: state.option
+        makeId: state.makeId
     }));
 }
 
@@ -530,13 +524,12 @@ function lines(items) {
     return items.map(function (item) { return "- " + item; }).join("\n");
 }
 
-function priChinesePrompt(grade, genre) {
+function priChinesePrompt() {
     return [
         "請建立一個名為「AI中文寫作教練」的學習助手網頁。",
         "",
         "目標使用者：",
         "香港小四至小六學生。",
-        "預設年級：" + grade + "。",
         "",
         "學習目標：",
         "協助學生提升寫作能力，而不是代學生完成作文。",
@@ -561,7 +554,6 @@ function priChinesePrompt(grade, genre) {
         "- 記敘文",
         "- 描寫文",
         "- 說明文",
-        "預設文體：" + genre + "。",
         "",
         "4. AI寫作教練",
         "",
@@ -653,12 +645,12 @@ function priChinesePrompt(grade, genre) {
         "",
         "每次回應最後加入：",
         "",
-        "「你已經想到很好的內容，請再逐步完成作文。」"
+        "「你已經想到很好的內容，我們再一步一步完成作文吧！」"
     ].join("\n");
 }
 
-function buildMakePrompt(theme, grade, option) {
-    if (state.band === "pri" && theme.id === "chi") return priChinesePrompt(grade, option);
+function buildMakePrompt(theme) {
+    if (state.band === "pri" && theme.id === "chi") return priChinesePrompt();
     const choiceItems = theme.inputs[1][1];
     const step2 = theme.steps[1];
     return [
@@ -666,7 +658,6 @@ function buildMakePrompt(theme, grade, option) {
         "",
         "目標使用者：",
         theme.audience,
-        "預設年級：" + grade + "。",
         "",
         "學習目標：",
         theme.goal,
@@ -684,7 +675,6 @@ function buildMakePrompt(theme, grade, option) {
         "",
         "3. " + theme.inputs[1][0],
         lines(choiceItems),
-        "預設" + theme.inputs[1][0] + "：" + option + "。",
         "",
         "4. " + theme.coach,
         "",
@@ -743,8 +733,8 @@ function buildMakePrompt(theme, grade, option) {
 
 function currentPrompt() {
     const theme = themeById(state.makeId);
-    if (!theme || !state.grade || !state.option) return "";
-    return buildMakePrompt(theme, state.grade, state.option);
+    if (!theme) return "";
+    return buildMakePrompt(theme);
 }
 
 function lockMark() {
@@ -755,13 +745,6 @@ function tabBar(items) {
     return '<div class="tab-bar" role="tablist">' + items.map(function (item) {
         return '<button type="button" class="tab-btn' + (item.on ? " on" : "") + '" data-action="' + item.action + '" data-value="' + item.value + '" aria-pressed="' + (item.on ? "true" : "false") + '">' +
             item.label + (item.locked ? lockMark() : "") + "</button>";
-    }).join("") + "</div>";
-}
-
-function pills(action, current, items) {
-    return '<div class="chip-row">' + items.map(function (item) {
-        const on = current === item;
-        return '<button type="button" class="pill-btn' + (on ? " on" : "") + '" data-action="' + action + '" data-value="' + escapeHtml(item) + '" aria-pressed="' + (on ? "true" : "false") + '">' + escapeHtml(item) + "</button>";
     }).join("") + "</div>";
 }
 
@@ -823,106 +806,12 @@ function renderPrompting() {
         panel;
 }
 
-const HELPER_PROMPT = [
-    "請建立一個名為「AI中文寫作教練」的學習助手網頁。",
-    "目標使用者：",
-    "香港小四至小六學生。",
-    "",
-    "學習目標：",
-    "協助學生提升寫作能力，而不是代學生完成作文。",
-    "",
-    "設計風格：",
-    "- 親切、有趣、兒童友善",
-    "- 使用中文介面",
-    "- 色彩活潑",
-    "- 適合小學生使用",
-    "",
-    "主要功能：",
-    "1. 作文題目輸入區",
-    "學生可以輸入作文題目。",
-    "2. 年級選擇",
-    "- 小四",
-    "- 小五",
-    "- 小六",
-    "3. 文體選擇",
-    "- 記敘文",
-    "- 描寫文",
-    "- 說明文",
-    "4. AI寫作教練",
-    "學生輸入題目後，",
-    "AI必須：",
-    "第一步：分析題目",
-    "協助學生理解：",
-    "- 題目關鍵字",
-    "- 寫作重點",
-    "- 文體特色",
-    "第二步：引導構思",
-    "透過提問方式協助學生思考：",
-    "例如：",
-    "- 故事發生在甚麼地方？",
-    "- 當時有誰在場？",
-    "- 發生了甚麼事情？",
-    "- 最深刻的是甚麼？",
-    "- 你有甚麼感受？",
-    "規則：",
-    "- 每次只問一條問題",
-    "- 等待學生回應",
-    "- 不直接提供答案",
-    "- 不代學生寫作",
-    "第三步：提供詞彙支援",
-    "根據學生內容提供：",
-    "- 5個形容詞",
-    "- 5個感受詞",
-    "- 3個成語",
-    "- 3個描寫句式",
-    "第四步：整理作文大綱",
-    "輸出：",
-    "【開頭】",
-    "時間、地點、人物",
-    "【經過】",
-    "事情發展",
-    "【高潮】",
-    "最重要事件",
-    "【結尾】",
-    "感受及反思",
-    "注意：",
-    "只提供大綱。",
-    "不要代學生完成內容。",
-    "第五步：自我檢查",
-    "完成後協助學生檢查：",
-    "- 是否切合題目",
-    "- 是否有足夠細節",
-    "- 是否有感受描寫",
-    "- 是否有清晰段落",
-    "AI角色設定：",
-    "你是一位香港資深小學中文老師。",
-    "教學原則：",
-    "- 不直接給範文",
-    "- 不直接給全文",
-    "- 優先提問",
-    "- 鼓勵學生思考",
-    "- 鼓勵學生自行完成作品",
-    "輸出語氣：",
-    "正面、鼓勵式、具啟發性。",
-    "每次回應最後加入：",
-    "「你已經想到很好的內容，我們再一步一步完成作文吧！」"
-].join("\n");
-
 function renderHelper() {
     let below = '<p class="lede">此為 Gemini Canvas 生成的作品。請選擇年級、文體及題目，然後依次完成五個寫作步驟。</p>';
     if (state.band === "pri") {
         below += '<iframe class="play-frame" title="AI中文寫作小助理" src="play-vibe.html"></iframe>';
     }
-    below += '<div class="btn-row">' +
-        '<button type="button" class="primary-btn" data-action="toggle-helper-prompt" aria-pressed="' + (state.showHelperPrompt ? "true" : "false") + '">' +
-        (state.showHelperPrompt ? "收起Prompt" : "顯示Prompt") + "</button>" +
-        '<button type="button" class="primary-btn" data-action="download-vibe">下載完整代碼</button></div>';
-    if (state.showHelperPrompt) {
-        const copied = state.copyMsg === "helper-prompt";
-        below += '<div class="panel"><textarea readonly id="helper-prompt">' + escapeHtml(HELPER_PROMPT) + "</textarea>" +
-            '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy" data-value="helper-prompt">' + icon("copy") + "複製這段提示詞</button>" +
-            (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div></div>";
-    }
+    below += '<div class="btn-row"><button type="button" class="primary-btn" data-action="download-vibe">下載完整代碼</button></div>';
     return below;
 }
 
@@ -950,9 +839,6 @@ function renderMake() {
         const copied = state.copyMsg === "make";
         panel = '<div class="panel">' +
             (theme.blurb ? '<p class="lede">' + escapeHtml(theme.blurb) + "</p>" : "") +
-            '<div class="field"><span class="lab">年級</span>' + pills("grade", state.grade, GRADES[state.band]) + "</div>" +
-            '<div class="field"><span class="lab">' + escapeHtml(theme.choiceLabel || theme.inputs[1][0]) + "</span>" +
-            pills("option", state.option, theme.choices || theme.inputs[1][1]) + "</div>" +
             '<div class="field"><span class="lab">Vibe Coding 提示詞</span>' +
             '<textarea readonly id="make-prompt">' + escapeHtml(currentPrompt()) + "</textarea></div>" +
             '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy" data-value="make">' + icon("copy") + "複製這段提示詞</button>" +
@@ -960,7 +846,7 @@ function renderMake() {
             '<p class="lede" style="margin-top:12px">複製後貼上 Gemini，以建立此學習助手網頁。</p></div>';
     }
     if (!lockOpen("make")) return lockBox("make");
-    return '<p class="lede">請選擇一個主題，再選擇年級及相關重點。提示詞會即時顯示，複製後貼上 Gemini。</p>' +
+    return '<p class="lede">請選擇一個主題。提示詞會即時顯示，複製後貼上 Gemini。</p>' +
         cards + panel;
 }
 
@@ -1059,8 +945,6 @@ document.getElementById("app").addEventListener("click", function (event) {
         if (state.band !== value) {
             state.band = value;
             state.makeId = "";
-            state.grade = "";
-            state.option = "";
         }
     } else if (action === "open") {
         state.page = value;
@@ -1069,21 +953,10 @@ document.getElementById("app").addEventListener("click", function (event) {
     } else if (action === "play") {
         state.playId = value;
     } else if (action === "make") {
-        if (state.makeId !== value) {
-            const theme = themeById(value);
-            state.makeId = value;
-            state.grade = GRADES[state.band][1];
-            state.option = (theme.choices || theme.inputs[1][1])[0];
-        }
-    } else if (action === "toggle-helper-prompt") {
-        state.showHelperPrompt = !state.showHelperPrompt;
+        state.makeId = value;
     } else if (action === "download-vibe") {
         downloadVibeFile();
         return;
-    } else if (action === "grade") {
-        state.grade = value;
-    } else if (action === "option") {
-        state.option = value;
     } else if (action === "unlock") {
         const typed = (document.getElementById("lock-pass").value || "").trim();
         if (typed === LOCK_PASS[value]) {
