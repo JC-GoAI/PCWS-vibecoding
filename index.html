@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>親子工作坊_Vibe Coding</title>
+    <title>親子共創 AI 學習助手</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="favicon.png">
     <style>
-    /* 1. 品牌色彩與設定 */
     :root {
         --goai-blue: #022169;
         --goai-blue-hover: #12338f;
@@ -18,7 +17,6 @@
         --white: #ffffff;
         --grey: #f4f6fa;
     }
-
     body {
         font-family: "PingFang HK", "Helvetica Neue", "Microsoft JhengHei", sans-serif;
         margin: 0;
@@ -28,24 +26,18 @@
         flex-direction: column;
         align-items: center;
         -webkit-font-smoothing: antialiased;
-        padding-bottom: 0;
     }
-
-    /* 2. 頂部 Banner 區域 */
     header {
         width: 100%;
-        max-width: none;
         background: var(--goai-blue);
         color: var(--white);
         padding: 10px 28px;
         box-sizing: border-box;
         position: relative;
         overflow: hidden;
-        margin-top: 0;
         border-radius: 0 0 16px 16px;
         box-shadow: 0 4px 15px rgba(2, 33, 105, 0.1);
     }
-
     .header-container {
         display: flex;
         align-items: center;
@@ -55,923 +47,1085 @@
         max-width: 1200px;
         margin: 0 auto;
     }
-
-    .header-logo {
-        height: 96px;
-        width: auto;
-        display: block;
-        object-fit: contain;
-        filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.2));
-    }
-
-    .header-text {
-        text-align: left;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    header h1 {
-        margin: 0;
-        font-size: 2.5rem;
-        font-weight: 900;
-        letter-spacing: 1px;
-        line-height: 1.25;
-    }
-    .highlight-yellow {
-        color: var(--goai-yellow);
-        font-weight: bold;
-    }
-
+    .header-logo { height: 88px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 4px 15px rgba(0,0,0,0.2)); }
+    .header-text { text-align: left; display: flex; flex-direction: column; gap: 4px; }
+    header h1 { margin: 0; font-size: 1.85rem; font-weight: 900; letter-spacing: 0.5px; line-height: 1.3; }
+    .header-sub { margin: 0; font-size: 0.95rem; color: #cbd5e1; font-weight: 600; }
+    .highlight-yellow { color: var(--goai-yellow); font-weight: bold; }
     .cartoon-shape {
-        position: absolute;
-        border-radius: 30px;
-        padding: 8px 18px;
-        font-size: 13px;
-        font-weight: bold;
-        box-shadow: 0 6px 0 rgba(0,0,0,0.15);
-        z-index: 1;
+        position: absolute; border-radius: 30px; padding: 8px 18px; font-size: 13px; font-weight: bold;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.15); z-index: 1;
     }
     .shape-monster1 { left: 3%; top: 18%; background: var(--card-green); color: white; transform: rotate(-8deg); }
     .shape-monster2 { right: 3%; bottom: 16%; background: var(--goai-orange); color: white; transform: rotate(10deg); }
-
-    /* 3. 主導航欄 */
-    .main-nav {
-        display: flex;
-        flex-direction: column;
-        background: transparent;
-        width: 95%;
-        max-width: 1200px;
-        gap: 14px;
-        padding: 20px 0 6px 0;
-    }
-
-    .nav-item {
-        background: var(--white);
-        border: 2px solid #e2e8f0;
-        border-radius: 20px;
-        padding: 24px;
-        text-align: center;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        color: var(--goai-blue);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-    }
-    .nav-item h2 { margin: 0 0 6px 0; font-size: 1.4rem; font-weight: 800; }
-    .nav-item p { margin: 0; font-size: 0.85rem; color: #718096; font-weight: 400; }
-
-    .nav-item:hover:not(.active) {
-        transform: translateY(-2px);
-        border-color: var(--goai-blue);
-        background-color: #f0f4ff;
-    }
-    .nav-item.active {
-        background-color: var(--goai-blue) !important;
-        color: var(--white) !important;
-        border-color: var(--goai-blue) !important;
-        box-shadow: 0 8px 20px rgba(10, 34, 102, 0.18);
-    }
-    .nav-item.active p { color: #cbd5e1 !important; }
-
-    /* 任務說明區 */
-    .info-box {
-        width: 95%;
-        max-width: 1200px;
-        background: var(--white);
-        border-left: 6px solid var(--card-green);
-        padding: 20px;
-        border-radius: 12px;
-        margin-top: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-        box-sizing: border-box;
-    }
-    .info-box h4 { margin: 0 0 6px 0; color: var(--goai-blue); font-size: 1.1rem; font-weight: 800; }
-    .info-box p { margin: 0; font-size: 0.9rem; color: #4a5568; line-height: 1.5; }
-    .info-box ol {
-        margin: 8px 0 0 0;
-        padding-left: 22px;
-        color: #4a5568;
-        font-size: 0.9rem;
-        line-height: 1.7;
-    }
-
-    /* 主要題目內容區塊 */
-    .main-container { width: 95%; max-width: 1200px; margin-top: 25px; display: none; flex-direction: column; gap: 30px; }
-    .main-container.active { display: flex; }
-
+    #app { width: 95%; max-width: 980px; margin: 18px auto 0; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
     .column {
-        background: var(--white);
-        padding: 30px;
-        border-radius: 24px;
-        box-shadow: 0 10px 25px rgba(10, 34, 102, 0.03);
-        box-sizing: border-box;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        background: var(--white); padding: 28px; border-radius: 24px;
+        box-shadow: 0 10px 25px rgba(10, 34, 102, 0.03); box-sizing: border-box;
     }
-
-    .card-yellow { border-top: 8px solid var(--goai-yellow); }
     .card-blue { border-top: 8px solid var(--goai-blue); }
-    .card-green { border-top: 8px solid var(--card-green); }
     .card-orange { border-top: 8px solid var(--goai-orange); }
-
-    .column h3 {
-        margin-top: 0;
-        color: var(--goai-blue);
-        font-size: 1.35rem;
-        font-weight: 800;
-        border-bottom: 2px solid #f1f5f9;
-        padding-bottom: 15px;
-        margin-bottom: 20px;
+    .column h2 { margin: 0 0 8px; color: var(--goai-blue); font-weight: 800; font-size: 1.45rem; display: flex; align-items: center; gap: 8px; }
+    .lede { color: #4a5568; line-height: 1.65; margin: 0 0 16px; text-align: center; }
+    .note {
+        background: #eef3ff; color: var(--goai-blue); border-radius: 12px;
+        padding: 12px 14px; font-weight: 700; line-height: 1.65; margin: 0 0 12px;
     }
-
-    .role-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 14px;
+    .primary-btn, .ghost-btn, .pill-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px;
+        padding: 0 22px; border-radius: 50px; font-size: 1rem; font-weight: 800; cursor: pointer;
+        border: 2px solid transparent; box-sizing: border-box; font-family: inherit;
     }
-    .role-badge {
-        font-size: 12px;
-        font-weight: 800;
-        background: #edf2f7;
-        color: var(--goai-blue);
-        padding: 6px 10px;
-        border-radius: 999px;
+    .primary-btn { background: var(--goai-blue); color: #fff; box-shadow: 0 4px 12px rgba(10, 34, 102, 0.12); }
+    .primary-btn:hover { background: var(--goai-blue-hover); }
+    .ghost-btn { background: #fff; color: var(--goai-blue); border-color: #cbd5e1; }
+    .pill-btn { background: #fff; color: var(--goai-blue); border-color: #e6eaf1; border-radius: 999px; min-height: 40px; padding: 8px 18px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05); }
+    .pill-btn.on, .pill-btn[aria-pressed="true"] { background: var(--goai-blue); border-color: var(--goai-blue); color: #fff; box-shadow: none; }
+    .seg-bar {
+        display: flex; align-items: stretch; gap: 6px; background: #f3f5f9;
+        border-radius: 18px; padding: 6px; margin: 0 0 18px;
     }
-
-    .dialogue-card {
-        display: flex;
-        align-items: flex-start;
-        gap: 14px;
-        background: #fffdf5;
-        border: 3px solid var(--goai-yellow);
-        border-radius: 18px;
-        padding: 16px 18px;
-        margin: 0 0 16px 0;
-        box-shadow: 0 6px 0 rgba(254, 207, 19, 0.28);
-    }
-    .parent-icon {
-        flex-shrink: 0;
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        background: var(--goai-blue);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 3px 0 rgba(2, 33, 105, 0.2);
-    }
-    .parent-icon svg { width: 32px; height: 32px; display: block; }
-    .dialogue {
-        font-size: 1.35rem;
-        font-weight: 800;
-        color: var(--goai-blue);
-        line-height: 1.55;
-        margin: 0;
-        padding-top: 6px;
-    }
-    .hint {
-        font-size: 0.9rem;
-        color: #718096;
-        line-height: 1.6;
-        margin: 0 0 14px 0;
-    }
-
-    .tip-box {
-        background: #fffbeb;
-        border: 1.5px solid #f6e05e;
-        border-radius: 14px;
-        padding: 12px 14px 14px;
-        margin: 0 0 16px 0;
-    }
-    .tip-head {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.85rem;
-        font-weight: 800;
-        color: #b7791f;
-        margin-bottom: 8px;
-    }
-    .tip-bulb {
-        width: 20px;
-        height: 20px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .tip-bulb svg { width: 20px; height: 20px; display: block; }
-    .tip-box p {
-        font-size: 0.9rem;
-        color: #4a5568;
-        line-height: 1.6;
-        margin: 0;
-    }
-    .tip-box p + p { margin-top: 8px; }
-
-    .card-blue .dialogue-card {
-        background: #f4f7ff;
-        border-color: var(--goai-blue);
-        box-shadow: 0 6px 0 rgba(2, 33, 105, 0.14);
-    }
-    .card-blue .tip-box {
-        background: #eef3ff;
-        border-color: #9eb3e6;
-    }
-    .card-blue .tip-head { color: var(--goai-blue); }
-
-    .card-orange .dialogue-card {
-        background: #fff7ed;
-        border-color: var(--goai-orange);
-        box-shadow: 0 6px 0 rgba(255, 139, 18, 0.28);
-    }
-    .card-orange .tip-box {
-        background: #fff4e5;
-        border-color: #ffd4a0;
-    }
-    .card-orange .tip-head { color: #c45c00; }
-
-    .card-green .dialogue-card {
-        background: #f0fdf7;
-        border-color: var(--card-green);
-        box-shadow: 0 6px 0 rgba(0, 205, 122, 0.28);
-    }
-    .card-green .tip-box {
-        background: #e8faf2;
-        border-color: #8ee6c0;
-    }
-    .card-green .tip-head { color: var(--goai-green); }
-
-    .card-yellow .dialogue-card {
-        background: #fffdf5;
-        border-color: var(--goai-yellow);
-        box-shadow: 0 6px 0 rgba(254, 207, 19, 0.28);
-    }
-    .card-yellow .tip-box {
-        background: #fffbeb;
-        border-color: #f6e05e;
-    }
-    .card-yellow .tip-head { color: #b7791f; }
-
-    .answer-box {
-        width: 100%;
-        min-height: 96px;
-        padding: 14px;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        outline: none;
-        font-family: inherit;
-        font-size: 1rem;
-        line-height: 1.5;
-        color: #1a202c;
-        box-sizing: border-box;
-        resize: vertical;
-    }
-    .answer-box:focus {
-        border-color: var(--goai-blue);
-        background: #f7fafc;
-    }
-
-    .chip-label {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: var(--goai-blue);
-        margin: 16px 0 8px 0;
-    }
-
-    .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-    .selection-grid.large-cards { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-
-    .grid-btn {
-        background: var(--white);
-        border: 2px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 15px;
-        text-align: left;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        box-sizing: border-box;
-    }
-    .grid-btn .badge {
-        font-size: 10px;
-        font-weight: bold;
-        background: #edf2f7;
-        color: #4a5568;
-        padding: 2px 6px;
-        border-radius: 4px;
-        width: fit-content;
-    }
-    .grid-btn .title { font-weight: 800; font-size: 1rem; color: #2d3748; }
-    .grid-btn .desc { font-size: 0.8rem; color: #718096; line-height: 1.3; }
-
-    .grid-btn:hover:not(.active) { border-color: var(--goai-blue); background: #f7fafc; }
-    .grid-btn.active {
-        border-color: var(--goai-blue);
-        background: #f0f4ff;
-        box-shadow: inset 0 0 0 1px var(--goai-blue);
-    }
-    .grid-btn.active .title { color: var(--goai-blue); }
-
-    .vibe-step-box {
-        background: #f8fafc;
-        border: 2px solid #cbd5e1;
-        border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 25px;
-    }
-    .vibe-step-title {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: var(--goai-blue);
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .prompt-text {
-        height: 260px;
-        overflow-y: auto;
-        font-size: 0.95rem;
-        white-space: pre-wrap;
-        color: #334155;
-        line-height: 1.6;
-        font-family: monospace;
-        background: #ffffff;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-    }
-    .copy-line {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: #ffffff;
-        border: 2px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 12px 14px;
-        margin-bottom: 10px;
-    }
-    .copy-line .sentence {
-        flex: 1;
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: #2d3748;
-        line-height: 1.5;
-    }
-
-    .copy-btn {
-        width: 100%;
-        height: 46px;
-        background: var(--goai-blue);
-        color: white;
-        border: 2px solid var(--goai-blue);
-        border-radius: 50px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 700;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 12px rgba(10, 34, 102, 0.12);
-        box-sizing: border-box;
-        margin-top: 10px;
-    }
-    .copy-btn:hover:not(:disabled) {
-        background: var(--goai-blue-hover);
-        border-color: var(--goai-blue-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(10, 34, 102, 0.2);
-    }
-    .copy-btn:disabled { background: #e2e8f0; border-color: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
-
-    .copy-btn.copy-btn-sm {
-        width: auto;
-        min-width: 96px;
-        height: 40px;
-        padding: 0 16px;
-        margin-top: 0;
-        flex-shrink: 0;
-        font-size: 0.9rem;
-        border-radius: 40px;
-    }
-
-    .copied {
-        background: var(--goai-green) !important;
-        border-color: var(--goai-green) !important;
-        color: var(--white) !important;
-        box-shadow: none !important;
-        transform: none !important;
-    }
-
-    .site-footer {
-        width: 100%;
-        margin-top: 48px;
-        padding: 28px 20px;
-        background: #f7f8fb;
-        color: #8a9099;
-        font-size: 13px;
+    .seg-btn {
+        flex: 1; border: 0; background: transparent; color: var(--goai-blue);
+        font: inherit; font-weight: 800; font-size: 0.95rem; line-height: 1.35;
+        min-height: 52px; padding: 10px 12px; border-radius: 14px; cursor: pointer;
         text-align: center;
-        line-height: 1.6;
-        box-sizing: border-box;
     }
-
+    .seg-btn.on { background: var(--goai-blue); color: #fff; box-shadow: 0 8px 18px rgba(2, 33, 105, 0.18); }
+    .chip-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 0 16px; }
+    .field .chip-row { justify-content: flex-start; margin-bottom: 0; }
+    .tab-bar {
+        display: flex; align-items: center; gap: 4px; background: #eef1f6;
+        border-radius: 16px; padding: 6px; margin: 0 0 14px; overflow-x: auto;
+    }
+    .tab-btn {
+        flex: 1 0 auto; border: 0; background: transparent; color: var(--goai-blue);
+        font: inherit; font-weight: 800; font-size: 0.95rem; min-height: 46px;
+        padding: 10px 16px; border-radius: 12px; cursor: pointer; white-space: nowrap;
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .tab-btn.on { background: var(--goai-blue); color: #fff; box-shadow: 0 6px 16px rgba(2, 33, 105, 0.16); }
+    .tab-btn .ico { width: 0.95em; height: 0.95em; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center; }
+    .choice-card {
+        background: #fff; border: 3px solid #e2e8f0; border-radius: 18px; padding: 16px 12px;
+        cursor: pointer; text-align: center; width: 168px; box-sizing: border-box; font: inherit; color: inherit;
+    }
+    .choice-card.wide { width: 220px; }
+    .choice-card h3 { margin: 0; font-size: 1.05rem; color: var(--goai-blue); line-height: 1.35; }
+    .choice-card.on h3, .choice-card.on .meta { color: #fff; }
+    .tier-blue { border-color: var(--goai-blue); }
+    .tier-blue.on { background: var(--goai-blue); }
+    .tier-orange { border-color: var(--goai-orange); }
+    .tier-orange.on { background: #c2410c; }
+    .tier-green { border-color: var(--goai-green); }
+    .tier-green.on { background: var(--goai-green); }
+    .tier-yellow { border-color: var(--goai-yellow); }
+    .tier-yellow.on { background: #8a6500; }
+    .meta { font-size: 0.8rem; font-weight: 800; color: var(--goai-orange); margin-bottom: 6px; }
+    textarea, input[type="password"] {
+        width: 100%; box-sizing: border-box; border: 2px solid #e2e8f0; border-radius: 12px;
+        padding: 12px; font: inherit; line-height: 1.55; background: #fff;
+    }
+    textarea { min-height: 140px; resize: vertical; }
+    .error-text { color: #c53030; font-size: 0.9rem; font-weight: 700; margin: 8px 0 0; }
+    .pass-box { max-width: 420px; margin: 16px auto 0; background: #f7f9fc; border-radius: 16px; padding: 16px; border: 2px solid #e2e8f0; }
+    .site-footer {
+        width: 100%; margin-top: 48px; padding: 28px 20px; background: #f7f8fb; color: #8a9099;
+        font-size: 13px; text-align: center; line-height: 1.6; box-sizing: border-box;
+    }
+    .ico { width: 1.15em; height: 1.15em; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .pick-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .make-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .level { margin-top: 14px; padding: 12px; border-radius: 14px; border: 3px solid var(--goai-blue); background: #fff; }
+    .level.lv2 { border-color: var(--goai-orange); }
+    .level.lv3 { border-color: var(--goai-green); }
+    .thumb-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 0 0 8px; }
+    .thumb-card {
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        width: min(100%, 280px); text-decoration: none; color: var(--goai-blue); font-weight: 800; font-size: 0.9rem;
+    }
+    .thumb-card img {
+        width: 100%; height: 200px; object-fit: contain; object-position: top center;
+        background: #fff; border: 2px solid #cbd5e1; border-radius: 12px;
+    }
+    .level h3 { margin: 0 0 8px; color: var(--goai-blue); font-size: 1.05rem; }
+    .field { margin: 14px 0; }
+    .field .lab { display: block; font-weight: 800; color: var(--goai-blue); margin-bottom: 8px; }
+    .copy-ok { color: var(--goai-green); font-weight: 800; }
+    .panel {
+        margin-top: 16px; background: #f7f9fc; border-radius: 16px; padding: 16px;
+        border: 2px solid #e2e8f0;
+    }
+    .route-card h3 { font-size: 1.2rem; }
+    .play-frame { width: 100%; height: 78vh; min-height: 640px; border: 2px solid #e2e8f0; border-radius: 16px; background: #fff; }
+    .band-row { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
+    .band-card {
+        flex: 1 1 240px; max-width: 340px; min-height: 240px; border: 3px solid #e2e8f0; border-radius: 28px;
+        background: #fff; color: var(--goai-blue); font: inherit; font-weight: 800; cursor: pointer;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+        padding: 28px 18px; box-shadow: 0 12px 28px rgba(10, 34, 102, 0.06);
+    }
+    .band-card:hover { border-color: var(--goai-blue); transform: translateY(-2px); }
+    .band-card strong { font-size: 1.7rem; }
+    .band-card em { font-style: normal; color: #4a5568; font-size: 0.95rem; font-weight: 700; }
+    .band-ico { width: 76px; height: 76px; stroke: var(--goai-blue); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .back-row { display: flex; justify-content: flex-end; margin: 0 0 10px; }
+    .back-btn {
+        border: 0; background: transparent; color: var(--goai-blue); font: inherit; font-weight: 800;
+        cursor: pointer; padding: 4px 2px;
+    }
     @media (max-width: 768px) {
         header { padding: 10px 16px; }
         .header-container { flex-direction: column; text-align: center; gap: 8px; }
-        .header-logo { height: 64px !important; margin: 0 auto; }
+        .header-logo { height: 64px; }
         .header-text { text-align: center; }
-        header h1 { font-size: 1.8rem; }
-        .dialogue { font-size: 1.15rem; }
-        .copy-line { flex-direction: column; align-items: stretch; }
-        .copy-btn-sm { width: 100%; }
-
+        header h1 { font-size: 1.35rem; }
         .cartoon-shape {
-            position: relative;
-            display: inline-block;
-            margin: 5px;
-            left: auto !important; right: auto !important; top: auto !important; bottom: auto !important;
-            transform: none !important;
+            position: relative; display: inline-block; margin: 5px;
+            left: auto !important; right: auto !important; top: auto !important; bottom: auto !important; transform: none !important;
         }
-    }
-
-    @media (min-width: 800px) {
-        .main-nav { flex-direction: row; gap: 20px; }
-        .nav-item { flex: 1; border-radius: 20px; }
+        .column { padding: 20px; }
+        .seg-bar { flex-direction: column; }
+        .band-card { max-width: none; min-height: 180px; }
     }
     </style>
 </head>
 <body>
-
 <header>
-    <div class="cartoon-shape shape-monster1">AI 學習</div>
-    <div class="cartoon-shape shape-monster2">親子共創</div>
+    <div class="cartoon-shape shape-monster1">Prompting</div>
+    <div class="cartoon-shape shape-monster2">Vibe Coding</div>
     <div class="header-container">
         <img src="logo.jpg?v=crop" alt="GOAI Logo" class="header-logo">
         <div class="header-text">
-            <h1>親子工作坊_<span class="highlight-yellow">Vibe Coding</span></h1>
+            <h1>親子共創 <span class="highlight-yellow">AI</span> 學習助手</h1>
+            <p class="header-sub">從 Prompting 到 Vibe Coding</p>
         </div>
     </div>
 </header>
-
-<nav class="main-nav">
-    <div class="nav-item active" id="nav-WORKSHOP" role="button" tabindex="0" onclick="switchSection('WORKSHOP')" onkeydown="navKey(event, 'WORKSHOP')">
-        <h2>親子共創</h2>
-        <p>三道對話題，用自己的話說出要做的遊戲</p>
-    </div>
-    <div class="nav-item" id="nav-SHARE" role="button" tabindex="0" onclick="switchSection('SHARE')" onkeydown="navKey(event, 'SHARE')">
-        <h2>試玩區</h2>
-        <p>提交自己的作品，或試玩其他人的作品</p>
-    </div>
-</nav>
-
-<main class="main-container active" id="quiz-container">
-
-    <section class="column card-blue">
-        <h3>學習難點</h3>
-        <div class="role-row">
-            <span class="role-badge">家長問</span>
-            <span class="role-badge">子女答</span>
-            <span class="role-badge">家長覆述</span>
-        </div>
-        <div class="dialogue-card">
-            <div class="parent-icon" aria-hidden="true">
-                <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
-            </div>
-            <p class="dialogue">家長問：「最近邊樣功課令你覺得好難？」</p>
-        </div>
-        <div class="tip-box">
-            <div class="tip-head">
-                <span class="tip-bulb" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none"><path d="M9 21h6v1H9v-1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#fecf13"/><path d="M9 21h6M10 18h4" stroke="#b7791f" stroke-width="1.6" stroke-linecap="round"/></svg>
-                </span>
-                <span>小提示</span>
-            </div>
-            <p>請子女說出一句完整的話，可一併說出年級。家長覆述：「即係你最怕……係咪？」確認後再填入。此題為必填，約十字以上即可解鎖提示詞。</p>
-            <p>若回答太短，家長可再問：「具體係記唔到，定係計錯？」或「可唔可以舉一條你最怕嘅題？」</p>
-        </div>
-        <textarea class="answer-box" id="answer-q1" maxlength="300" placeholder="請把子女的原句寫在這裡" oninput="updatePrompt()"></textarea>
-        <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
-        <div class="selection-grid large-cards" id="examples-q1"></div>
-    </section>
-
-    <section class="column card-orange">
-        <h3>玩法</h3>
-        <div class="role-row">
-            <span class="role-badge">家長問</span>
-            <span class="role-badge">兩人一起答</span>
-            <span class="role-badge">家長覆述</span>
-        </div>
-        <div class="dialogue-card">
-            <div class="parent-icon" aria-hidden="true">
-                <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
-            </div>
-            <p class="dialogue">家長問：「如果可以用遊戲嚟練習，你會想點樣玩？」</p>
-        </div>
-        <div class="tip-box">
-            <div class="tip-head">
-                <span class="tip-bulb" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none"><path d="M9 21h6v1H9v-1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#fecf13"/><path d="M9 21h6M10 18h4" stroke="#b7791f" stroke-width="1.6" stroke-linecap="round"/></svg>
-                </span>
-                <span>小提示</span>
-            </div>
-            <p>請子女自由描述，家長不要急於糾正。覆述例子：「即係你想有個籃接啱嘅答案，接錯就唔好扣好多分，係咪？」此題可留空；留空時，提示詞會採用大按鈕問答遊戲作為後備。</p>
-        </div>
-        <textarea class="answer-box" id="answer-q2" maxlength="300" placeholder="請把兩人一起說好的玩法寫在這裡（可留空）" oninput="updatePrompt()"></textarea>
-        <p class="chip-label">完全說不出時，可先選一種感覺（仍可改寫）</p>
-        <div class="selection-grid large-cards" id="choice-q2"></div>
-        <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
-        <div class="selection-grid large-cards" id="examples-q2"></div>
-    </section>
-
-    <section class="column card-green">
-        <h3>態度</h3>
-        <div class="role-row">
-            <span class="role-badge">家長問</span>
-            <span class="role-badge">子女答</span>
-            <span class="role-badge">家長可分享一句</span>
-        </div>
-        <div class="dialogue-card">
-            <div class="parent-icon" aria-hidden="true">
-                <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
-            </div>
-            <p class="dialogue">家長問：「答錯嗰下，你想遊戲點對你？兇少少逼你再試，定溫柔啲慢慢教？」</p>
-        </div>
-        <div class="tip-box">
-            <div class="tip-head">
-                <span class="tip-bulb" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none"><path d="M9 21h6v1H9v-1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#fecf13"/><path d="M9 21h6M10 18h4" stroke="#b7791f" stroke-width="1.6" stroke-linecap="round"/></svg>
-                </span>
-                <span>小提示</span>
-            </div>
-            <p>請用子女自己的字句填寫。家長可以分享，但不可代答。此題可留空；留空時，提示詞會要求遊戲不責罵、用大字顯示正確答案，並再給一次機會。</p>
-        </div>
-        <textarea class="answer-box" id="answer-q3" maxlength="300" placeholder="請把子女希望被對待的方式寫在這裡（可留空）" oninput="updatePrompt()"></textarea>
-        <p class="chip-label">想不到可先用例子，填入後仍可修改</p>
-        <div class="selection-grid large-cards" id="examples-q3"></div>
-    </section>
-
-    <section class="column card-yellow" style="margin-bottom: 40px;">
-        <h3>提示詞與修改遊戲</h3>
-
-        <div class="vibe-step-box">
-            <div class="vibe-step-title">任務一：複製下面的提示詞，並貼到Gemini Canvas</div>
-            <div class="prompt-text" id="prompt-step1">提示詞將在此自動生成。</div>
-            <button class="copy-btn" id="btn-copy-1" onclick="copyText('prompt-step1', 'btn-copy-1')" disabled>複製任務一提示詞</button>
-        </div>
-
-        <div class="vibe-step-box" style="background: #fffdf5; border-color: var(--goai-yellow);">
-            <div class="vibe-step-title">任務二：第一版出現後，用自己的話修改</div>
-            <div class="tip-box">
-                <div class="tip-head">
-                    <span class="tip-bulb" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none"><path d="M9 21h6v1H9v-1zm3-19a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#fecf13"/><path d="M9 21h6M10 18h4" stroke="#b7791f" stroke-width="1.6" stroke-linecap="round"/></svg>
-                    </span>
-                    <span>小提示</span>
-                </div>
-                <p>請先試玩約三十秒。然後由子女說一句要改的內容，家長照原文輸入，不要改寫成精準的提示詞。之後家長說一句自己想加的內容，並詢問子女是否同意。</p>
-            </div>
-            <div class="dialogue-card">
-                <div class="parent-icon" aria-hidden="true">
-                    <svg viewBox="0 0 64 64" fill="none"><circle cx="24" cy="16" r="8" fill="#fecf13"/><path d="M8 50c0-11 7-18 16-18s16 7 16 18" fill="#ffffff"/><circle cx="46" cy="22" r="6" fill="#fecf13"/><path d="M36 52c0-8 4.5-13 10-13s10 5 10 13" fill="#ffffff"/></svg>
-                </div>
-                <p class="dialogue">家長問子女：「玩完三十秒，你最想改邊一樣？顏色、難度，定題目？」</p>
-            </div>
-            <p class="chip-label">句式開頭（請自行把句子完成）</p>
-            <div class="copy-line">
-                <span class="sentence" id="revise-1">「幫我將 ______ 改成 ______。」</span>
-                <button class="copy-btn copy-btn-sm" id="btn-revise-1" onclick="copyText('revise-1', 'btn-revise-1', '已複製')">複製此句</button>
-            </div>
-            <div class="copy-line">
-                <span class="sentence" id="revise-2">「太難／太容易，請 ______。」</span>
-                <button class="copy-btn copy-btn-sm" id="btn-revise-2" onclick="copyText('revise-2', 'btn-revise-2', '已複製')">複製此句</button>
-            </div>
-            <div class="copy-line">
-                <span class="sentence" id="revise-3">「加一個 ______，當我答對就 ______。」</span>
-                <button class="copy-btn copy-btn-sm" id="btn-revise-3" onclick="copyText('revise-3', 'btn-revise-3', '已複製')">複製此句</button>
-            </div>
-            <div class="copy-line">
-                <span class="sentence" id="revise-4">「題目改成關於 ______，出 5 題。」</span>
-                <button class="copy-btn copy-btn-sm" id="btn-revise-4" onclick="copyText('revise-4', 'btn-revise-4', '已複製')">複製此句</button>
-            </div>
-        </div>
-    </section>
-</main>
-
-<main class="main-container" id="share-container">
-    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-
-        <section class="column card-orange" style="flex: 1; min-width: 300px; padding: 25px; box-sizing: border-box;">
-            <h3>提交我的作品</h3>
-            <p style="color: #4a5568; font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px;">
-                請把 Gemini Canvas 連結分享給大家。
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <input type="text" id="uploadDate" placeholder="日期（例如：20260730）" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
-                <input type="text" id="uploadNum" placeholder="班別學號（例如：5B03）" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
-                <input type="url" id="uploadUrl" placeholder="請貼上 Gemini 分享連結（https://...）" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
-                <button id="submitBtn" onclick="uploadMyWork()" style="background: var(--goai-orange); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s;">
-                    發佈作品
-                </button>
-            </div>
-        </section>
-
-        <section class="column card-green" style="flex: 1; min-width: 300px; padding: 25px; box-sizing: border-box;">
-            <h3>試玩其他人的作品</h3>
-            <p style="color: #4a5568; font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px;">
-                請輸入日期及班別學號，即可開啟其他人的作品。
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <input type="text" id="playDate" placeholder="日期（例如：20260730）" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
-                <input type="text" id="playNum" placeholder="班別學號（例如：5B05）" style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; outline: none;">
-                <button onclick="playOtherWork()" style="background: var(--card-green); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; margin-top: 50px;">
-                    立即開啟遊戲
-                </button>
-            </div>
-        </section>
-
-    </div>
-</main>
-
+<main id="app"></main>
+<footer class="site-footer">© 2026 CLEAR, The Chinese University of Hong Kong · Parent–Child Workshop</footer>
+<script src="vibe-source.js"></script>
 <script>
-const FALLBACK_PLAY = "請做成大按鈕、大字的問答遊戲。";
-const FALLBACK_FEEL = "請不要責罵玩家；用大字顯示正確答案，並再給一次機會。";
-const MIN_Q1_LEN = 10;
+const STORAGE_KEY = "pcws-coach-v1";
+const LOCK_PASS = { vibe: "jcgoai", make: "pcws" };
 
-const examplesQ1 = [
-    { title: "英文時態", desc: "小四英文，過去式常常用錯。" },
-    { title: "中文錯別字", desc: "分不清「已」和「己」、「補」和「捕」。" },
-    { title: "九九乘法", desc: "小三數學，七和八的乘法要想很久。" }
+const PLAY = [
+    {
+        id: "chi",
+        title: "中文",
+        lead: "作文題：一次停電的晚餐",
+        hint: "",
+        basic: "有一天，你和家人在家中吃晚餐時突然停電。請寫一篇文章，記述那一次的經歷和感受。",
+        mid: "你是我的中文老師。請你指導我如何完成以下的作文題目。\n「有一天，你和家人在家中吃晚餐時突然停電。請寫一篇文章，記述那一次的經歷和感受。」",
+        high: function (band) {
+            const role = band === "sec" ? "你是香港中一至中三學生的中文老師。" : "你是香港小六學生的中文老師。";
+            return "# 角色\n" + role + "\n# 任務\n我需要完成以下作文題目：「有一天，你和家人在家中吃晚餐時突然停電。請寫一篇文章，記述那一次的經歷和感受。」\n# 指導方向\n1. 你不會直接給我答案或範文。\n2. 首先，你會用問題的形式去引導我思考。鼓勵我以正常及合理的方向去思考。\n3. 然後，你為我提供5個情景去刺激我思考。在每個情景中，你需提供10個適合的名詞，10個形容詞，10個感受詞和10個成語。\n4. 給我10種有用的句式，但不要提供範句。";
+        }
+    },
+    {
+        id: "eng",
+        title: "英文",
+        lead: "閱讀理解。篇章和題目請看工作紙。",
+        hint: "請先打開工作紙上的英文篇章，再複製提示詞。",
+        basic: "Attached the passage and questions (jpg or pdf)\nGive me the answers with explanation.",
+        mid: "Attached the passage and questions (jpg or pdf)\nAct as my English teacher, teach me how to do the questions without giving me the answers.",
+        high: function (band) {
+            const persona = band === "sec" ? "Hong Kong secondary 1 to 3 English teacher." : "Hong Kong primary 6 English teacher.";
+            return "Attached the passage and questions (jpg or pdf)\n### Persona\n" + persona + "\n### Task\nTeach me how to do the reading exercise without giving me the answers\n### Instruction\n1. My Cambridge English Scale is about 150. Explain the meaning of all the words which are about or higher than 150.\n2. Tell me the key concept of each paragraph\n3. For each question, guide me how to find out the answers. Tell me if synonyms are needed.";
+        }
+    },
+    {
+        id: "math",
+        title: "數學",
+        lead: "梯形題。題目圖請看工作紙。",
+        hint: "Level 2 是按講義「先加角色、不要直接給答案」補上的一句。Level 3 沿用講義原文。",
+        basic: "Attached the diagram (jpg or pdf)\n上圖是由P和Q兩個梯形所組成，Q的面積是30 cm^2，h的值是多少？",
+        mid: "Attached the diagram (jpg or pdf)\n你是我的數學老師。請指導我做這題，不要直接給答案。\n上圖是由P和Q兩個梯形所組成，Q的面積是30 cm^2，h的值是多少？",
+        high: function (band) {
+            const role = band === "sec" ? "你是香港中一至中三數學老師。" : "你是香港小六數學老師。";
+            return "Attached the diagram (jpg or pdf)\n# 角色\n" + role + "\n# 任務\n圖中是由 P 和 Q 兩個梯形所組成，Q 的面積是 30 cm^2，h 的值是多少？\n# 指導方向\n1. 你不需要告訴我答案，也不用把計算步驟寫出來。\n2. 你需要把問題分拆成數條小問題，符合解難過程。\n3. 你要把問題中需要使用的數學技巧明列。";
+        }
+    }
 ];
 
-const examplesQ2 = [
-    { title: "接答案", desc: "用籃子接住從上面掉下來的正確答案。" },
-    { title: "答題按鈕", desc: "畫面出現題目，用大按鈕選正確答案。" },
-    { title: "走迷宮", desc: "在迷宮裡走動，走向寫着正確答案的出口。" }
-];
+const GRADES = {
+    pri: ["小四", "小五", "小六"],
+    sec: ["中一", "中二", "中三"]
+};
 
-const examplesQ3 = [
-    { title: "溫柔提示", desc: "不要罵我，用大字告訴我哪一個才對。" },
-    { title: "再給機會", desc: "答錯不要扣很多分，讓我再試一次。" },
-    { title: "明確提醒", desc: "錯了就停下來，清楚顯示正確做法。" }
-];
+const MAKE = {
+    pri: [
+        {
+            id: "chi",
+            title: "中文作文思考教練",
+            blurb: "引導構思、詞彙和大綱，不代寫文章。",
+            choiceLabel: "預設文體",
+            choices: ["記敘文", "描寫文", "說明文"]
+        },
+        {
+            id: "eng",
+            name: "AI英文閱讀教練",
+            title: "英文閱讀理解教練",
+            blurb: "解釋難字、指出去哪一段找，不代選答案。",
+            audience: "香港小四至小六學生。",
+            goal: "協助學生學會做閱讀理解，而不是代學生選出答案。",
+            style: ["親切、有趣、兒童友善", "使用中英對照介面", "色彩活潑", "適合小學生使用"],
+            inputs: [
+                ["篇章與題目輸入區", "學生可以貼上篇章和問題，或依照工作紙作答。"],
+                ["練習重點", ["字義", "主旨", "選擇題"]]
+            ],
+            coach: "AI英文閱讀教練",
+            trigger: "學生輸入篇章和問題後",
+            steps: [
+                ["解釋難字", "只解釋對這個年級太難的字，每個字給一個簡單意思。"],
+                ["引導找答案", "透過提問協助學生思考，例如：這一段主要講甚麼？題目的關鍵字出現在哪一段？"],
+                ["同義詞提示", "如果題目和文章用了不同的字，指出可能是同義表達，不要指出正確選項。"],
+                ["整理答題大綱", "只輸出：\n【題目問甚麼】\n【去哪一段找】\n【我的證據】\n【我的答案】\n答案一欄留給學生自己寫。"],
+                ["自我檢查", "協助學生檢查：有沒有用文章中的證據、有沒有看錯題目。"]
+            ],
+            rule4: "不代學生選擇答案",
+            role: "你是一位香港資深小學英文老師。",
+            principles: ["不直接給答案", "不指出正確選項"],
+            cheer: "你已經找到線索，請繼續處理下一題。"
+        },
+        {
+            id: "math",
+            name: "AI數學解題教練",
+            title: "數學解題提示教練",
+            blurb: "拆開步驟、點出技巧，不代算答案。",
+            audience: "香港小四至小六學生。",
+            goal: "協助學生學會解題，而不是代學生算出答案。",
+            style: ["親切、有趣、兒童友善", "使用中文介面", "色彩清晰", "適合小學生使用"],
+            inputs: [
+                ["題目輸入區", "學生可以輸入數學題，或描述工作紙上的圖。"],
+                ["題目類型", ["計算", "圖形", "應用題"]]
+            ],
+            coach: "AI數學教練",
+            trigger: "學生輸入題目後",
+            steps: [
+                ["分析題目", "協助學生看清楚：題目已知甚麼、要求甚麼、單位是甚麼。"],
+                ["引導解題", "透過提問協助學生思考，例如：圖中有哪些形狀？哪一個數是已知？可以先求哪一部分？"],
+                ["指出技巧", "列出這題要用的數學技巧，只寫名稱，不寫完整算式。"],
+                ["整理解題大綱", "只輸出：\n【已知】\n【要求】\n【先做】\n【再做】\n不要算出最終答案。"],
+                ["自我檢查", "協助學生檢查：是否用了正確單位、步驟是否對應問題、答案是否合理。"]
+            ],
+            rule4: "不代學生列式",
+            role: "你是一位香港資深小學數學老師。",
+            principles: ["不直接給答案", "不寫完整計算步驟"],
+            cheer: "你已經找到下一步，請再計算一小步。"
+        },
+        {
+            id: "gs",
+            name: "AI常識研習教練",
+            title: "常識專題研習提問助手",
+            blurb: "幫忙收窄題目和列大綱，不代寫報告。",
+            audience: "香港小四至小六學生。",
+            goal: "協助學生提出問題和整理發現，而不是代學生完成研習報告。",
+            style: ["親切、有趣、兒童友善", "使用中文介面", "色彩活潑", "適合小學生使用"],
+            inputs: [
+                ["研習題目輸入區", "學生可以輸入想探究的題目。"],
+                ["研習方向", ["人物", "地方", "生活現象"]]
+            ],
+            coach: "AI常識研習教練",
+            trigger: "學生輸入研習題目後",
+            steps: [
+                ["收窄題目", "協助學生判斷題目是太大還是太細，並改成一個可以探究的小問題。"],
+                ["引導探究", "透過提問協助學生思考，例如：你可以到何處查閱？可以詢問誰？你自己觀察到甚麼？"],
+                ["專題詞語", "提供5個相關詞語，每個附一句簡單解釋，不要寫成報告。"],
+                ["整理報告大綱", "只輸出：\n【題目】\n【我想知道】\n【資料】\n【我的發現】\n【總結】\n不要代學生填寫內容。"],
+                ["自我檢查", "協助學生檢查：有沒有自己的發現、資料是否關連題目。"]
+            ],
+            rule4: "不代學生寫報告",
+            role: "你是一位香港資深小學常識老師。",
+            principles: ["不直接給報告", "不代學生寫發現"],
+            cheer: "你已經有自己的問題，請再找一個證據。"
+        }
+    ],
+    sec: [
+        {
+            id: "chi",
+            name: "AI議論文教練",
+            title: "議論文構思教練",
+            blurb: "引導立場、理由和例子，不代寫全文。",
+            audience: "香港中一至中三學生。",
+            goal: "協助學生構思議論文，而不是代學生完成文章。",
+            style: ["清晰、友善、適合青少年", "使用中文介面", "色彩穩重", "適合中學生使用"],
+            inputs: [
+                ["論題輸入區", "學生可以輸入議論文題目。"],
+                ["立場", ["同意", "不同意", "兩面都寫"]]
+            ],
+            coach: "AI議論文教練",
+            trigger: "學生輸入論題後",
+            steps: [
+                ["分析論題", "協助學生找出題目關鍵詞，以及正反雙方在爭論甚麼。"],
+                ["引導構思", "透過提問協助學生思考，例如：你的立場是甚麼？一個理由是甚麼？可以舉哪個香港例子？反方會怎樣說？"],
+                ["論說詞語", "提供5個連接詞和3個論說句式，不要寫成完整段落。"],
+                ["整理大綱", "只輸出：\n【引論】\n【理由一】\n【理由二】\n【反方與回應】\n【結論】\n不要代學生寫內容。"],
+                ["自我檢查", "協助學生檢查：是否跑題、是否只有立場而沒有理由、例子是否關連論點。"]
+            ],
+            rule4: "不代學生寫全文",
+            role: "你是一位香港資深中學中文老師。",
+            principles: ["不直接給範文", "不直接給全文"],
+            cheer: "你已經有自己的立場，請再補充一個理由。"
+        },
+        {
+            id: "eng",
+            name: "AI Reading & Vocabulary Coach",
+            title: "Reading & Vocabulary Coach",
+            blurb: "解釋難字和段落主旨，不代寫答案。",
+            audience: "香港中一至中三學生。",
+            goal: "協助學生閱讀篇章和運用詞彙，而不是代學生寫出答案。",
+            style: ["清晰、友善、適合青少年", "使用中英對照介面", "色彩清晰", "適合中學生使用"],
+            inputs: [
+                ["篇章與題目輸入區", "學生可以貼上篇章和問題。"],
+                ["練習重點", ["字彙", "段落主旨", "答題位置"]]
+            ],
+            coach: "AI Reading & Vocabulary Coach",
+            trigger: "學生輸入篇章和問題後",
+            steps: [
+                ["解釋難字", "只解釋超出學生程度的字，每個字給簡單英文解釋和一個中文意思。"],
+                ["引導閱讀", "透過提問協助學生思考，例如：這一段的主旨是甚麼？題目關鍵字在哪一行？"],
+                ["詞彙提示", "如果題目用了同義詞，提示學生兩邊在說同一件事，不要指出正確答案。"],
+                ["整理答題大綱", "只輸出：\n【Question】\n【Paragraph】\n【Evidence】\n【My answer】\n答案一欄留給學生自己寫。"],
+                ["自我檢查", "協助學生檢查：證據是否來自文章、句子是否答非所問。"]
+            ],
+            rule4: "不代學生寫完整答案",
+            role: "你是一位香港資深中學英文老師。",
+            principles: ["不直接給答案", "不代學生寫完整句子"],
+            cheer: "你已經找到段落，請再用自己的句子說明一次。"
+        },
+        {
+            id: "math",
+            name: "AI解難思維教練",
+            title: "解難思維訓練助手",
+            blurb: "先問已知和所求，不代寫完整步驟。",
+            audience: "香港中一至中三學生。",
+            goal: "協助學生建立解難步驟，而不是代學生完成計算。",
+            style: ["清晰、友善、適合青少年", "使用中文介面", "色彩清晰", "適合中學生使用"],
+            inputs: [
+                ["題目輸入區", "學生可以輸入數學題。"],
+                ["題目類型", ["代數", "圖形", "應用題"]]
+            ],
+            coach: "AI解難思維教練",
+            trigger: "學生輸入題目後",
+            steps: [
+                ["分清已知和所求", "協助學生列出題目給了甚麼、最後要求甚麼。"],
+                ["引導解難", "透過提問協助學生思考，例如：可以先設甚麼？圖中哪一段有用？下一步要先處理哪個條件？"],
+                ["指出技巧", "列出要用的數學技巧，只寫名稱，不寫完整步驟。"],
+                ["整理解難大綱", "只輸出：\n【已知】\n【所求】\n【方法】\n【要計算的部分】\n不要算出最終答案。"],
+                ["自我檢查", "協助學生檢查：是否答非所問、單位是否正確、結果是否合理。"]
+            ],
+            rule4: "不代學生寫完整步驟",
+            role: "你是一位香港資深中學數學老師。",
+            principles: ["不直接給答案", "不寫完整計算步驟"],
+            cheer: "你已經選對方向，請再完成一小步。"
+        },
+        {
+            id: "sci",
+            name: "AI科學探究教練",
+            title: "科學探究與實驗分析教練",
+            blurb: "用問題帶出變量、證據和結論，不代寫報告。",
+            audience: "香港中一至中三學生。",
+            goal: "協助學生進行探究和推理，而不是直接提供結論。",
+            style: ["清晰、友善、適合青少年", "使用中文介面", "色彩清晰", "適合中學生使用"],
+            inputs: [
+                ["探究問題輸入區", "學生可以輸入想探究的問題。"],
+                ["探究重點", ["觀察", "公平測試", "數據解釋"]]
+            ],
+            coach: "AI科學探究教練",
+            trigger: "學生輸入探究問題後",
+            steps: [
+                ["分析問題", "協助學生分清：想知道甚麼、可以觀察甚麼、哪些字眼需要先解釋。"],
+                ["引導探究", "透過提問協助學生思考，例如：你要改變哪一個變量？甚麼要保持不變？你預測會看到甚麼？"],
+                ["科學詞語", "提供5個相關科學詞語，每個附一句簡單解釋，不要寫成結論。"],
+                ["整理探究大綱", "只輸出：\n【問題】\n【假設】\n【方法】\n【要記錄的結果】\n【結論】\n結論一欄留給學生自己寫。"],
+                ["自我檢查", "協助學生檢查：測試是否公平、證據是否支持自己的說法。"]
+            ],
+            rule4: "不代學生寫結論",
+            role: "你是一位香港資深中學科學老師。",
+            principles: ["不直接給結論", "不代學生寫實驗報告"],
+            cheer: "你已經有自己的觀察，請再用證據思考下一步。"
+        }
+    ]
+};
 
-const playChoices = [
-    { title: "答題按鈕", desc: "「我撳大掣嚟揀答案。」", fill: "我想撳大掣嚟揀答案。" },
-    { title: "移動去接", desc: "「我郁嚟郁去，接啱嘅嘢。」", fill: "我想郁嚟郁去，接啱嘅嘢。" }
-];
+let state = loadState();
 
-function navKey(event, section) {
-    if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        switchSection(section);
-    }
-}
-
-function switchSection(section) {
-    document.getElementById("nav-WORKSHOP").className = section === "WORKSHOP" ? "nav-item active" : "nav-item";
-    document.getElementById("nav-SHARE").className = section === "SHARE" ? "nav-item active" : "nav-item";
-
-    const quizContainer = document.getElementById("quiz-container");
-    const shareContainer = document.getElementById("share-container");
-
-    if (section === "SHARE") {
-        quizContainer.classList.remove("active");
-        shareContainer.classList.add("active");
-        loadDatabase();
-    } else {
-        shareContainer.classList.remove("active");
-        quizContainer.classList.add("active");
-    }
-}
-
-function renderExampleButtons(containerId, list, textareaId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = "";
-    list.forEach(function (item) {
-        const btn = document.createElement("div");
-        btn.className = "grid-btn";
-        btn.setAttribute("role", "button");
-        btn.tabIndex = 0;
-        btn.innerHTML = '<div class="title">' + item.title + '</div><div class="desc">' + item.desc + "</div>";
-        btn.onclick = function () {
-            const box = document.getElementById(textareaId);
-            box.value = item.desc;
-            highlightActive(containerId, btn);
-            updatePrompt();
-            box.focus();
-        };
-        btn.onkeydown = function (event) {
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                btn.click();
-            }
-        };
-        container.appendChild(btn);
-    });
-}
-
-function renderPlayChoices() {
-    const container = document.getElementById("choice-q2");
-    container.innerHTML = "";
-    playChoices.forEach(function (item) {
-        const btn = document.createElement("div");
-        btn.className = "grid-btn";
-        btn.setAttribute("role", "button");
-        btn.tabIndex = 0;
-        btn.innerHTML = '<div class="badge">兩選一</div><div class="title">' + item.title + '</div><div class="desc">' + item.desc + "</div>";
-        btn.onclick = function () {
-            const box = document.getElementById("answer-q2");
-            box.value = item.fill;
-            highlightActive("choice-q2", btn);
-            updatePrompt();
-            box.focus();
-        };
-        btn.onkeydown = function (event) {
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                btn.click();
-            }
-        };
-        container.appendChild(btn);
-    });
-}
-
-function highlightActive(containerId, activeBtn) {
-    const children = document.getElementById(containerId).children;
-    for (let i = 0; i < children.length; i++) {
-        children[i].classList.remove("active");
-    }
-    activeBtn.classList.add("active");
-}
-
-function getAnswers() {
-    return {
-        q1: document.getElementById("answer-q1").value.trim(),
-        q2: document.getElementById("answer-q2").value.trim(),
-        q3: document.getElementById("answer-q3").value.trim()
-    };
-}
-
-function updatePrompt() {
-    const step1Box = document.getElementById("prompt-step1");
-    const btn1 = document.getElementById("btn-copy-1");
-    const answers = getAnswers();
-
-    if (answers.q1.replace(/\s/g, "").length < MIN_Q1_LEN) {
-        step1Box.innerText = "提示詞將在此自動生成。";
-        btn1.disabled = true;
-        return;
-    }
-
-    const playLine = answers.q2 || FALLBACK_PLAY;
-    const feelLine = answers.q3 || FALLBACK_FEEL;
-
-    step1Box.innerText =
-        "請在 Gemini Canvas 做一個可以即時遊玩的單一 HTML 小遊戲。\n\n" +
-        "我是家長，正與子女一起製作。\n" +
-        "我們想練習的功課是：" + answers.q1 + "\n\n" +
-        "玩法（請依照我們自己的說法）：" + playLine + "\n" +
-        "如果玩法不夠清楚，就做成大按鈕、大字的問答遊戲。\n\n" +
-        "答錯時請這樣對待玩家：" + feelLine + "\n" +
-        "如果我們沒有說明，就請不要責罵、用大字顯示正確答案，並再給一次機會。\n\n" +
-        "畫面要簡單：按鈕要大、文字要大，適合兩個人一起看螢幕。\n" +
-        "請直接做出可以遊玩的版本，不要先詢問一堆問題。";
-
-    btn1.disabled = false;
-}
-
-function copyText(elementId, btnId, successLabel) {
-    const textStr = document.getElementById(elementId).innerText;
-    const doneLabel = successLabel || "已複製，請貼入 Gemini 對話框";
-    function markCopied() {
-        const btn = document.getElementById(btnId);
-        const originalText = btn.innerText;
-        btn.innerText = doneLabel;
-        btn.classList.add("copied");
-        setTimeout(function () {
-            btn.innerText = originalText;
-            btn.classList.remove("copied");
-        }, 3000);
-    }
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(textStr).then(markCopied).catch(function () {
-            legacyCopy(textStr, markCopied);
-        });
-        return;
-    }
-    legacyCopy(textStr, markCopied);
-}
-
-function legacyCopy(textStr, onSuccess) {
+function loadState() {
+    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", makeId: "", grade: "", option: "", copyMsg: "", lockError: "", showHelperPrompt: false };
     try {
-        const proxyArea = document.createElement("textarea");
-        proxyArea.value = textStr;
-        proxyArea.style.position = "fixed";
-        proxyArea.style.top = "0";
-        proxyArea.style.left = "0";
-        proxyArea.style.width = "1px";
-        proxyArea.style.height = "1px";
-        proxyArea.style.padding = "0";
-        proxyArea.style.border = "none";
-        proxyArea.style.outline = "none";
-        proxyArea.style.background = "transparent";
-
-        document.body.appendChild(proxyArea);
-        proxyArea.focus();
-        proxyArea.select();
-
-        const success = document.execCommand("copy");
-        proxyArea.remove();
-        if (success) onSuccess();
-    } catch (err) {
-        console.error("無法完成複製：", err);
-    }
+        const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "{}");
+        if (saved.activity === "prompt" || saved.activity === "helper" || saved.activity === "make") base.activity = saved.activity;
+        else if (saved.page === "make") base.activity = "make";
+        else if (saved.playMode === "vibe") base.activity = "helper";
+        else if (saved.page === "play" || saved.playMode === "prompt") base.activity = "prompt";
+        if (saved.helperBand === "pri" || saved.helperBand === "sec") base.helperBand = saved.helperBand;
+        else if (base.activity === "helper" && (saved.band === "pri" || saved.band === "sec")) base.helperBand = saved.band;
+        if (saved.band === "pri" || saved.band === "sec") base.band = saved.band;
+        if (saved.page === "play" || saved.page === "make") base.page = saved.page;
+        if (saved.playMode === "prompt" || saved.playMode === "vibe") base.playMode = saved.playMode;
+        if (PLAY.some(function (s) { return s.id === saved.playId; })) base.playId = saved.playId;
+        const themes = MAKE[base.band] || [];
+        if (themes.some(function (t) { return t.id === saved.makeId; })) {
+            base.makeId = saved.makeId;
+            base.grade = saved.grade || "";
+            base.option = saved.option || "";
+        }
+    } catch (e) {}
+    return base;
 }
 
-const GOOGLE_SHEET_API = "";
-let appDatabase = {};
-
-function loadDatabase() {
-    if (!GOOGLE_SHEET_API) return;
-    fetch(GOOGLE_SHEET_API)
-        .then(function (response) { return response.json(); })
-        .then(function (data) { appDatabase = data; })
-        .catch(function (error) { console.error("載入失敗：", error); });
+function saveState() {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+        activity: state.activity,
+        helperBand: state.helperBand,
+        band: state.band,
+        page: state.page,
+        playMode: state.playMode,
+        playId: state.playId,
+        makeId: state.makeId,
+        grade: state.grade,
+        option: state.option
+    }));
 }
 
-function uploadMyWork() {
-    const date = document.getElementById("uploadDate").value.trim();
-    const num = document.getElementById("uploadNum").value.trim();
-    const url = document.getElementById("uploadUrl").value.trim();
-    const btn = document.getElementById("submitBtn");
-
-    if (!date || !num || !url) {
-        alert("請完整填寫日期、號碼與連結。");
-        return;
-    }
-
-    if (!GOOGLE_SHEET_API) {
-        alert("作品分享尚未開放，請稍後再試。");
-        return;
-    }
-
-    btn.innerText = "正在上傳……";
-    btn.disabled = true;
-
-    fetch(GOOGLE_SHEET_API, {
-        method: "POST",
-        body: JSON.stringify({ date: date, num: num, url: url }),
-        headers: { "Content-Type": "text/plain;charset=utf-8" }
-    })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            if (data.status === "success") {
-                alert("發佈成功。其他同學現在可以試玩你的作品。");
-                document.getElementById("uploadUrl").value = "";
-                loadDatabase();
-            }
-        })
-        .catch(function () { alert("發佈失敗，請稍後再試。"); })
-        .finally(function () {
-            btn.innerText = "發佈作品";
-            btn.disabled = false;
-        });
+function escapeHtml(str) {
+    return String(str == null ? "" : str)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function playOtherWork() {
-    const date = document.getElementById("playDate").value.trim();
-    const num = document.getElementById("playNum").value.trim();
+function icon(name) {
+    const paths = {
+        play: '<polygon points="8,5 19,12 8,19"/>',
+        make: '<path d="M14 4l6 6-9 9H5v-6z"/><path d="M12 6l6 6"/>',
+        copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/>'
+    };
+    return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + paths[name] + "</svg>";
+}
 
-    if (!date || !num) {
-        alert("請輸入完整的日期與作品號碼。");
+function lockOpen(id) {
+    return true;
+}
+
+function lockBox(id) {
+    return '<div class="pass-box"><p class="lede">這部分尚未開放。請輸入密碼。</p>' +
+        '<input type="password" id="lock-pass" placeholder="密碼" autocomplete="off">' +
+        (state.lockError === id ? '<p class="error-text">密碼不正確</p>' : "") +
+        '<div class="btn-row"><button type="button" class="primary-btn" data-action="unlock" data-value="' + id + '">進入</button></div></div>';
+}
+
+function playById(id) {
+    return PLAY.filter(function (s) { return s.id === id; })[0] || null;
+}
+
+function themes() {
+    return MAKE[state.band] || [];
+}
+
+function themeById(id) {
+    return themes().filter(function (t) { return t.id === id; })[0] || null;
+}
+
+function lines(items) {
+    return items.map(function (item) { return "- " + item; }).join("\n");
+}
+
+function priChinesePrompt(grade, genre) {
+    return [
+        "請建立一個名為「AI中文寫作教練」的學習助手網頁。",
+        "",
+        "目標使用者：",
+        "香港小四至小六學生。",
+        "預設年級：" + grade + "。",
+        "",
+        "學習目標：",
+        "協助學生提升寫作能力，而不是代學生完成作文。",
+        "",
+        "設計風格：",
+        "- 親切、有趣、兒童友善",
+        "- 使用中文介面",
+        "- 色彩活潑",
+        "- 適合小學生使用",
+        "",
+        "主要功能：",
+        "",
+        "1. 作文題目輸入區",
+        "學生可以輸入作文題目。",
+        "",
+        "2. 年級選擇",
+        "- 小四",
+        "- 小五",
+        "- 小六",
+        "",
+        "3. 文體選擇",
+        "- 記敘文",
+        "- 描寫文",
+        "- 說明文",
+        "預設文體：" + genre + "。",
+        "",
+        "4. AI寫作教練",
+        "",
+        "學生輸入題目後，",
+        "",
+        "AI必須：",
+        "",
+        "第一步：分析題目",
+        "",
+        "協助學生理解：",
+        "- 題目關鍵字",
+        "- 寫作重點",
+        "- 文體特色",
+        "",
+        "第二步：引導構思",
+        "",
+        "透過提問方式協助學生思考：",
+        "",
+        "例如：",
+        "",
+        "- 故事發生在甚麼地方？",
+        "- 當時有誰在場？",
+        "- 發生了甚麼事情？",
+        "- 最深刻的是甚麼？",
+        "- 你有甚麼感受？",
+        "",
+        "規則：",
+        "",
+        "- 每次只問一條問題",
+        "- 等待學生回應",
+        "- 不直接提供答案",
+        "- 不代學生寫作",
+        "",
+        "第三步：提供詞彙支援",
+        "",
+        "根據學生內容提供：",
+        "",
+        "- 5個形容詞",
+        "- 5個感受詞",
+        "- 3個成語",
+        "- 3個描寫句式",
+        "",
+        "第四步：整理作文大綱",
+        "",
+        "輸出：",
+        "",
+        "【開頭】",
+        "時間、地點、人物",
+        "",
+        "【經過】",
+        "事情發展",
+        "",
+        "【高潮】",
+        "最重要事件",
+        "",
+        "【結尾】",
+        "感受及反思",
+        "",
+        "注意：",
+        "",
+        "只提供大綱。",
+        "",
+        "不要代學生完成內容。",
+        "",
+        "第五步：自我檢查",
+        "",
+        "完成後協助學生檢查：",
+        "",
+        "- 是否切合題目",
+        "- 是否有足夠細節",
+        "- 是否有感受描寫",
+        "- 是否有清晰段落",
+        "",
+        "AI角色設定：",
+        "",
+        "你是一位香港資深小學中文老師。",
+        "",
+        "教學原則：",
+        "",
+        "- 不直接給範文",
+        "- 不直接給全文",
+        "- 優先提問",
+        "- 鼓勵學生思考",
+        "- 鼓勵學生自行完成作品",
+        "",
+        "輸出語氣：",
+        "",
+        "正面、鼓勵式、具啟發性。",
+        "",
+        "每次回應最後加入：",
+        "",
+        "「你已經想到很好的內容，請再逐步完成作文。」"
+    ].join("\n");
+}
+
+function buildMakePrompt(theme, grade, option) {
+    if (state.band === "pri" && theme.id === "chi") return priChinesePrompt(grade, option);
+    const choiceItems = theme.inputs[1][1];
+    const step2 = theme.steps[1];
+    return [
+        "請建立一個名為「" + theme.name + "」的學習助手網頁。",
+        "",
+        "目標使用者：",
+        theme.audience,
+        "預設年級：" + grade + "。",
+        "",
+        "學習目標：",
+        theme.goal,
+        "",
+        "設計風格：",
+        lines(theme.style),
+        "",
+        "主要功能：",
+        "",
+        "1. " + theme.inputs[0][0],
+        theme.inputs[0][1],
+        "",
+        "2. 年級選擇",
+        lines(GRADES[state.band]),
+        "",
+        "3. " + theme.inputs[1][0],
+        lines(choiceItems),
+        "預設" + theme.inputs[1][0] + "：" + option + "。",
+        "",
+        "4. " + theme.coach,
+        "",
+        theme.trigger + "，",
+        "",
+        "AI必須：",
+        "",
+        "第一步：" + theme.steps[0][0],
+        "",
+        theme.steps[0][1],
+        "",
+        "第二步：" + step2[0],
+        "",
+        step2[1],
+        "",
+        "規則：",
+        "",
+        "- 每次只問一條問題",
+        "- 等待學生回應",
+        "- 不直接提供答案",
+        "- " + theme.rule4,
+        "",
+        "第三步：" + theme.steps[2][0],
+        "",
+        theme.steps[2][1],
+        "",
+        "第四步：" + theme.steps[3][0],
+        "",
+        theme.steps[3][1],
+        "",
+        "第五步：" + theme.steps[4][0],
+        "",
+        theme.steps[4][1],
+        "",
+        "AI角色設定：",
+        "",
+        theme.role,
+        "",
+        "教學原則：",
+        "",
+        "- " + theme.principles[0],
+        "- " + theme.principles[1],
+        "- 優先提問",
+        "- 鼓勵學生思考",
+        "- 鼓勵學生自行完成作品",
+        "",
+        "輸出語氣：",
+        "",
+        "正面、鼓勵式、具啟發性。",
+        "",
+        "每次回應最後加入：",
+        "",
+        "「" + theme.cheer + "」"
+    ].join("\n");
+}
+
+function currentPrompt() {
+    const theme = themeById(state.makeId);
+    if (!theme || !state.grade || !state.option) return "";
+    return buildMakePrompt(theme, state.grade, state.option);
+}
+
+function lockMark() {
+    return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>';
+}
+
+function tabBar(items) {
+    return '<div class="tab-bar" role="tablist">' + items.map(function (item) {
+        return '<button type="button" class="tab-btn' + (item.on ? " on" : "") + '" data-action="' + item.action + '" data-value="' + item.value + '" aria-pressed="' + (item.on ? "true" : "false") + '">' +
+            item.label + (item.locked ? lockMark() : "") + "</button>";
+    }).join("") + "</div>";
+}
+
+function pills(action, current, items) {
+    return '<div class="chip-row">' + items.map(function (item) {
+        const on = current === item;
+        return '<button type="button" class="pill-btn' + (on ? " on" : "") + '" data-action="' + action + '" data-value="' + escapeHtml(item) + '" aria-pressed="' + (on ? "true" : "false") + '">' + escapeHtml(item) + "</button>";
+    }).join("") + "</div>";
+}
+
+function chipRow(items) {
+    return '<div class="chip-row">' + items.map(function (item) {
+        return '<button type="button" class="pill-btn' + (item.on ? " on" : "") + '" data-action="' + item.action + '" data-value="' + escapeHtml(item.value) + '" aria-pressed="' + (item.on ? "true" : "false") + '">' + escapeHtml(item.label) + "</button>";
+    }).join("") + "</div>";
+}
+
+function segBar(items) {
+    return '<div class="seg-bar" role="tablist">' + items.map(function (item) {
+        return '<button type="button" class="seg-btn' + (item.on ? " on" : "") + '" data-action="' + item.action + '" data-value="' + item.value + '" aria-pressed="' + (item.on ? "true" : "false") + '">' + escapeHtml(item.label) + "</button>";
+    }).join("") + "</div>";
+}
+
+function levelBlock(key, label, text, note, tone) {
+    const copied = state.copyMsg === "play-" + key;
+    return '<div class="level ' + tone + '"><h3>' + label + "</h3>" +
+        (note ? '<p class="note">' + escapeHtml(note) + "</p>" : "") +
+        '<textarea readonly id="play-' + key + '">' + escapeHtml(text) + "</textarea>" +
+        '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy" data-value="play-' + key + '">' + icon("copy") + "複製這段提示詞</button>" +
+        (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div></div>";
+}
+
+function thumbLink(href, label) {
+    return '<a class="thumb-card" download href="' + href + '"><img src="' + href + '" alt="' + label + '"><span>' + label + "</span></a>";
+}
+
+function subjectDownloads(id) {
+    if (id === "eng") {
+        return '<div class="thumb-row">' +
+            thumbLink("refs/english-passage.jpg", "下載英文篇章") +
+            thumbLink("refs/english-questions.jpg", "下載英文題目") +
+            "</div>";
+    }
+    if (id === "math") {
+        return '<div class="thumb-row">' + thumbLink("refs/math-diagram.jpg", "下載數學題目圖") + "</div>";
+    }
+    return "";
+}
+
+function renderPrompting() {
+    const chips = chipRow(PLAY.map(function (s) {
+        return { action: "play", value: s.id, label: s.title, on: state.playId === s.id };
+    }));
+    const subject = playById(state.playId);
+    let panel = "";
+    if (subject) {
+        const mathNote = subject.id === "math" ? subject.hint : "";
+        panel = '<div class="panel">' +
+            subjectDownloads(subject.id) +
+            levelBlock("basic", "Level 1", subject.basic, "", "lv1") +
+            levelBlock("mid", "Level 2", subject.mid, mathNote, "lv2") +
+            levelBlock("high", "Level 3", subject.high(state.band), "", "lv3") +
+            "</div>";
+    }
+    return chips +
+        '<p class="lede">請先選擇一個科目，每個科目分為三個程度。英文及數學部分須先下載參考圖片，上載至 Gemini，再按「複製」，將提示詞貼上。</p>' +
+        panel;
+}
+
+const HELPER_PROMPT = [
+    "請建立一個名為「AI中文寫作教練」的學習助手網頁。",
+    "目標使用者：",
+    "香港小四至小六學生。",
+    "",
+    "學習目標：",
+    "協助學生提升寫作能力，而不是代學生完成作文。",
+    "",
+    "設計風格：",
+    "- 親切、有趣、兒童友善",
+    "- 使用中文介面",
+    "- 色彩活潑",
+    "- 適合小學生使用",
+    "",
+    "主要功能：",
+    "1. 作文題目輸入區",
+    "學生可以輸入作文題目。",
+    "2. 年級選擇",
+    "- 小四",
+    "- 小五",
+    "- 小六",
+    "3. 文體選擇",
+    "- 記敘文",
+    "- 描寫文",
+    "- 說明文",
+    "4. AI寫作教練",
+    "學生輸入題目後，",
+    "AI必須：",
+    "第一步：分析題目",
+    "協助學生理解：",
+    "- 題目關鍵字",
+    "- 寫作重點",
+    "- 文體特色",
+    "第二步：引導構思",
+    "透過提問方式協助學生思考：",
+    "例如：",
+    "- 故事發生在甚麼地方？",
+    "- 當時有誰在場？",
+    "- 發生了甚麼事情？",
+    "- 最深刻的是甚麼？",
+    "- 你有甚麼感受？",
+    "規則：",
+    "- 每次只問一條問題",
+    "- 等待學生回應",
+    "- 不直接提供答案",
+    "- 不代學生寫作",
+    "第三步：提供詞彙支援",
+    "根據學生內容提供：",
+    "- 5個形容詞",
+    "- 5個感受詞",
+    "- 3個成語",
+    "- 3個描寫句式",
+    "第四步：整理作文大綱",
+    "輸出：",
+    "【開頭】",
+    "時間、地點、人物",
+    "【經過】",
+    "事情發展",
+    "【高潮】",
+    "最重要事件",
+    "【結尾】",
+    "感受及反思",
+    "注意：",
+    "只提供大綱。",
+    "不要代學生完成內容。",
+    "第五步：自我檢查",
+    "完成後協助學生檢查：",
+    "- 是否切合題目",
+    "- 是否有足夠細節",
+    "- 是否有感受描寫",
+    "- 是否有清晰段落",
+    "AI角色設定：",
+    "你是一位香港資深小學中文老師。",
+    "教學原則：",
+    "- 不直接給範文",
+    "- 不直接給全文",
+    "- 優先提問",
+    "- 鼓勵學生思考",
+    "- 鼓勵學生自行完成作品",
+    "輸出語氣：",
+    "正面、鼓勵式、具啟發性。",
+    "每次回應最後加入：",
+    "「你已經想到很好的內容，我們再一步一步完成作文吧！」"
+].join("\n");
+
+function renderHelper() {
+    let below = '<p class="lede">此為 Gemini Canvas 生成的作品。請選擇年級、文體及題目，然後依次完成五個寫作步驟。</p>';
+    if (state.band === "pri") {
+        below += '<iframe class="play-frame" title="AI中文寫作小助理" src="play-vibe.html"></iframe>';
+    }
+    below += '<div class="btn-row">' +
+        '<button type="button" class="primary-btn" data-action="toggle-helper-prompt" aria-pressed="' + (state.showHelperPrompt ? "true" : "false") + '">' +
+        (state.showHelperPrompt ? "收起Prompt" : "顯示Prompt") + "</button>" +
+        '<button type="button" class="primary-btn" data-action="download-vibe">下載完整代碼</button></div>';
+    if (state.showHelperPrompt) {
+        const copied = state.copyMsg === "helper-prompt";
+        below += '<div class="panel"><textarea readonly id="helper-prompt">' + escapeHtml(HELPER_PROMPT) + "</textarea>" +
+            '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy" data-value="helper-prompt">' + icon("copy") + "複製這段提示詞</button>" +
+            (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div></div>";
+    }
+    return below;
+}
+
+function saveTextFile(text, name) {
+    const blob = new Blob([text], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+}
+
+function downloadVibeFile() {
+    const name = "AI中文寫作小助理.html";
+    function fromEmbedded() {
+        if (window.VIBE_HTML) saveTextFile(window.VIBE_HTML, name);
+    }
+    if (location.protocol === "file:") {
+        fromEmbedded();
         return;
     }
+    fetch("play-vibe.html").then(function (res) {
+        if (!res.ok) throw new Error("missing");
+        return res.text();
+    }).then(function (text) {
+        saveTextFile(text, name);
+    }).catch(fromEmbedded);
+}
 
-    if (appDatabase[date] && appDatabase[date][num]) {
-        window.open(appDatabase[date][num], "_blank");
-        document.getElementById("playNum").value = "";
+function renderMake() {
+    const cards = chipRow(themes().map(function (t) {
+        return { action: "make", value: t.id, label: t.title, on: state.makeId === t.id };
+    }));
+    const theme = themeById(state.makeId);
+    let panel = "";
+    if (theme) {
+        const copied = state.copyMsg === "make";
+        panel = '<div class="panel">' +
+            (theme.blurb ? '<p class="lede">' + escapeHtml(theme.blurb) + "</p>" : "") +
+            '<div class="field"><span class="lab">年級</span>' + pills("grade", state.grade, GRADES[state.band]) + "</div>" +
+            '<div class="field"><span class="lab">' + escapeHtml(theme.choiceLabel || theme.inputs[1][0]) + "</span>" +
+            pills("option", state.option, theme.choices || theme.inputs[1][1]) + "</div>" +
+            '<div class="field"><span class="lab">Vibe Coding 提示詞</span>' +
+            '<textarea readonly id="make-prompt">' + escapeHtml(currentPrompt()) + "</textarea></div>" +
+            '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy" data-value="make">' + icon("copy") + "複製這段提示詞</button>" +
+            (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div>" +
+            '<p class="lede" style="margin-top:12px">複製後貼上 Gemini，以建立此學習助手網頁。</p></div>';
+    }
+    if (!lockOpen("make")) return lockBox("make");
+    return '<p class="lede">請選擇一個主題，再選擇年級及相關重點。提示詞會即時顯示，複製後貼上 Gemini。</p>' +
+        cards + panel;
+}
+
+function bandIcon(kind) {
+    const pri = '<path d="M8 20V10"/><path d="M16 20V10"/><path d="M4 20h16"/><path d="M12 4l8 6H4z"/><path d="M10 20v-4h4v4"/>';
+    const sec = '<path d="M3 10l9-6 9 6-9 6z"/><path d="M7 12v5c0 1.5 2.2 3 5 3s5-1.5 5-3v-5"/><path d="M21 10v6"/>';
+    return '<svg class="band-ico" viewBox="0 0 24 24" aria-hidden="true">' + (kind === "pri" ? pri : sec) + "</svg>";
+}
+
+function renderHome() {
+    return '<p class="lede">請先選擇小學或中學。</p><div class="band-row">' +
+        '<button type="button" class="band-card" data-action="band" data-value="pri">' + bandIcon("pri") + "<strong>小學</strong><em>小四至小六</em></button>" +
+        '<button type="button" class="band-card" data-action="band" data-value="sec">' + bandIcon("sec") + "<strong>中學</strong><em>中一至中三</em></button>" +
+        "</div>";
+}
+
+function render() {
+    const scrollY = window.scrollY;
+    const viewKey = state.activity + "|" + state.helperBand + "|" + state.band + "|" + state.playId + "|" + state.makeId;
+    const keepScroll = state._viewKey === viewKey;
+    let html;
+    if (!state.band) {
+        html = '<section class="column">' + renderHome() + "</section>";
     } else {
-        alert("找不到對應的作品。請確認同學已經發佈，或檢查號碼是否正確。");
-        loadDatabase();
+        const nav = segBar([
+            { action: "activity", value: "prompt", label: "Go Play：引導式提示詞", on: state.activity === "prompt" },
+            { action: "activity", value: "helper", label: "Go Play：學習小助手", on: state.activity === "helper" },
+            { action: "activity", value: "make", label: "Go Make：親子共創", on: state.activity === "make" }
+        ]);
+        const back = '<div class="back-row"><button type="button" class="back-btn" data-action="home">返回選擇小學或中學</button></div>';
+        let below = "";
+        if (state.activity === "prompt") below = renderPrompting();
+        if (state.activity === "helper") below = renderHelper();
+        if (state.activity === "make") below = renderMake();
+        html = '<section class="column">' + back + nav + below + "</section>";
+    }
+    document.getElementById("app").innerHTML = html;
+    saveState();
+    state._viewKey = viewKey;
+    window.scrollTo(0, keepScroll ? scrollY : 0);
+}
+
+function copyText(text, msg) {
+    function done() {
+        state.copyMsg = msg;
+        render();
+    }
+    function fallback() {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.left = "-9999px";
+        document.body.appendChild(area);
+        area.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        document.body.removeChild(area);
+        done();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        let finished = false;
+        function finish() {
+            if (finished) return;
+            finished = true;
+            done();
+        }
+        navigator.clipboard.writeText(text).then(finish).catch(function () {
+            fallback();
+            finish();
+        });
+        setTimeout(function () {
+            if (!finished) {
+                fallback();
+                finish();
+            }
+        }, 500);
+    } else {
+        fallback();
     }
 }
 
-renderExampleButtons("examples-q1", examplesQ1, "answer-q1");
-renderExampleButtons("examples-q2", examplesQ2, "answer-q2");
-renderExampleButtons("examples-q3", examplesQ3, "answer-q3");
-renderPlayChoices();
-updatePrompt();
+document.getElementById("app").addEventListener("click", function (event) {
+    const btn = event.target.closest("[data-action]");
+    if (!btn) return;
+    const action = btn.getAttribute("data-action");
+    const value = btn.getAttribute("data-value");
+    if (action !== "unlock") state.lockError = "";
+    state.copyMsg = "";
+    if (action === "home") {
+        state.band = "";
+    } else if (action === "activity") {
+        state.activity = value;
+    } else if (action === "helper-band") {
+        state.helperBand = value;
+    } else if (action === "band") {
+        if (state.band !== value) {
+            state.band = value;
+            state.makeId = "";
+            state.grade = "";
+            state.option = "";
+        }
+    } else if (action === "open") {
+        state.page = value;
+    } else if (action === "play-mode") {
+        state.playMode = value;
+    } else if (action === "play") {
+        state.playId = value;
+    } else if (action === "make") {
+        if (state.makeId !== value) {
+            const theme = themeById(value);
+            state.makeId = value;
+            state.grade = GRADES[state.band][1];
+            state.option = (theme.choices || theme.inputs[1][1])[0];
+        }
+    } else if (action === "toggle-helper-prompt") {
+        state.showHelperPrompt = !state.showHelperPrompt;
+    } else if (action === "download-vibe") {
+        downloadVibeFile();
+        return;
+    } else if (action === "grade") {
+        state.grade = value;
+    } else if (action === "option") {
+        state.option = value;
+    } else if (action === "unlock") {
+        const typed = (document.getElementById("lock-pass").value || "").trim();
+        if (typed === LOCK_PASS[value]) {
+            try { sessionStorage.setItem("pcws-lock-" + value, "1"); } catch (e) {}
+            state.lockError = "";
+        } else {
+            state.lockError = value;
+        }
+    } else if (action === "copy") {
+        const text = value === "make"
+            ? currentPrompt()
+            : (document.getElementById(value) || {}).value || "";
+        if (text) copyText(text, value === "make" ? "make" : value);
+        return;
+    }
+    render();
+});
+
+document.getElementById("app").addEventListener("keydown", function (event) {
+    if (event.key !== "Enter" || event.target.id !== "lock-pass") return;
+    event.preventDefault();
+    const btn = document.querySelector('[data-action="unlock"]');
+    if (btn) btn.click();
+});
+
+render();
 </script>
-
-<footer class="site-footer">
-    © 2026 CLEAR, The Chinese University of Hong Kong · Parent–Child Workshop
-</footer>
-
 </body>
 </html>
