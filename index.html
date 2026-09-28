@@ -93,9 +93,7 @@
     }
     .seg-btn.on { background: var(--goai-blue); color: #fff; box-shadow: 0 8px 18px rgba(2, 33, 105, 0.18); }
     .chip-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 0 16px; }
-    .chip-row.play { gap: 22px 36px; }
-    .chip-col { display: flex; flex-direction: column; align-items: center; gap: 4px; max-width: 220px; }
-    .src-line { font-size: 0.72rem; line-height: 1.3; font-weight: 700; color: #64748b; text-align: center; }
+    .src-line { margin: 16px 0 0; font-size: 0.78rem; line-height: 1.45; font-weight: 700; color: #64748b; text-align: center; }
     .field .chip-row { justify-content: flex-start; margin-bottom: 0; }
     .tab-bar {
         display: flex; align-items: center; gap: 4px; background: #eef1f6;
@@ -160,7 +158,6 @@
         border: 2px solid #e2e8f0;
     }
     .route-card h3 { font-size: 1.2rem; }
-    .play-frame { width: 100%; height: 78vh; min-height: 640px; border: 2px solid #e2e8f0; border-radius: 16px; background: #fff; }
     .band-row { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
     .band-card {
         flex: 1 1 240px; max-width: 340px; min-height: 240px; border: 3px solid #e2e8f0; border-radius: 28px;
@@ -207,7 +204,6 @@
 </header>
 <main id="app"></main>
 <footer class="site-footer">© 2026 CLEAR, The Chinese University of Hong Kong · Parent–Child Workshop</footer>
-<script src="vibe-source.js"></script>
 <script>
 const STORAGE_KEY = "pcws-coach-v1";
 const LOCK_PASS = { vibe: "jcgoai", make: "pcws" };
@@ -216,7 +212,7 @@ const PLAY = [
     {
         id: "chi",
         title: "中文",
-        source: "TSA小六中文寫作",
+        source: "資料來源：TSA P6 - 中國語文寫作評估",
         lead: "作文題：一次停電的晚餐",
         hint: "",
         basic: "有一天，你和家人在家中吃晚餐時突然停電。請寫一篇文章，記述那一次的經歷和感受。",
@@ -229,7 +225,7 @@ const PLAY = [
     {
         id: "eng",
         title: "英文",
-        source: "Pre S1 HKAT - reading",
+        source: "資料來源：Pre S1 HKAT - 英國語文閱讀評估",
         lead: "閱讀理解。篇章和題目請看工作紙。",
         hint: "請先打開工作紙上的英文篇章，再複製提示詞。",
         basic: "Attached the passage and questions (jpg or pdf)\nGive me the answers with explanation.",
@@ -242,7 +238,7 @@ const PLAY = [
     {
         id: "math",
         title: "數學",
-        source: "Pre S1 HKAT - MC question",
+        source: "資料來源：Pre S1 HKAT - 數學科選擇題",
         lead: "梯形題。題目圖請看工作紙。",
         hint: "Level 2 是按講義「先加角色、不要直接給答案」補上的一句。Level 3 沿用講義原文。",
         basic: "Attached the diagram (jpg or pdf)\n上圖是由P和Q兩個梯形所組成，Q的面積是30 cm^2，h的值是多少？",
@@ -792,28 +788,23 @@ function subjectDownloads(id) {
     return "";
 }
 
-function playChipRow() {
-    return '<div class="chip-row play">' + PLAY.map(function (s) {
-        const source = state.band === "pri" && s.source
-            ? '<span class="src-line">' + escapeHtml(s.source) + "</span>"
-            : "";
-        const on = state.playId === s.id;
-        return '<div class="chip-col">' + source +
-            '<button type="button" class="pill-btn' + (on ? " on" : "") + '" data-action="play" data-value="' + escapeHtml(s.id) + '" aria-pressed="' + (on ? "true" : "false") + '">' + escapeHtml(s.title) + "</button></div>";
-    }).join("") + "</div>";
-}
-
 function renderPrompting() {
-    const chips = playChipRow();
+    const chips = chipRow(PLAY.map(function (s) {
+        return { action: "play", value: s.id, label: s.title, on: state.playId === s.id };
+    }));
     const subject = playById(state.playId);
     let panel = "";
     if (subject) {
         const mathNote = subject.id === "math" ? subject.hint : "";
+        const source = state.band === "pri" && subject.source
+            ? '<p class="src-line">' + escapeHtml(subject.source) + "</p>"
+            : "";
         panel = '<div class="panel">' +
             subjectDownloads(subject.id) +
             levelBlock("basic", "Level 1", subject.basic, "", "lv1") +
             levelBlock("mid", "Level 2", subject.mid, mathNote, "lv2") +
             levelBlock("high", "Level 3", subject.high(state.band), "", "lv3") +
+            source +
             "</div>";
     }
     return chips +
@@ -822,26 +813,7 @@ function renderPrompting() {
 }
 
 function renderHelper() {
-    let below = '<p class="lede">此為 Gemini Canvas 生成的作品。請選擇年級、文體及題目，然後依次完成五個寫作步驟。</p>';
-    if (state.band === "pri") {
-        below += '<iframe class="play-frame" title="AI中文寫作小助理" src="play-vibe.html"></iframe>';
-    }
-    below += '<div class="btn-row"><button type="button" class="primary-btn" data-action="download-vibe">下載完整代碼</button></div>';
-    return below;
-}
-
-function downloadVibeFile() {
-    const text = window.VIBE_HTML || "";
-    if (!text) return;
-    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "AI中文寫作小助理.txt";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    return "";
 }
 
 function renderMake() {
@@ -888,7 +860,7 @@ function render() {
     } else {
         const nav = segBar([
             { action: "activity", value: "prompt", label: "Go Play：引導式提示詞", on: state.activity === "prompt" },
-            { action: "activity", value: "helper", label: "Go Play：學習小助手", on: state.activity === "helper" },
+            { action: "activity", value: "helper", label: "Go Play：互動學習遊戲", on: state.activity === "helper" },
             { action: "activity", value: "make", label: "Go Make：親子共創", on: state.activity === "make" }
         ]);
         const back = '<div class="back-row"><button type="button" class="back-btn" data-action="home">返回選擇小學或中學</button></div>';
@@ -1001,9 +973,6 @@ document.getElementById("app").addEventListener("click", function (event) {
         state.playId = value;
     } else if (action === "make") {
         state.makeId = value;
-    } else if (action === "download-vibe") {
-        downloadVibeFile();
-        return;
     } else if (action === "unlock") {
         const typed = (document.getElementById("lock-pass").value || "").trim();
         if (typed === LOCK_PASS[value]) {
