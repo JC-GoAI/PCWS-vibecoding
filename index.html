@@ -796,7 +796,7 @@ function renderPrompting() {
     let panel = "";
     if (subject) {
         const mathNote = subject.id === "math" ? subject.hint : "";
-        const source = state.band === "pri" && subject.source
+        const source = subject.source
             ? '<p class="src-line">' + escapeHtml(subject.source) + "</p>"
             : "";
         panel = '<div class="panel">' +
@@ -817,24 +817,7 @@ function renderHelper() {
 }
 
 function renderMake() {
-    const cards = chipRow(themes().map(function (t) {
-        return { action: "make", value: t.id, label: t.title, on: state.makeId === t.id };
-    }));
-    const theme = themeById(state.makeId);
-    let panel = "";
-    if (theme) {
-        const copied = state.copyMsg === "make";
-        panel = '<div class="panel">' +
-            (theme.blurb ? '<p class="lede">' + escapeHtml(theme.blurb) + "</p>" : "") +
-            '<div class="field"><span class="lab">Vibe Coding 提示詞</span>' +
-            '<textarea readonly id="make-prompt">' + escapeHtml(currentPrompt()) + "</textarea></div>" +
-            '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy" data-value="make">' + icon("copy") + "複製這段提示詞</button>" +
-            (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div>" +
-            '<p class="lede" style="margin-top:12px">複製後貼上 Gemini，以建立此學習助手網頁。</p></div>';
-    }
-    if (!lockOpen("make")) return lockBox("make");
-    return '<p class="lede">請選擇一個主題。提示詞會即時顯示，複製後貼上 Gemini。</p>' +
-        cards + panel;
+    return "";
 }
 
 function bandIcon(kind) {
