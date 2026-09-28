@@ -93,6 +93,9 @@
     }
     .seg-btn.on { background: var(--goai-blue); color: #fff; box-shadow: 0 8px 18px rgba(2, 33, 105, 0.18); }
     .chip-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 0 16px; }
+    .chip-row.play { gap: 22px 36px; }
+    .chip-col { display: flex; flex-direction: column; align-items: center; gap: 4px; max-width: 220px; }
+    .src-line { font-size: 0.72rem; line-height: 1.3; font-weight: 700; color: #64748b; text-align: center; }
     .field .chip-row { justify-content: flex-start; margin-bottom: 0; }
     .tab-bar {
         display: flex; align-items: center; gap: 4px; background: #eef1f6;
@@ -213,6 +216,7 @@ const PLAY = [
     {
         id: "chi",
         title: "中文",
+        source: "TSA小六中文寫作",
         lead: "作文題：一次停電的晚餐",
         hint: "",
         basic: "有一天，你和家人在家中吃晚餐時突然停電。請寫一篇文章，記述那一次的經歷和感受。",
@@ -225,6 +229,7 @@ const PLAY = [
     {
         id: "eng",
         title: "英文",
+        source: "Pre S1 HKAT - reading",
         lead: "閱讀理解。篇章和題目請看工作紙。",
         hint: "請先打開工作紙上的英文篇章，再複製提示詞。",
         basic: "Attached the passage and questions (jpg or pdf)\nGive me the answers with explanation.",
@@ -237,6 +242,7 @@ const PLAY = [
     {
         id: "math",
         title: "數學",
+        source: "Pre S1 HKAT - MC question",
         lead: "梯形題。題目圖請看工作紙。",
         hint: "Level 2 是按講義「先加角色、不要直接給答案」補上的一句。Level 3 沿用講義原文。",
         basic: "Attached the diagram (jpg or pdf)\n上圖是由P和Q兩個梯形所組成，Q的面積是30 cm^2，h的值是多少？",
@@ -786,10 +792,19 @@ function subjectDownloads(id) {
     return "";
 }
 
+function playChipRow() {
+    return '<div class="chip-row play">' + PLAY.map(function (s) {
+        const source = state.band === "pri" && s.source
+            ? '<span class="src-line">' + escapeHtml(s.source) + "</span>"
+            : "";
+        const on = state.playId === s.id;
+        return '<div class="chip-col">' + source +
+            '<button type="button" class="pill-btn' + (on ? " on" : "") + '" data-action="play" data-value="' + escapeHtml(s.id) + '" aria-pressed="' + (on ? "true" : "false") + '">' + escapeHtml(s.title) + "</button></div>";
+    }).join("") + "</div>";
+}
+
 function renderPrompting() {
-    const chips = chipRow(PLAY.map(function (s) {
-        return { action: "play", value: s.id, label: s.title, on: state.playId === s.id };
-    }));
+    const chips = playChipRow();
     const subject = playById(state.playId);
     let panel = "";
     if (subject) {
