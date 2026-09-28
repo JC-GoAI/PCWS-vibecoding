@@ -903,8 +903,21 @@ function sizePromptAreas() {
     if (level3) level3.style.height = (promptContentHeight(level3) + 8) + "px";
     const make = document.getElementById("make-prompt");
     if (make) {
+        const panel = make.closest(".panel");
+        const footer = document.querySelector(".site-footer");
+        const makeTop = make.getBoundingClientRect().top + window.scrollY;
+        const afterBox = panel
+            ? panel.getBoundingClientRect().bottom - make.getBoundingClientRect().bottom
+            : 140;
+        const footerSpace = footer ? footer.offsetHeight + 48 : 0;
+        const available = window.innerHeight - makeTop - afterBox - footerSpace - 16;
         const full = promptContentHeight(make);
-        make.style.height = Math.max(160, Math.round(full / 2)) + "px";
+        make.style.height = Math.max(120, Math.min(full, Math.round(available))) + "px";
+        const overflow = document.documentElement.scrollHeight - window.innerHeight;
+        if (overflow > 0) {
+            const next = parseFloat(make.style.height) - overflow - 4;
+            make.style.height = Math.max(96, Math.round(next)) + "px";
+        }
     }
 }
 
