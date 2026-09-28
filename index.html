@@ -127,7 +127,6 @@
         width: 100%; box-sizing: border-box; border: 2px solid #e2e8f0; border-radius: 12px;
         padding: 12px; font: inherit; line-height: 1.55; background: #fff;
     }
-    textarea { min-height: 140px; resize: vertical; }
     .error-text { color: #c53030; font-size: 0.9rem; font-weight: 700; margin: 8px 0 0; }
     .pass-box { max-width: 420px; margin: 16px auto 0; background: #f7f9fc; border-radius: 16px; padding: 16px; border: 2px solid #e2e8f0; }
     .site-footer {
@@ -927,33 +926,18 @@ function renderHelper() {
     return below;
 }
 
-function saveTextFile(text, name) {
-    const blob = new Blob([text], { type: "text/html;charset=utf-8" });
+function downloadVibeFile() {
+    const text = window.VIBE_HTML || "";
+    if (!text) return;
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = name;
+    link.download = "AI中文寫作小助理.txt";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
-}
-
-function downloadVibeFile() {
-    const name = "AI中文寫作小助理.html";
-    function fromEmbedded() {
-        if (window.VIBE_HTML) saveTextFile(window.VIBE_HTML, name);
-    }
-    if (location.protocol === "file:") {
-        fromEmbedded();
-        return;
-    }
-    fetch("play-vibe.html").then(function (res) {
-        if (!res.ok) throw new Error("missing");
-        return res.text();
-    }).then(function (text) {
-        saveTextFile(text, name);
-    }).catch(fromEmbedded);
 }
 
 function renderMake() {
