@@ -178,6 +178,24 @@
         display: block; width: 100%; height: calc(100vh - 250px); min-height: 720px;
         border: 0; border-radius: 18px; background: #fffbf0;
     }
+    .game-tools { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .game-tools .ghost-btn { flex: 1 1 200px; }
+    .game-tools .ghost-btn[aria-expanded="true"] { background: var(--goai-blue); color: #fff; border-color: var(--goai-blue); }
+    .reveal-panel {
+        display: none; margin-top: 12px; background: #f7f9fc; border: 2px solid #e2e8f0;
+        border-radius: 16px; padding: 16px; max-height: 70vh; overflow: auto;
+    }
+    .reveal-panel.open { display: block; }
+    .nocopy, .nocopy * {
+        user-select: none; -webkit-user-select: none; -moz-user-select: none;
+        -webkit-touch-callout: none; -webkit-user-drag: none;
+    }
+    .prompt-view { margin: 0; white-space: pre-wrap; line-height: 1.7; font: inherit; color: #1a202c; }
+    .chat-shot { position: relative; margin: 0 0 12px; }
+    .chat-shot:last-child { margin-bottom: 0; }
+    .chat-shot img { width: 100%; height: auto; display: block; border-radius: 12px; pointer-events: none; }
+    .chat-shield { position: absolute; inset: 0; }
+    @media print { .nocopy { display: none !important; } }
     body.playing-game #app { max-width: 1100px; }
     @media (max-width: 768px) {
         header { padding: 10px 16px; }
@@ -817,9 +835,62 @@ function renderPrompting() {
         panel;
 }
 
+const GAME_PROMPT = [
+    "# 角色",
+    "你是一位擅長製作中文教育遊戲的前端工程師。",
+    "",
+    "# 背景與任務",
+    "請建立可直接遊玩的單頁遊戲《成語迴轉壽司店》：淺色柔和的日式迴轉壽司店，糖果色，人物與物件要大，字體清晰。畫面要有遊戲感，不要像測驗卷或工作紙。",
+    "遊戲機制：",
+    "",
+    "玩家是壽司店學徒。上方坐着客人，旁邊是一句有空格的句子，頭上有耐心條，中間為答對的成語解釋。下方迴轉帶持續移動，每次只見三四件成語壽司，只有一件正確。玩家要在正確那件經過面前時點選。",
+    "點中後，壽司飛入空格，客人滿意，加分，Combo 加一，約一秒顯示一句解釋，隨即迎接下一位客人。點錯則壽司跌落，Combo 中斷，耐心下降。正確那件走過而未點到，視作漏單，耐心再降。耐心歸零或 60 秒完結，遊戲結束。答錯或漏單只扣耐心，不扣剩餘時間。",
+    "連續答對累積 Combo，三連擊起分數以 1.5、2、3 倍計算，並有得分與煙花特效。連續五題出現熟客，答對雙倍分。難度逐步提升：開局帶慢、干擾項意思相差較遠；中段帶快、加入近義或形近成語；尾段客人耐心較短，間中兩個空格，要按順序點選。",
+    "題目隨機抽取，包括句子填充、情境應用及日常生活，以香港小四至小六常見成語為主，不少於 100 條，每條一句解釋。結束後先顯示該局成語圖鑑（成語、原句、解釋），再可下載 Word 檔。",
+    "",
+    "# 指導與限制",
+    "- 香港書面語繁體中文，適合小四至小六",
+    "- 支援滑鼠、觸控、手機及電腦",
+    "- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行",
+    "- 單空格只有一個正確答案；雙空格要按正確順序點選",
+    "- 動畫要流暢：帶移動、壽司飛入、答錯跌落、客人表情、得分與 Combo 特效"
+].join("\n");
+
 function renderHelper() {
     if (state.band !== "pri") return "";
-    return '<iframe class="game-frame" title="成語迴轉壽司店" src="games/idiom-sushi.html"></iframe>';
+    return '<iframe class="game-frame" title="成語迴轉壽司店" src="games/idiom-sushi.html"></iframe>' +
+        '<div class="game-tools">' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">展示prompt</button>' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-chat" aria-expanded="false">展示與AI的完整對話</button>' +
+        '<button type="button" class="ghost-btn" data-action="download-code">下載完整代碼</button>' +
+        "</div>" +
+        '<div id="reveal-prompt" class="reveal-panel nocopy"><pre class="prompt-view">' + escapeHtml(GAME_PROMPT) + "</pre></div>" +
+        '<div id="reveal-chat" class="reveal-panel nocopy">' +
+        '<div class="chat-shot"><img src="games/ai-chat-1.png" alt="" draggable="false"><div class="chat-shield"></div></div>' +
+        '<div class="chat-shot"><img src="games/ai-chat-2.png" alt="" draggable="false"><div class="chat-shield"></div></div>' +
+        "</div>";
+}
+
+function downloadGameCode() {
+    fetch("games/idiom-sushi.html").then(function (res) {
+        if (!res.ok) throw new Error("missing");
+        return res.text();
+    }).then(function (text) {
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "成語迴轉壽司店.txt";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+    }).catch(function () {});
+}
+
+function insideLockedCopy(node) {
+    const el = node && node.nodeType === 1 ? node : node && node.parentElement;
+    return !!(el && el.closest && el.closest(".nocopy"));
 }
 
 function renderMake() {
@@ -977,9 +1048,36 @@ document.getElementById("app").addEventListener("click", function (event) {
             : (document.getElementById(value) || {}).value || "";
         if (text) copyText(text, value === "make" ? "make" : value);
         return;
+    } else if (action === "reveal") {
+        const panel = document.getElementById(value);
+        if (!panel) return;
+        const open = panel.classList.toggle("open");
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+        if (open) panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        return;
+    } else if (action === "download-code") {
+        downloadGameCode();
+        return;
     }
     render();
 });
+
+["copy", "cut", "contextmenu", "dragstart", "selectstart"].forEach(function (type) {
+    document.addEventListener(type, function (event) {
+        if (!insideLockedCopy(event.target)) return;
+        event.preventDefault();
+        if (event.clipboardData) event.clipboardData.setData("text/plain", "");
+    });
+});
+
+document.addEventListener("keydown", function (event) {
+    const key = (event.key || "").toLowerCase();
+    const shortcut = (event.metaKey || event.ctrlKey) && (key === "c" || key === "x" || key === "a" || key === "s" || key === "p" || key === "u");
+    if (!shortcut) return;
+    const sel = window.getSelection();
+    const selected = sel && sel.anchorNode && insideLockedCopy(sel.anchorNode);
+    if (insideLockedCopy(event.target) || selected) event.preventDefault();
+}, true);
 
 document.getElementById("app").addEventListener("keydown", function (event) {
     if (event.key !== "Enter" || event.target.id !== "lock-pass") return;
