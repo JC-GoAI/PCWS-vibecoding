@@ -191,10 +191,16 @@
         -webkit-touch-callout: none; -webkit-user-drag: none;
     }
     .prompt-view { margin: 0; white-space: pre-wrap; line-height: 1.7; font: inherit; color: #1a202c; }
-    .chat-shot { position: relative; margin: 0 0 12px; }
-    .chat-shot:last-child { margin-bottom: 0; }
-    .chat-shot img { width: 100%; height: auto; display: block; border-radius: 12px; pointer-events: none; }
+    .chat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+    .chat-shot { position: relative; margin: 0; min-width: 0; }
+    .chat-shot img {
+        display: block; width: 100%; height: auto; max-width: 100%;
+        border-radius: 12px; pointer-events: none;
+    }
+    #chat-img-1 { max-width: min(100%, 845px); }
+    #chat-img-2 { max-width: min(100%, 964px); }
     .chat-shield { position: absolute; inset: 0; }
+    body.playing-game.chat-open #app { max-width: min(98vw, 1860px); }
     @media print { .nocopy { display: none !important; } }
     body.playing-game #app { max-width: 1100px; }
     @media (max-width: 768px) {
@@ -865,10 +871,10 @@ function renderHelper() {
         '<button type="button" class="ghost-btn" data-action="download-code">下載完整代碼</button>' +
         "</div>" +
         '<div id="reveal-prompt" class="reveal-panel nocopy"><pre class="prompt-view">' + escapeHtml(GAME_PROMPT) + "</pre></div>" +
-        '<div id="reveal-chat" class="reveal-panel nocopy">' +
-        '<div class="chat-shot"><img src="games/ai-chat-1.png" alt="" draggable="false"><div class="chat-shield"></div></div>' +
-        '<div class="chat-shot"><img src="games/ai-chat-2.png" alt="" draggable="false"><div class="chat-shield"></div></div>' +
-        "</div>";
+        '<div id="reveal-chat" class="reveal-panel nocopy"><div class="chat-row">' +
+        '<div class="chat-shot"><img id="chat-img-1" src="games/ai-chat-1.png" alt="" draggable="false"><div class="chat-shield"></div></div>' +
+        '<div class="chat-shot"><img id="chat-img-2" src="games/ai-chat-2.png" alt="" draggable="false"><div class="chat-shield"></div></div>' +
+        "</div></div>";
 }
 
 function downloadGameCode() {
@@ -1051,9 +1057,19 @@ document.getElementById("app").addEventListener("click", function (event) {
     } else if (action === "reveal") {
         const panel = document.getElementById(value);
         if (!panel) return;
-        const open = panel.classList.toggle("open");
-        btn.setAttribute("aria-expanded", open ? "true" : "false");
-        if (open) panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        const willOpen = !panel.classList.contains("open");
+        document.querySelectorAll(".reveal-panel").forEach(function (other) {
+            other.classList.remove("open");
+        });
+        document.querySelectorAll('.game-tools [data-action="reveal"]').forEach(function (otherBtn) {
+            otherBtn.setAttribute("aria-expanded", "false");
+        });
+        if (willOpen) {
+            panel.classList.add("open");
+            btn.setAttribute("aria-expanded", "true");
+            panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+        document.body.classList.toggle("chat-open", document.getElementById("reveal-chat").classList.contains("open"));
         return;
     } else if (action === "download-code") {
         downloadGameCode();
