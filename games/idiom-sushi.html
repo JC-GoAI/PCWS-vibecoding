@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>成語迴轉壽司店 - 中文學習遊戲</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Zen Maru Gothic & Noto Sans TC for cute, clear Japanese-style typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
+      background-color: #FFFDF9;
+      color: #4A3E3D;
+      overflow-x: hidden;
+    }
+    /* Cute Candy Palette Variables */
+    :root {
+      --bg-cream: #FFFDF7;
+      --wood-dark: #8D5B4C;
+      --wood-light: #ECC8A0;
+      --tatami: #EAF4DC;
+      --sakura-pink: #FF9AA2;
+      --nori-green: #3D6B56;
+      --salmon-orange: #FF7B54;
+      --tamago-yellow: #FFD166;
+      --tuna-red: #EF476F;
+    }
+
+    /* Conveyor belt tracks pattern */
+    .conveyor-track {
+      background: repeating-linear-gradient(
+        90deg,
+        #4E3629 0px,
+        #4E3629 14px,
+        #3D2B20 14px,
+        #3D2B20 28px
+      );
+      box-shadow: inset 0 6px 12px rgba(0,0,0,0.35);
+    }
+    .tatami-banner {
+      background: radial-gradient(circle, #fbf7ee 10%, transparent 11%), radial-gradient(circle at bottom left, #fbf7ee 5%, transparent 6%), radial-gradient(circle at bottom right, #fbf7ee 5%, transparent 6%), radial-gradient(circle at top left, #fbf7ee 5%, transparent 6%), radial-gradient(circle at top right, #fbf7ee 5%, transparent 6%);
+      background-size: 20px 20px;
+      background-color: #f7ecd7;
+    }
+
+    /* Bounce and float keyframes */
+    @keyframes gentleBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .animate-bob {
+      animation: gentleBob 2.2s ease-in-out infinite;
+    }
+
+    @keyframes dropFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(180px) rotate(45deg); opacity: 0; }
+    }
+    .plate-falling {
+      animation: dropFall 0.55s ease-in forwards !important;
+      pointer-events: none !important;
+    }
+
+    @keyframes popScore {
+      0% { transform: translate(-50%, 0) scale(0.6); opacity: 0; }
+      50% { transform: translate(-50%, -35px) scale(1.3); opacity: 1; }
+      100% { transform: translate(-50%, -60px) scale(1); opacity: 0; }
+    }
+    .score-popup {
+      position: absolute;
+      animation: popScore 0.85s ease-out forwards;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    /* Custom scrollbar for idiom compendium */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F8F1E5;
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #E2BC8C;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-[#FFFBF0] text-[#3D312A] selection:bg-pink-200">
+
+  <!-- Top Bar: Game Stats & Audio Control -->
+  <header class="w-full bg-[#FFEED9] border-b-4 border-[#ECC8A0] px-4 py-2 flex items-center justify-between shadow-sm sticky top-0 z-40">
+    <div class="flex items-center space-x-2">
+      <span class="text-2xl sm:text-3xl">🍣</span>
+      <div>
+        <h1 class="font-black text-lg sm:text-2xl text-[#8D4B38] tracking-wider flex items-center gap-1.5">
+          成語迴轉壽司店
+          <span id="vipBadge" class="hidden text-xs bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full shadow animate-pulse">
+            熟客光臨 (雙倍分!)
+          </span>
+        </h1>
+        <p class="text-xs text-[#A87B65] font-bold">學徒出師大挑戰</p>
+      </div>
+    </div>
+
+    <!-- HUD Indicators -->
+    <div class="flex items-center gap-3 sm:gap-6">
+      <!-- Combo Meter -->
+      <div class="flex flex-col items-center bg-white/80 border-2 border-orange-200 px-3 py-0.5 rounded-2xl shadow-inner min-w-[75px]">
+        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-wider">連擊 COMBO</span>
+        <div class="flex items-baseline gap-1">
+          <span id="comboText" class="text-xl sm:text-2xl font-black text-orange-500 leading-none">0</span>
+          <span id="multiplierBadge" class="text-[11px] font-bold text-pink-600 hidden">x1.5</span>
+        </div>
+      </div>
+
+      <!-- Score Display -->
+      <div class="flex flex-col items-center bg-white/80 border-2 border-amber-200 px-3 py-0.5 rounded-2xl shadow-inner min-w-[85px]">
+        <span class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">營業額 (分)</span>
+        <span id="scoreText" class="text-xl sm:text-2xl font-black text-amber-600 leading-none">0</span>
+      </div>
+
+      <!-- Time Clock -->
+      <div class="flex items-center bg-white border-2 border-red-300 px-3 py-1 rounded-2xl shadow-sm">
+        <span class="text-lg mr-1">⏳</span>
+        <span id="timerText" class="text-xl sm:text-2xl font-black text-rose-500 min-w-[36px] text-center">60</span>
+        <span class="text-xs font-bold text-rose-400 ml-0.5">秒</span>
+      </div>
+
+      <!-- Sound Toggle -->
+      <button id="soundBtn" class="bg-amber-100 hover:bg-amber-200 border-2 border-amber-300 p-2 rounded-2xl transition active:scale-95 text-lg" title="聲音開關">
+        🔊
+      </button>
+    </div>
+  </header>
+
+  <!-- Upper Counter Area: Seated Customers, Patience Bar, Speech Bubble with sentence -->
+  <main class="flex-1 w-full max-w-5xl mx-auto p-3 sm:p-4 flex flex-col justify-between relative overflow-hidden">
+    
+    <!-- Restaurant Background Decorations -->
+    <div class="w-full bg-[#FFF5E4] border-4 border-[#ECC8A0] rounded-3xl p-3 sm:p-5 shadow-lg relative flex flex-col md:flex-row items-center gap-4 sm:gap-6 tatami-banner">
+      
+      <!-- Customer Avatar & Patience Bar -->
+      <div class="flex flex-col items-center shrink-0">
+        <!-- Customer Patience Bar Container -->
+        <div class="w-32 sm:w-36 bg-gray-200 rounded-full h-4 sm:h-5 border-2 border-white shadow-inner overflow-hidden mb-2 relative">
+          <div id="patienceBar" class="h-full bg-gradient-to-r from-emerald-400 via-yellow-400 to-rose-500 rounded-full transition-all duration-300 ease-out" style="width: 100%;"></div>
+          <span class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white drop-shadow">耐心值</span>
+        </div>
+
+        <!-- Customer Character Visual -->
+        <div id="customerAvatarContainer" class="relative group">
+          <div id="customerMoodEmoji" class="absolute -top-3 -right-2 text-2xl z-20 transition-all duration-300">
+            🍵
+          </div>
+          <!-- SVG Cartoon Animals (Swappable) -->
+          <div id="customerSVG" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-orange-100 border-4 border-amber-300 shadow-md flex items-center justify-center relative overflow-hidden animate-bob">
+            <!-- Drawn with inline cute SVG -->
+            <svg id="customerFace" viewBox="0 0 100 100" class="w-20 h-20">
+              <!-- Default: Shiba Inu Guest -->
+              <circle cx="50" cy="50" r="42" fill="#E8A856" />
+              <circle cx="50" cy="60" r="26" fill="#FFF9ED" />
+              <!-- Ears -->
+              <polygon points="20,15 32,38 12,35" fill="#C97F32" />
+              <polygon points="80,15 68,38 88,35" fill="#C97F32" />
+              <!-- Eyes -->
+              <circle id="eyeL" cx="36" cy="46" r="4" fill="#3D2B20" />
+              <circle id="eyeR" cx="64" cy="46" r="4" fill="#3D2B20" />
+              <!-- Blushes -->
+              <circle cx="28" cy="54" r="5" fill="#FFA5A5" opacity="0.7"/>
+              <circle cx="72" cy="54" r="5" fill="#FFA5A5" opacity="0.7"/>
+              <!-- Nose & Mouth -->
+              <ellipse cx="50" cy="52" rx="4" ry="3" fill="#3D2B20" />
+              <path id="mouthPath" d="M 46 58 Q 50 63 54 58" stroke="#3D2B20" stroke-width="2.5" fill="none" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div id="customerNameTag" class="mt-1 text-center bg-amber-700 text-amber-50 text-[11px] font-bold py-0.5 px-2.5 rounded-full shadow">
+            柴犬客人
+          </div>
+        </div>
+      </div>
+
+      <!-- Speech Bubble with Question & Missing Blank(s) -->
+      <div class="flex-1 w-full bg-white/95 border-3 border-amber-200 rounded-3xl p-4 sm:p-5 shadow-md relative min-h-[140px] flex flex-col justify-center">
+        <!-- Speech Bubble pointer triangle -->
+        <div class="hidden md:block absolute -left-3 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-r-[12px] border-r-white/95"></div>
+
+        <!-- Order Category Badge & Prompt -->
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="bg-rose-100 text-rose-600 text-xs font-black px-2.5 py-0.5 rounded-full border border-rose-200 flex items-center gap-1">
+              <span>🥢</span> 點單句子
+            </span>
+            <span id="questionTypeBadge" class="text-[11px] font-bold text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-md">
+              日常情境
+            </span>
+          </div>
+          <span id="blankInstruction" class="text-xs font-bold text-amber-600">
+            請選取壽司填入空格！
+          </span>
+        </div>
+
+        <!-- Question Sentence Display -->
+        <div id="sentenceContainer" class="text-base sm:text-xl font-bold leading-relaxed text-[#3D2F29] tracking-wide py-1">
+          <!-- Dynamically filled with blanks -->
+        </div>
+
+        <!-- Correct Idiom Explanation Popout -->
+        <div id="explanationBox" class="mt-2 text-xs sm:text-sm text-emerald-800 bg-emerald-50 border-2 border-emerald-300 rounded-xl px-3 py-1.5 font-bold flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-1">
+          <span class="text-base">💡</span>
+          <span id="explanationText">答對啦！成語解釋：...</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Central Idiom Explanation Showcase (畫面中間位置成語解釋看板) -->
+    <div id="centerExplanationCard" class="w-full my-2 bg-gradient-to-r from-[#FFF9EE] via-[#FFF3D6] to-[#FFF9EE] border-2 border-amber-300 rounded-2xl px-3 sm:px-4 py-2 shadow-sm transition-all duration-300 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 flex-1 min-w-0">
+        <div id="centerIconBadge" class="w-9 h-9 rounded-xl bg-amber-400 text-white flex items-center justify-center font-black text-lg shrink-0 shadow-sm transition-transform">
+          💡
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-0.5">
+            <span class="text-[11px] font-black text-amber-800 uppercase tracking-wider">成語釋義看板</span>
+            <span id="centerIdiomTag" class="text-xs font-black text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-200 hidden"></span>
+          </div>
+          <p id="centerExplanationText" class="text-xs sm:text-sm font-bold text-[#4A3828] leading-tight line-clamp-2 sm:line-clamp-1">
+            🎯 點擊傳送帶上的正確成語壽司，這裡將為你即時解鎖精闢解釋！
+          </p>
+        </div>
+      </div>
+      <div id="streakFeedback" class="text-pink-600 font-extrabold text-xs sm:text-sm shrink-0 animate-pulse"></div>
+    </div>
+
+    <!-- Conveyor Belt Section -->
+    <div class="w-full bg-[#5C4033] rounded-3xl p-3 sm:p-4 shadow-2xl border-4 border-[#3D281D] relative flex flex-col justify-end">
+      
+      <!-- Counter Bar Shelf Edge & Right-Top Power-up Props Toolbar -->
+      <div class="w-full flex items-center justify-between mb-1.5 px-1">
+        <div class="flex items-center gap-1.5 text-xs font-black text-amber-200/90">
+          <span class="text-base">🍣</span>
+          <span>迴轉盛盤</span>
+        </div>
+        
+        <!-- Three Power-up Props (傳送帶右上方三個小道具) -->
+        <div class="flex items-center gap-2">
+          <!-- Prop 1: Green Tea (Restore Patience) -->
+          <button id="propTeaBtn" class="flex items-center gap-1.5 bg-[#442E23] hover:bg-[#53392C] border-2 border-emerald-400 active:scale-95 text-white px-2.5 py-1 rounded-xl shadow transition" title="使用熱茶：恢復35%顧客耐心值">
+            <span class="text-base sm:text-lg">🍵</span>
+            <div class="flex flex-col text-left leading-none">
+              <span class="text-[10px] font-black text-emerald-300">熱茶</span>
+              <span id="propTeaCount" class="text-[11px] font-black text-white">x2</span>
+            </div>
+          </button>
+
+          <!-- Prop 2: Slow Wasabi (Slows Belt Speed) -->
+          <button id="propWasabiBtn" class="flex items-center gap-1.5 bg-[#442E23] hover:bg-[#53392C] border-2 border-cyan-400 active:scale-95 text-white px-2.5 py-1 rounded-xl shadow transition" title="使用冰鎮芥末：傳送帶減速50%（持續6秒）">
+            <span class="text-base sm:text-lg">🧊</span>
+            <div class="flex flex-col text-left leading-none">
+              <span class="text-[10px] font-black text-cyan-300">減速</span>
+              <span id="propWasabiCount" class="text-[11px] font-black text-white">x2</span>
+            </div>
+          </button>
+
+          <!-- Prop 3: Golden Chopsticks (Remove Wrong & Highlight) -->
+          <button id="propChopsticksBtn" class="flex items-center gap-1.5 bg-[#442E23] hover:bg-[#53392C] border-2 border-amber-400 active:scale-95 text-white px-2.5 py-1 rounded-xl shadow transition" title="使用金筷：剔除錯誤壽司並為正確壽司加上金色高光">
+            <span class="text-base sm:text-lg">🥢</span>
+            <div class="flex flex-col text-left leading-none">
+              <span class="text-[10px] font-black text-amber-300">金筷</span>
+              <span id="propChopsticksCount" class="text-[11px] font-black text-white">x2</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Moving Conveyor Area -->
+      <div id="conveyorTrackArea" class="conveyor-track h-36 sm:h-44 w-full rounded-2xl relative overflow-hidden flex items-center">
+        <!-- Center Target Zone Marking Line (Subtle Visual Aid) -->
+        <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-40 sm:w-56 border-x-2 border-dashed border-amber-300/30 bg-amber-400/5 pointer-events-none flex flex-col justify-between py-1 items-center">
+          <span class="text-[10px] font-black text-amber-200/50 uppercase tracking-widest">點選最佳時機</span>
+          <span class="text-[10px] font-black text-amber-200/50 uppercase tracking-widest">▲ ▲ ▲</span>
+        </div>
+
+        <!-- Plates will be dynamically appended and moved in JS inside this track -->
+        <div id="platesStage" class="w-full h-full relative"></div>
+      </div>
+
+      <!-- Conveyor Base Trim -->
+      <div class="mt-2 flex justify-between items-center px-4 text-[11px] text-amber-200/80 font-bold">
+        <span>◀ 壽司向左迴轉中</span>
+        <span>漏單將會扣減客人耐心哦！</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Welcome / Start Overlay Modal -->
+  <div id="startModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#FFFDF7] border-4 border-[#ECC8A0] rounded-3xl max-w-md w-full p-6 text-center shadow-2xl relative">
+      <div class="text-6xl mb-3 animate-bob">🍣</div>
+      <h2 class="text-2xl sm:text-3xl font-black text-[#8D4B38] mb-2">成語迴轉壽司店</h2>
+      <p class="text-sm sm:text-base font-bold text-amber-800 mb-4 leading-relaxed">
+        歡迎來到成語壽司店！客人點了一道道含有成語空格的佳餚。當正確的成語壽司隨迴轉帶經過你面前時，敏捷點擊上菜吧！
+      </p>
+
+      <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 text-left text-xs sm:text-sm text-amber-900 mb-5 space-y-1.5">
+        <div class="flex items-center gap-2 font-bold text-rose-600">
+          <span>🎯</span><span>遊戲規則：</span>
+        </div>
+        <p>• 點選正確成語壽司飛入空格，客人開心加分並延長耐性。</p>
+        <p>• 點錯或漏單只會扣耐心，<strong>不扣剩餘時間</strong>！</p>
+        <p>• 連續答對累積 Combo，三連擊起享 1.5 ~ 3 倍得分狂歡！</p>
+        <p>• 每答對 5 題迎來「熟客」，可獲得雙倍賞金！</p>
+        <p>• 中後期節奏加快，偶爾會出現兩個空格，需依序點選！</p>
+      </div>
+
+      <button id="startGameBtn" class="w-full bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-black py-3.5 px-6 rounded-2xl text-lg shadow-lg active:scale-95 transition transform">
+        開始營業！(60秒)
+      </button>
+    </div>
+  </div>
+
+  <!-- Game Over & Illustrated Handbook (成語圖鑑) Modal -->
+  <div id="gameOverModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="bg-[#FFFDF7] border-4 border-[#ECC8A0] rounded-3xl max-w-2xl w-full p-5 sm:p-7 text-center shadow-2xl my-auto">
+      
+      <!-- Ending Header -->
+      <div id="endTitleEmoji" class="text-5xl sm:text-6xl mb-1">🎉</div>
+      <h2 id="endTitleText" class="text-2xl sm:text-3xl font-black text-[#8D4B38] mb-1">今日打烊！學徒出師考核</h2>
+      <p id="endSubtitle" class="text-xs sm:text-sm text-amber-800 font-bold mb-4">做得好！客人們非常滿意你的成語壽司手藝！</p>
+
+      <!-- Scoreboard Summary Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-5">
+        <div class="bg-amber-50 border-2 border-amber-200 p-2.5 rounded-2xl">
+          <div class="text-[11px] font-bold text-amber-700">最終營業額</div>
+          <div id="finalScore" class="text-xl sm:text-2xl font-black text-amber-600">0</div>
+        </div>
+        <div class="bg-orange-50 border-2 border-orange-200 p-2.5 rounded-2xl">
+          <div class="text-[11px] font-bold text-orange-700">最高連擊</div>
+          <div id="finalCombo" class="text-xl sm:text-2xl font-black text-orange-500">0</div>
+        </div>
+        <div class="bg-emerald-50 border-2 border-emerald-200 p-2.5 rounded-2xl">
+          <div class="text-[11px] font-bold text-emerald-700">完成訂單</div>
+          <div id="finalCount" class="text-xl sm:text-2xl font-black text-emerald-600">0 份</div>
+        </div>
+        <div class="bg-rose-50 border-2 border-rose-200 p-2.5 rounded-2xl">
+          <div class="text-[11px] font-bold text-rose-700">評價星級</div>
+          <div id="finalRank" class="text-base sm:text-lg font-black text-rose-500 mt-0.5">⭐⭐⭐</div>
+        </div>
+      </div>
+
+      <!-- Session Idiom Handbook (本局成語圖鑑) -->
+      <div class="text-left mb-5">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-base sm:text-lg font-black text-[#8D4B38] flex items-center gap-1.5">
+            <span>📖</span> 本局成語圖鑑 (複習溫故)
+          </h3>
+          <span id="compendiumCount" class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+            共 0 條成語
+          </span>
+        </div>
+        
+        <div id="compendiumList" class="max-h-56 sm:max-h-64 overflow-y-auto space-y-2 pr-1 text-xs sm:text-sm">
+          <!-- Dynamic cards inserted here -->
+        </div>
+      </div>
+
+      <!-- Action Buttons: Restart & Download Word -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button id="downloadWordBtn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-4 rounded-2xl shadow active:scale-95 transition flex items-center justify-center gap-2">
+          <span>📄</span> 下載 Word 學習複習單 (.doc)
+        </button>
+        <button id="restartGameBtn" class="flex-1 bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-black py-3 px-4 rounded-2xl shadow active:scale-95 transition">
+          再來一局！
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Audio SFX Generator via Web Audio API (No external sound files required) */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playCorrect() {
+        if (this.muted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        // Pleasant high chime arpeggio
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+        osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.52);
+      }
+      playWrong() {
+        if (this.muted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(110, now + 0.22);
+
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.26);
+      }
+      playPlateClick() {
+        if (this.muted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.07);
+      }
+      playComboFanfare() {
+        if (this.muted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        [587.33, 739.99, 880, 1174.66].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+          gain.gain.setValueAtTime(0.2, now + idx * 0.07);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.3);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.07);
+          osc.stop(now + idx * 0.07 + 0.32);
+        });
+      }
+      playVIPArrival() {
+        if (this.muted) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        [440, 554.37, 659.25].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+          gain.gain.setValueAtTime(0.25, now + idx * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.35);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.09);
+          osc.stop(now + idx * 0.09 + 0.38);
+        });
+      }
+    }
+    const sounds = new SoundEngine();
+
+    // Comprehensive bank of Hong Kong Primary 4 to 6 Idioms with blanks, distractors and definitions
+    const IDIOM_BANK = [
+      // 1-10
+      {
+        idiom: "守株待兔",
+        sentence: "想要取得優異的成績，我們必須踏實努力，絕不能抱著【___】的僥倖心態。",
+        explanation: "比喻死守狹隘經驗，不知變通，或妄想不勞而獲。",
+        category: "寓言啟發",
+        distractors: ["拔苗助長", "亡羊補牢", "掩耳盜鈴"]
+      },
+      {
+        idiom: "畫蛇添足",
+        sentence: "這篇文章的結尾本已非常完美，你再加上這段話反而是【___】了。",
+        explanation: "比喻多此一舉，不但無益，反而把事情弄糟。",
+        category: "生活寫作",
+        distractors: ["錦上添花", "雪中送炭", "弄巧成拙"]
+      },
+      {
+        idiom: "一舉兩得",
+        sentence: "做義工既能幫助社區長者，又能充實自己的課外體驗，真是一件【___】的好事。",
+        explanation: "做一件事同時收到兩種成效。",
+        category: "日常應用",
+        distractors: ["半途而廢", "徒勞無功", "事倍功半"]
+      },
+      {
+        idiom: "井底之蛙",
+        sentence: "我們應該多出外走走增廣見聞，切莫做目光短淺的【___】。",
+        explanation: "比喻見識狹小、眼界狹窄的人。",
+        category: "修養見聞",
+        distractors: ["害群之馬", "盲人摸象", "坐井觀天"]
+      },
+      {
+        idiom: "亡羊補牢",
+        sentence: "雖然這次測驗沒考好，但只要現在開始【___】認真複習，期末考仍大有可為。",
+        explanation: "比喻出了差錯後，及時想辦法補救，免得再受損失。",
+        category: "學習反思",
+        distractors: ["雪上加霜", "火上澆油", "守株待兔"]
+      },
+      {
+        idiom: "掩耳盜鈴",
+        sentence: "犯了錯誤就應坦白認錯，企圖隱瞞只不過是【___】，自欺欺人罷了。",
+        explanation: "比喻自己欺騙自己，明明掩蓋不住的事情偏要想辦法隱瞞。",
+        category: "做人處事",
+        distractors: ["偷天換日", "裝模作樣", "狐假虎威"]
+      },
+      {
+        idiom: "狐假虎威",
+        sentence: "他仗著班長是他哥哥就在同學面前耀武揚威，這種【___】的行為真令人反感。",
+        explanation: "比喻依仗別人的勢力來欺壓或恐嚇他人。",
+        category: "校園生活",
+        distractors: ["狐疑不決", "狼狽為奸", "投石問路"]
+      },
+      {
+        idiom: "拔苗助長",
+        sentence: "學習必須循序漸進，如果強求過快，往往會【___】，適得其反。",
+        explanation: "比喻急於求成，反而把事情弄糟。",
+        category: "學習啟示",
+        distractors: ["水滴石穿", "循序漸進", "迎難而上"]
+      },
+      {
+        idiom: "塞翁失馬",
+        sentence: "雖然這次旅行因颱風取消，但一家人聚在家裡包餃子也很開心，真是【___】，焉知非福。",
+        explanation: "比喻壞事在一定條件下可以轉變為好事。",
+        category: "生活感悟",
+        distractors: ["盲人摸象", "自相矛盾", "走馬看花"]
+      },
+      {
+        idiom: "同心協力",
+        sentence: "拔河比賽中，全體同學【___】，終於奪得了冠軍。",
+        explanation: "心意相同，努力合作，共同完成事情。",
+        category: "團隊合作",
+        distractors: ["各懷鬼胎", "分道揚鑣", "袖手旁觀"]
+      },
+
+      // 11-20
+      {
+        idiom: "半途而廢",
+        sentence: "做事情最忌諱【___】，只要堅持到底就一定能看見成果。",
+        explanation: "事情做了一半就停止，不能堅持下去。",
+        category: "學習態度",
+        distractors: ["持之以恆", "堅持不懈", "全力以赴"]
+      },
+      {
+        idiom: "水滴石穿",
+        sentence: "只要每天堅持背誦十個英語單詞，日積月累，終能達到【___】的成效。",
+        explanation: "比喻只要持之以恆，堅持不懈，細微的力量也能完成艱難的事。",
+        category: "學習勵志",
+        distractors: ["杯水車薪", "過眼雲煙", "風吹草動"]
+      },
+      {
+        idiom: "熟能生巧",
+        sentence: "彈鋼琴剛開始可能不順手，但只要勤加練習，自會【___】。",
+        explanation: "事情熟練了，自然能掌握巧妙的竅門。",
+        category: "才藝技能",
+        distractors: ["弄巧成拙", "拔苗助長", "平淡無奇"]
+      },
+      {
+        idiom: "集思廣益",
+        sentence: "專題報告遇到瓶頸時，組員們圍坐在一起【___】，很快就想出了新點子。",
+        explanation: "集中眾人的智慧，廣泛吸收有益的意見。",
+        category: "合作探討",
+        distractors: ["獨斷專行", "各執己見", "自以為是"]
+      },
+      {
+        idiom: "雪中送炭",
+        sentence: "在志明最困難的時候，家豪主動借給他參考書，無異於【___】。",
+        explanation: "在別人急需援助時給予即時的幫助。",
+        category: "友情互助",
+        distractors: ["落井下石", "錦上添花", "推波助瀾"]
+      },
+      {
+        idiom: "錦上添花",
+        sentence: "哥哥考獲全班第一，又在演講比賽中折桂，真是【___】，喜上加喜。",
+        explanation: "比喻美上加美，好上加好。",
+        category: "慶賀場面",
+        distractors: ["雪上加霜", "火上澆油", "差強人意"]
+      },
+      {
+        idiom: "名列前茅",
+        sentence: "小晴平日溫習用功，在這次全港數學競賽中果然【___】。",
+        explanation: "比喻成績或名次優異，位居前列。",
+        category: "學業競賽",
+        distractors: ["名落孫山", "屈指可數", "默默無聞"]
+      },
+      {
+        idiom: "名落孫山",
+        sentence: "雖然他在初賽中【___】，但他並沒有氣餒，相約明年再來。",
+        explanation: "指考試或選拔未被錄取。",
+        category: "比賽試煉",
+        distractors: ["名列前茅", "一鳴驚人", "首屈一指"]
+      },
+      {
+        idiom: "溫故知新",
+        sentence: "孔子曾教導我們，學習要時常【___】，才能獲得更深刻的體會。",
+        explanation: "溫習舊知識，從中能有新的領悟與理解。",
+        category: "治學良方",
+        distractors: ["喜新厭舊", "囫圇吞棗", "走馬看花"]
+      },
+      {
+        idiom: "博覽群書",
+        sentence: "李老師【___】，知識淵博，上課時總能為我們講述生動的歷史典故。",
+        explanation: "廣泛閱讀各類書籍，見識廣博。",
+        category: "讀書養成",
+        distractors: ["目不識丁", "坐井觀天", "不求甚解"]
+      },
+
+      // 21-30
+      {
+        idiom: "融會貫通",
+        sentence: "學習科學不能只死記硬背，要將各章節的概念【___】，才能靈活解題。",
+        explanation: "把各方面的知識結合理解，獲得全面透徹的領會。",
+        category: "思考理解",
+        distractors: ["斷章取義", "生搬硬套", "管中窺豹"]
+      },
+      {
+        idiom: "廢寢忘食",
+        sentence: "科學家在實驗室裡【___】地鑽研，終於成功研發出新型環保物料。",
+        explanation: "形容專心致志，連睡覺和吃飯都顧不上了。",
+        category: "專注熱情",
+        distractors: ["東張西望", "游手好閒", "三天打魚"]
+      },
+      {
+        idiom: "聚精會神",
+        sentence: "同學們在課堂上【___】地聽老師講解課文，教室裡安靜得連針掉地都能聽見。",
+        explanation: "集中精神，專心致志。",
+        category: "課堂表現",
+        distractors: ["心不在焉", "魂不守舍", "神魂顛倒"]
+      },
+      {
+        idiom: "胸有成竹",
+        sentence: "面對這次考驗，他早已作好充分準備，因此回答問題時【___】，神態自若。",
+        explanation: "比喻處事之前已有完整成熟的盤算與把握。",
+        category: "自信從容",
+        distractors: ["束手無策", "忐忑不安", "六神無主"]
+      },
+      {
+        idiom: "突飛猛進",
+        sentence: "經過一年的勤奮練習，他在游泳方面的表現【___】，令人刮目相看。",
+        explanation: "形容進步非常迅速。",
+        category: "才藝進步",
+        distractors: ["裹足不前", "江河日下", "停滯不前"]
+      },
+      {
+        idiom: "耳濡目染",
+        sentence: "父母都是熱心公益的人，小芳【___】，從小也十分懂得體貼別人。",
+        explanation: "經常聽到看到，不知不覺中受到深刻影響。",
+        category: "家庭教育",
+        distractors: ["冷眼旁觀", "道聽塗說", "孤陋寡聞"]
+      },
+      {
+        idiom: "潛移默化",
+        sentence: "經典優雅的文學作品能對青少年的心靈產生【___】的良好影響。",
+        explanation: "指人的思想或品性受到無形、不知不覺的感染變化。",
+        category: "文化薰陶",
+        distractors: ["立竿見影", "翻天覆地", "大驚小怪"]
+      },
+      {
+        idiom: "迎難而上",
+        sentence: "遇到艱深複雜的難題時，我們要具備【___】的精神，勇敢尋找突破口。",
+        explanation: "勇敢面對困難，不畏懼退縮。",
+        category: "堅毅品格",
+        distractors: ["知難而退", "畏首畏尾", "望而卻步"]
+      },
+      {
+        idiom: "出類拔萃",
+        sentence: "陳學長不僅品學兼優，還精通體育，在學校裡是個【___】的模範學生。",
+        explanation: "超出同類之上，形容品德或才藝極其卓越。",
+        category: "品德表彰",
+        distractors: ["普普通通", "濫竽充數", "平庸無奇"]
+      },
+      {
+        idiom: "鶴立雞群",
+        sentence: "身高一米八的哥哥站在小學生的隊列中，顯得格外【___】。",
+        explanation: "像鶴站在雞群中一樣，比喻才能或儀表在人群中極為突出。",
+        category: "形象生動",
+        distractors: ["芸芸眾生", "隨波逐流", "混為一談"]
+      },
+
+      // 31-40
+      {
+        idiom: "絡繹不絕",
+        sentence: "維多利亞公園的花市熱鬧非凡，前來觀賞採購的市民【___】。",
+        explanation: "形容行人、車馬接連不斷，往來頻繁。",
+        category: "市井盛況",
+        distractors: ["門可羅雀", "寥寥無幾", "荒無人煙"]
+      },
+      {
+        idiom: "人山人海",
+        sentence: "國慶煙花匯演當晚，尖沙咀海旁【___】，擠得水泄不通。",
+        explanation: "形容聚集的人群非常多，十分擁擠熱鬧。",
+        category: "熱鬧場景",
+        distractors: ["空無一人", "冷冷清清", "四顧無人"]
+      },
+      {
+        idiom: "欣喜若狂",
+        sentence: "當校長宣布我們班獲得戲劇節金獎時，大家激動得【___】，歡呼躍起。",
+        explanation: "高興得像發了狂一樣，形容極度高興歡喜。",
+        category: "心情喜悅",
+        distractors: ["愁眉苦臉", "悲痛欲絕", "心灰意冷"]
+      },
+      {
+        idiom: "眉開眼笑",
+        sentence: "收到爺爺送的精緻模型玩具，弟弟頓時【___】，開心得合不攏嘴。",
+        explanation: "眉頭舒展，眼睛含笑，形容十分高興愉快的樣子。",
+        category: "神情描寫",
+        distractors: ["愁容滿面", "垂頭喪氣", "怒目切齒"]
+      },
+      {
+        idiom: "垂頭喪氣",
+        sentence: "自從遺失了心愛的鋼筆後，美美整天【___】，提不起精神。",
+        explanation: "形容失意沮喪、萎靡不振的神態。",
+        category: "神態情緒",
+        distractors: ["神采飛揚", "趾高氣揚", "得意忘形"]
+      },
+      {
+        idiom: "提心吊膽",
+        sentence: "深夜走在沒有路燈的窄巷裡，他總是【___】，生怕有壞人出現。",
+        explanation: "形容心裡十分害怕、焦慮不安。",
+        category: "心理情緒",
+        distractors: ["高枕無憂", "泰然自若", "處之泰然"]
+      },
+      {
+        idiom: "坐立不安",
+        sentence: "考試成績還沒公布，他在走廊裡來回踱步，顯得【___】。",
+        explanation: "形容心情緊張、焦躁憂慮，坐著躺著都無法安定下來。",
+        category: "緊張描寫",
+        distractors: ["從容不迫", "安之若素", "心平氣和"]
+      },
+      {
+        idiom: "膽小如鼠",
+        sentence: "平時看他身材魁梧，沒想到一見到蟑螂就嚇得跳起來，真是【___】。",
+        explanation: "膽子小得像老鼠一樣，形容膽量非常微小恐怯。",
+        category: "個性特質",
+        distractors: ["勇往直前", "膽大包天", "無所畏懼"]
+      },
+      {
+        idiom: "驚弓之鳥",
+        sentence: "經歷了上次的火警逃生演練，警報一響，他便如同【___】般立刻警覺張望。",
+        explanation: "比喻受過驚嚇後，遇到一點動靜就惶恐不安的人。",
+        category: "情境心理",
+        distractors: ["初生之犢", "籠中之鳥", "落荒而逃"]
+      },
+      {
+        idiom: "迫不及待",
+        sentence: "放學鐘聲一響，同學們便【___】地衝向操場參加運動會。",
+        explanation: "急迫得不能再等待，形容心情非常急切。",
+        category: "行為描寫",
+        distractors: ["從容自若", "慢條斯理", "不慌不忙"]
+      },
+
+      // 41-50
+      {
+        idiom: "水落石出",
+        sentence: "經過警方的縝密調查，這起竊案的真相終於【___】。",
+        explanation: "水退下去，石頭自然顯露出來。比喻事情真相大白。",
+        category: "真相大白",
+        distractors: ["撲朔迷離", "霧裡看花", "暗無天日"]
+      },
+      {
+        idiom: "恍然大悟",
+        sentence: "聽完老師耐心的解說後，我才【___】，原來這道題可以用逆向思維解開。",
+        explanation: "突然間猛然醒悟過來。",
+        category: "思考豁達",
+        distractors: ["茫然不解", "不知所措", "冥頑不靈"]
+      },
+      {
+        idiom: "鴉雀無聲",
+        sentence: "校長走上講台準備宣布重要消息時，整個禮堂頓時【___】。",
+        explanation: "連烏鴉和麻雀的聲音都沒有，形容環境極為寂靜。",
+        category: "環境描繪",
+        distractors: ["人聲鼎沸", "吵鬧不休", "沸沸揚揚"]
+      },
+      {
+        idiom: "大公無私",
+        sentence: "作為球場裁判，必須秉持【___】的原則，公正判定每一次違規。",
+        explanation: "辦事公正公正，毫不偏袒私心。",
+        category: "品德操守",
+        distractors: ["自私自利", "營私舞弊", "偏聽偏信"]
+      },
+      {
+        idiom: "捨己為人",
+        sentence: "消防員在烈火中【___】救出受困居民，其英勇事蹟令人肅然起敬。",
+        explanation: "捨棄自己的利益甚至生命，去幫助或拯救他人。",
+        category: "崇高精神",
+        distractors: ["損人利己", "假公濟私", "獨善其身"]
+      },
+      {
+        idiom: "見義勇為",
+        sentence: "看到老奶奶在馬路中央跌倒，那位青年【___】，立即上前將她扶至安全處。",
+        explanation: "看到正義的事就勇敢地去做，毫不猶豫退縮。",
+        category: "善行義舉",
+        distractors: ["袖手旁觀", "置身事外", "畏縮不前"]
+      },
+      {
+        idiom: "飲水思源",
+        sentence: "我們今天能擁有優良的學習環境，必須【___】，感恩前輩與學校的付出。",
+        explanation: "喝水時想到水源，比喻不忘本，懂得感恩報德。",
+        category: "感恩道德",
+        distractors: ["忘恩負義", "過河拆橋", "得魚忘筌"]
+      },
+      {
+        idiom: "過河拆橋",
+        sentence: "別人幫助你渡過難關後，你絕不能【___】，做出背棄朋友的事情。",
+        explanation: "比喻達到目的後，就把曾經幫助過自己的人一腳踢開。",
+        category: "處事警惕",
+        distractors: ["飲水思源", "知恩圖報", "投桃報李"]
+      },
+      {
+        idiom: "腳踏實地",
+        sentence: "通往成功的道路沒有捷徑，只有【___】地耕耘，才能收穫甜美的果實。",
+        explanation: "比喻做事踏實認真、不浮誇、不走捷徑。",
+        category: "奮鬥勉勵",
+        distractors: ["好高騖遠", "空中樓閣", "虛無縹緲"]
+      },
+      {
+        idiom: "好高騖遠",
+        sentence: "基礎尚未穩固就想挑戰高難度技巧，難免顯得有些【___】。",
+        explanation: "比喻不切實際地追求過高過遠的目標。",
+        category: "學藝警惕",
+        distractors: ["實事求是", "腳踏實地", "穩紮穩打"]
+      },
+
+      // 51-60
+      {
+        idiom: "事半功倍",
+        sentence: "找到了合適的學習方法，複習起來自然能收到【___】的效果。",
+        explanation: "形容費力小而收效大。",
+        category: "方法效率",
+        distractors: ["事倍功半", "徒勞無功", "勞而無功"]
+      },
+      {
+        idiom: "事倍功半",
+        sentence: "缺乏良好的時間規劃，盲目熬夜苦讀往往只會【___】。",
+        explanation: "形容花費了加倍的精力，卻只收到一半的成效。",
+        category: "反思借鑑",
+        distractors: ["事半功倍", "一日千里", "水到渠成"]
+      },
+      {
+        idiom: "徒勞無功",
+        sentence: "如果不分析根本原因就胡亂修理儀器，最後只會是【___】。",
+        explanation: "白白耗費了辛勞，卻沒有收到任何成效。",
+        category: "做事啟發",
+        distractors: ["卓有成效", "功成名就", "大功告成"]
+      },
+      {
+        idiom: "自相矛盾",
+        sentence: "你剛才說他從未遲到，現在又說他經常早退，這不是【___】嗎？",
+        explanation: "比喻言行前後不一致，自己否定自己。",
+        category: "邏輯辨析",
+        distractors: ["天衣無縫", "名副其實", "無懈可擊"]
+      },
+      {
+        idiom: "對牛彈琴",
+        sentence: "給完全不懂樂理的人大談交響樂的和弦變換，簡直是【___】。",
+        explanation: "比喻對不懂道理的人講高深道理，白費口舌；亦譏諷說話者不看對象。",
+        category: "幽默生動",
+        distractors: ["琴瑟和鳴", "推心置腹", "高山流水"]
+      },
+      {
+        idiom: "走馬看花",
+        sentence: "參觀博物館若只是【___】地隨便瀏覽，就很難體會展品的歷史文化內涵。",
+        explanation: "比喻觀察事物匆忙粗略，未能深入了解。",
+        category: "觀察參觀",
+        distractors: ["明察秋毫", "追根究底", "刨根問底"]
+      },
+      {
+        idiom: "袖手旁觀",
+        sentence: "身為同班同學，看到同桌遇上學習困難，我們絕不能【___】。",
+        explanation: "把手縮在袖子裡在一旁觀看，比喻置身事外不予過問或相助。",
+        category: "班級互助",
+        distractors: ["鼎力相助", "慷慨解囊", "身先士卒"]
+      },
+      {
+        idiom: "日新月異",
+        sentence: "現代電腦科技【___】，為我們的日常生活帶來了翻天覆地的便利。",
+        explanation: "每天每月都有新的變化，形容發展或進步極其迅速。",
+        category: "科技生活",
+        distractors: ["一成不變", "墨守成規", "停滯不前"]
+      },
+      {
+        idiom: "雨後春筍",
+        sentence: "隨著環保風潮興起，市區內的綠色有機小店如【___】般紛紛湧現。",
+        explanation: "春雨過後竹筍迅速萌發，比喻新事物大量湧現。",
+        category: "社會風貌",
+        distractors: ["寥若晨星", "銷聲匿跡", "滄海一粟"]
+      },
+      {
+        idiom: "千變萬化",
+        sentence: "天上的雲朵【___】，一會兒像綿羊，一會兒像巨龍，奇妙極了。",
+        explanation: "形容變化繁多、形態極其豐富不可預測。",
+        category: "自然觀察",
+        distractors: ["千篇一律", "始終如一", "呆板無奇"]
+      },
+
+      // 61-70
+      {
+        idiom: "持之以恆",
+        sentence: "鍛鍊體魄最需要的是【___】，如果三天打魚兩天曬網，很難見到成效。",
+        explanation: "長久堅持下去，不中途放棄。",
+        category: "恆心自律",
+        distractors: ["半途而廢", "一曝十寒", "淺嘗輒止"]
+      },
+      {
+        idiom: "鍥而不捨",
+        sentence: "古生物學家憑著【___】的精神，在荒漠中搜尋數月，終於發掘出珍貴的恐龍化石。",
+        explanation: "不斷地鏤刻不鬆手，比喻做事堅持不懈、持之以恒。",
+        category: "科學探索",
+        distractors: ["半途而廢", "暴殄天物", "因循守舊"]
+      },
+      {
+        idiom: "循序漸進",
+        sentence: "練習書法應當【___】，先練好基本筆畫，再嘗試書寫整篇作品。",
+        explanation: "按一定的順序與步驟逐漸深入或提高。",
+        category: "技藝研習",
+        distractors: ["躐等躁進", "一步登天", "拔苗助長"]
+      },
+      {
+        idiom: "孜孜不倦",
+        sentence: "愛迪生一生【___】地投入發明創作，為人類科技文明作出了卓越貢獻。",
+        explanation: "工作或學習勤勉努力，不知疲倦。",
+        category: "勤奮好學",
+        distractors: ["飽食終日", "懶惰成性", "無所事事"]
+      },
+      {
+        idiom: "不恥下問",
+        sentence: "遇到不懂的疑難，我們應具備【___】的胸襟，向身邊的同學請教。",
+        explanation: "不以向地位比自己低或學識比自己少的人請教為可恥。",
+        category: "謙虛好學",
+        distractors: ["自高自大", "師心自用", "孤芳自賞"]
+      },
+      {
+        idiom: "全神貫注",
+        sentence: "他【___】地凝視著棋盤，苦思應對對手突擊的最佳著法。",
+        explanation: "把全部精神和心思集中在一件事情上。",
+        category: "專心致志",
+        distractors: ["心猿意馬", "漫不經心", "丟三落四"]
+      },
+      {
+        idiom: "豁然開朗",
+        sentence: "經過老師一語點破謎底，我頓覺【___】，所有疑團煙消雲散。",
+        explanation: "形容由狹隘幽暗突然變得寬闊明亮，亦形容心裡頓時領悟明白。",
+        category: "思維領悟",
+        distractors: ["冥思苦想", "百思不解", "如墮煙霧"]
+      },
+      {
+        idiom: "舉一反三",
+        sentence: "優秀的學習者往往能【___】，掌握了一種題型，便能解答同類其他變化題。",
+        explanation: "列舉出一件事情，就能推知其他同類事理。",
+        category: "靈活思考",
+        distractors: ["墨守成規", "膠柱鼓瑟", "生吞活剝"]
+      },
+      {
+        idiom: "風雨同舟",
+        sentence: "這幾位老友一起創辦學校，多年來【___】，共同渡過了許多難關。",
+        explanation: "在風雨同舟共濟，比喻在困境中共同患難、齊心協力。",
+        category: "患難友情",
+        distractors: ["各自為政", "分崩離析", "貌合神離"]
+      },
+      {
+        idiom: "推己及人",
+        sentence: "在公共場合保持安靜是一種【___】的良好修養，不應給他人帶來困擾。",
+        explanation: "用自己的心思情理去推想別人的心思情理，設身處地為人著想。",
+        category: "公民品德",
+        distractors: ["自以為是", "損人利己", "斤斤計較"]
+      },
+
+      // 71-80
+      {
+        idiom: "一諾千金",
+        sentence: "他向來言行一致，【___】，答應過的事情必定全力辦妥。",
+        explanation: "一句許諾相當於千金重，形容說話極有信用，說到做到。",
+        category: "誠信美德",
+        distractors: ["出爾反爾", "言而無信", "口蜜腹劍"]
+      },
+      {
+        idiom: "言而有信",
+        sentence: "做人應當【___】，切不可信口開河，隨意背棄朋友的信任。",
+        explanation: "說話誠實有信用。",
+        category: "為人準則",
+        distractors: ["出爾反爾", "食言而肥", "招搖撞騙"]
+      },
+      {
+        idiom: "表裡如一",
+        sentence: "他為人純樸坦蕩，【___】，深得老師與同學的由衷敬佩。",
+        explanation: "外表與內心完全一致，形容待人接物誠實坦白。",
+        category: "誠實正直",
+        distractors: ["口是心非", "虛情假意", "陽奉陰違"]
+      },
+      {
+        idiom: "班門弄斧",
+        sentence: "在著名的書法家面前展示我那生疏的筆法，實在是【___】了。",
+        explanation: "在魯班門前賣弄揮斧技巧，比喻在行家面前賣弄本領，不知自量。",
+        category: "謙恭自省",
+        distractors: ["自慚形穢", "登堂入室", "游刃有餘"]
+      },
+      {
+        idiom: "夜郎自大",
+        sentence: "如果不開拓眼界、了解世界局勢，盲目自滿就難免淪為【___】。",
+        explanation: "比喻妄自尊大，孤陋寡聞而盲目自誇自大。",
+        category: "警世寓言",
+        distractors: ["妄自菲薄", "自強不息", "謙虛謹慎"]
+      },
+      {
+        idiom: "自以為是",
+        sentence: "他在小組討論中總是【___】，不肯聽取組員提出的合理建議。",
+        explanation: "總認為自己的看法和做法都是正確的，不接受別人意見。",
+        category: "反思處事",
+        distractors: ["謙恭下士", "集思廣益", "從善如流"]
+      },
+      {
+        idiom: "得意忘形",
+        sentence: "取得一點點成績就【___】，往往是接下來遭遇失敗的前兆。",
+        explanation: "高興得控制不住自己，失去常態，形容高興過頭而失態。",
+        category: "心態自律",
+        distractors: ["寵辱不驚", "戒驕戒躁", "處之泰然"]
+      },
+      {
+        idiom: "目中無人",
+        sentence: "自從贏得了全港演說冠軍後，他的神態變得有些【___】，令人難以親近。",
+        explanation: "眼裡沒有別人，形容驕傲狂妄、看不起所有人。",
+        category: "驕傲戒慎",
+        distractors: ["虛懷若谷", "平易近人", "彬彬有禮"]
+      },
+      {
+        idiom: "知恩圖報",
+        sentence: "受人滴水之恩，當思湧泉相報，做人必須懂得【___】。",
+        explanation: "知道受了別人的恩惠，便設法給予回報感恩。",
+        category: "感恩道德",
+        distractors: ["忘恩負義", "以怨報德", "過河拆橋"]
+      },
+      {
+        idiom: "望梅止渴",
+        sentence: "長途跋涉中水壺早已見底，大家談論著下山後的大西瓜來【___】。",
+        explanation: "比喻願望無法實現，只好用空想或虛假情境來安慰自己。",
+        category: "成語典故",
+        distractors: ["雪中送炭", "畫餅充飢", "自欺欺人"]
+      },
+
+      // 81-90
+      {
+        idiom: "妙筆生花",
+        sentence: "在這位作家的【___】下，原本平凡的校園日常變得妙趣橫生。",
+        explanation: "比喻文筆生動優美，寫作技巧極其高超卓越。",
+        category: "文學造詣",
+        distractors: ["平鋪直敘", "枯燥無味", "粗製濫造"]
+      },
+      {
+        idiom: "實事求是",
+        sentence: "科學探究注重數據與實證，每一步驟都要秉持【___】的嚴謹態度。",
+        explanation: "從實際情況出發，探求客觀事物的真實規律，不虛浮作假。",
+        category: "求知態度",
+        distractors: ["弄虛作假", "憑空捏造", "投機取巧"]
+      },
+      {
+        idiom: "爭先恐後",
+        sentence: "小賣部一開門，飢腸轆轆的同學們便【___】地湧進去買點心。",
+        explanation: "爭著向前，唯恐落於人後。",
+        category: "活潑場面",
+        distractors: ["魚貫而行", "禮讓三先", "不慌不忙"]
+      },
+      {
+        idiom: "力爭上游",
+        sentence: "在新學期的班會上，大家紛紛許下諾言，誓要在學業與品德上【___】。",
+        explanation: "比喻努力奮發向上，爭取先進優良的成績。",
+        category: "奮發勵志",
+        distractors: ["自甘墮落", "不求上進", "甘居人後"]
+      },
+      {
+        idiom: "迎刃而解",
+        sentence: "只要抓住了問題的核心癥結，其他次要困難便會【___】。",
+        explanation: "比喻主要問題解決了，其餘相關問題就能容易順利地化解。",
+        category: "解決智慧",
+        distractors: ["千頭萬緒", "積重難返", "束手無策"]
+      },
+      {
+        idiom: "撲朔迷離",
+        sentence: "這起失蹤案的線索錯綜複雜，情節【___】，令辦案警員大傷腦筋。",
+        explanation: "形容事情錯綜複雜，難以看清其真相。",
+        category: "案件情節",
+        distractors: ["涇渭分明", "一目了然", "黑白分明"]
+      },
+      {
+        idiom: "怒氣衝衝",
+        sentence: "看見自己剛拼好的積木被弟弟故意摔碎，他【___】地大聲責問。",
+        explanation: "形容憤怒到了極點，怒火中燒的樣子。",
+        category: "神情激憤",
+        distractors: ["和顏悅色", "心平氣和", "平心靜氣"]
+      },
+      {
+        idiom: "心花怒放",
+        sentence: "收到心儀中學的錄取通知書，全家人都高興得【___】。",
+        explanation: "形容心裡高興開朗到了極點，像盛開的花朵一樣爛漫。",
+        category: "歡天喜地",
+        distractors: ["悶悶不樂", "憂心忡忡", "痛心疾首"]
+      },
+      {
+        idiom: "杞人憂天",
+        sentence: "明天的露營活動天氣預報晴朗無雲，你就別再【___】擔心下暴雨了。",
+        explanation: "比喻缺乏事實依據、毫無必要的憂慮與擔心。",
+        category: "心態開導",
+        distractors: ["居安思危", "未雨綢繆", "防患未然"]
+      },
+      {
+        idiom: "急於求成",
+        sentence: "學習樂器需要日積月累地練習指法，切莫【___】，否則基礎不牢。",
+        explanation: "急切地想在短時間內取得成功。",
+        category: "學習警惕",
+        distractors: ["循序漸進", "按部就班", "穩扎穩打"]
+      },
+
+      // 91-100
+      {
+        idiom: "欲速不達",
+        sentence: "古人常說【___】，貪圖快速往往容易出錯，反而拉長了完成的時間。",
+        explanation: "過分性急想快點達到目的，反而往往無法如願達成。",
+        category: "哲理明訓",
+        distractors: ["事半功倍", "馬到成功", "神速如風"]
+      },
+      {
+        idiom: "斤斤計較",
+        sentence: "大家都是同班好友，日常小事何必【___】，多一點包容世界更美好。",
+        explanation: "形容過分計較微小的利益或無關緊要的小事。",
+        category: "同窗相處",
+        distractors: ["寬宏大量", "大度包容", "不拘小節"]
+      },
+      {
+        idiom: "防患未然",
+        sentence: "學校定期組織消防疏散演習，就是為了【___】，保障全體師生安全。",
+        explanation: "在禍患或災難發生之前就做好預防措施。",
+        category: "安全校園",
+        distractors: ["亡羊補牢", "放任自流", "臨渴掘井"]
+      },
+      {
+        idiom: "未雨綢繆",
+        sentence: "出外遠足前備齊雨具和急救藥品，正是【___】的明智做法。",
+        explanation: "比喻事先做好周全的防備工作。",
+        category: "出行常識",
+        distractors: ["臨陣磨槍", "臨渴掘井", "盲目冒進"]
+      },
+      {
+        idiom: "居安思危",
+        sentence: "在風調雨順、生活安定的日子裡，我們依然要具備【___】的警覺意識。",
+        explanation: "處在平安安定的環境中，要時常想到可能發生的危險與困難。",
+        category: "人生智慧",
+        distractors: ["醉生夢死", "麻木不仁", "盲目樂觀"]
+      },
+      {
+        idiom: "津津有味",
+        sentence: "圖書館裡，同學們正捧著精彩的冒險小說，讀得【___】。",
+        explanation: "形容興味濃厚的樣子，亦形容吃東西很有滋味。",
+        category: "閱讀趣味",
+        distractors: ["索然無味", "枯燥乏味", "味同嚼蠟"]
+      },
+      {
+        idiom: "愛不釋手",
+        sentence: "這本童話繪本的插畫生動精美，弟弟拿在手裡【___】。",
+        explanation: "喜愛得捨不得放下。",
+        category: "喜愛之情",
+        distractors: ["嗤之以鼻", "棄若敝屣", "置之不理"]
+      },
+      {
+        idiom: "情同手足",
+        sentence: "志明與家豪從小一起長大，朝夕相處，感情深厚，真可謂【___】。",
+        explanation: "彼此交情深厚，如同親兄弟骨肉一般。",
+        category: "深厚友情",
+        distractors: ["萍水相逢", "互不相干", "反目成仇"]
+      },
+      {
+        idiom: "落井下石",
+        sentence: "朋友失意困難之際，我們應當施以援手，絕不可【___】冷嘲熱諷。",
+        explanation: "看見別人掉進井裡，不但不救，反而往井裡扔石頭。比喻乘人之危加以打擊陷害。",
+        category: "為人戒訓",
+        distractors: ["雪中送炭", "拔刀相助", "扶危濟困"]
+      },
+      {
+        idiom: "自食其力",
+        sentence: "長大成人後，我們應當踏踏實實憑自己的勞動【___】，回報父母與社會。",
+        explanation: "依靠自己的勞動和本領來養活自己。",
+        category: "獨立成長",
+        distractors: ["坐享其成", "不勞而獲", "寄人籬下"]
+      },
+
+      // 101-112 (Includes double-blank advanced challenges for late game!)
+      {
+        idiom: "坐井觀天",
+        sentence: "不願接觸外面的新鮮世界，整日閉門造車，無異於【___】。",
+        explanation: "坐在井底看天，比喻眼光狹小，見識短淺。",
+        category: "哲理明燈",
+        distractors: ["一覽無遺", "包羅萬象", "海納百川"]
+      },
+      {
+        idiom: "按部就班",
+        sentence: "組裝這台複雜的機械模型，必須【___】地依照說明書步驟操作。",
+        explanation: "按照一定的條理、步驟與規範做事。",
+        category: "嚴謹細心",
+        distractors: ["雜亂無章", "急於求成", "顛三倒四"]
+      },
+      {
+        idiom: "臨渴掘井",
+        sentence: "平日不燒香，平時不溫習，到了考試前一晚才【___】，怎能考出好成績？",
+        explanation: "感到口渴時才去挖井，比喻事到臨頭才慌忙作準備，為時已晚。",
+        category: "學習警鐘",
+        distractors: ["未雨綢繆", "防患未然", "早有準備"]
+      },
+      {
+        idiom: "一鳴驚人",
+        sentence: "平時默默無聞的他，在這次全校文藝匯演中大放異彩，真可謂【___】。",
+        explanation: "平時沒有名聲，一有行動就做出驚人的優異成績。",
+        category: "才藝驚豔",
+        distractors: ["默默無聞", "無聲無息", "名落孫山"]
+      },
+      // Special Double-Blank Questions (For late game sequence challenges)
+      {
+        isDouble: true,
+        idioms: ["雪中送炭", "錦上添花"],
+        sentence: "好朋友遇到急難時我們要【①___】，當他取得佳績時我們再【②___】致賀。",
+        explanation: "「雪中送炭」指急需時給予實質幫助，「錦上添花」指好上加好。",
+        category: "雙重挑戰",
+        distractors: ["火上澆油", "落井下石"]
+      },
+      {
+        isDouble: true,
+        idioms: ["事半功倍", "事倍功半"],
+        sentence: "掌握高效率的閱讀方法能【①___】，若死記硬背反而會【②___】。",
+        explanation: "「事半功倍」指費力小收效大，「事倍功半」指費力大收效微。",
+        category: "雙重挑戰",
+        distractors: ["徒勞無功", "水到渠成"]
+      },
+      {
+        isDouble: true,
+        idioms: ["持之以恆", "半途而廢"],
+        sentence: "求學問最可貴的是【①___】，最忌諱的則是【②___】。",
+        explanation: "「持之以恆」勉勵長久堅持，「半途而廢」警戒半途放棄。",
+        category: "雙重挑戰",
+        distractors: ["淺嘗輒止", "全力以赴"]
+      },
+      {
+        isDouble: true,
+        idioms: ["腳踏實地", "好高騖遠"],
+        sentence: "做學問一定要【①___】，切莫【②___】脫離實際。",
+        explanation: "「腳踏實地」形容做事認真踏實，「好高騖遠」形容追求不切實際的目標。",
+        category: "雙重挑戰",
+        distractors: ["拔苗助長", "一成不變"]
+      }
+    ];
+
+    // Cute sushi illustration SVGs for plates
+    const SUSHI_TYPES = [
+      { name: "三文魚壽司", color: "#FF7B54", riceColor: "#FFF9ED", garnish: "#E04F26" },
+      { name: "玉子燒壽司", color: "#FFD166", riceColor: "#FFF9ED", garnish: "#2B4C38" },
+      { name: "吞拿魚壽司", color: "#EF476F", riceColor: "#FFF9ED", garnish: "#B32746" },
+      { name: "甜蝦壽司", color: "#FF9AA2", riceColor: "#FFF9ED", garnish: "#E65C69" },
+      { name: "軍艦壽司", color: "#2B4C38", riceColor: "#FFF9ED", garnish: "#F78C6C" }
+    ];
+
+    // Customer types for variety
+    const CUSTOMERS = [
+      { name: "柴犬食客", ears: "dog", faceColor: "#E8A856", mood: "🍵" },
+      { name: "貓咪食客", ears: "cat", faceColor: "#F4A261", mood: "🐱" },
+      { name: "熊貓食客", ears: "panda", faceColor: "#F7F7F7", mood: "🐼" },
+      { name: "白兔食客", ears: "rabbit", faceColor: "#FFE5EC", mood: "🥕" },
+      { name: "企鵝食客", ears: "penguin", faceColor: "#6B9080", mood: "🍙" }
+    ];
+
+    const GameState = {
+      score: 0,
+      combo: 0,
+      maxCombo: 0,
+      patience: 100,
+      timeLeft: 60,
+      timerId: null,
+      animFrameId: null,
+      isPlaying: false,
+      conveyorSpeed: 2.2, // pixels per frame
+      baseSpeed: 2.2,
+      isSlowed: false,
+      slowTimerId: null,
+      questionIndex: 0,
+      currentQuestion: null,
+      doubleBlankStep: 0, // 0 for 1st blank, 1 for 2nd blank
+      questionsSolved: 0,
+      consecutiveCorrect: 0,
+      isVIPGuest: false,
+      usedIdiomsInSession: [],
+      activePlates: [], // plates on belt
+      spawnIntervalTimer: 0,
+      props: {
+        tea: 2,
+        wasabi: 2,
+        chopsticks: 2
+      }
+    };
+
+    // DOM Cache
+    const elScore = document.getElementById("scoreText");
+    const elCombo = document.getElementById("comboText");
+    const elTimer = document.getElementById("timerText");
+    const elPatience = document.getElementById("patienceBar");
+    const elSentence = document.getElementById("sentenceContainer");
+    const elExplanationBox = document.getElementById("explanationBox");
+    const elExplanationText = document.getElementById("explanationText");
+    const elCenterIdiomTag = document.getElementById("centerIdiomTag");
+    const elCenterExplanationText = document.getElementById("centerExplanationText");
+    const elCenterCard = document.getElementById("centerExplanationCard");
+    const elCenterIcon = document.getElementById("centerIconBadge");
+    const elTrackArea = document.getElementById("conveyorTrackArea");
+    const elPlatesStage = document.getElementById("platesStage");
+    const elVIPBadge = document.getElementById("vipBadge");
+    const elMultiplierBadge = document.getElementById("multiplierBadge");
+    const elCustomerName = document.getElementById("customerNameTag");
+    const elCustomerMood = document.getElementById("customerMoodEmoji");
+    const elCustomerFace = document.getElementById("customerFace");
+    const elBlankInstruction = document.getElementById("blankInstruction");
+    const elStreakFeedback = document.getElementById("streakFeedback");
+
+    // Prop Button DOMs
+    const propTeaBtn = document.getElementById("propTeaBtn");
+    const propTeaCount = document.getElementById("propTeaCount");
+    const propWasabiBtn = document.getElementById("propWasabiBtn");
+    const propWasabiCount = document.getElementById("propWasabiCount");
+    const propChopsticksBtn = document.getElementById("propChopsticksBtn");
+    const propChopsticksCount = document.getElementById("propChopsticksCount");
+
+    // Modal DOMs
+    const startModal = document.getElementById("startModal");
+    const gameOverModal = document.getElementById("gameOverModal");
+    const startGameBtn = document.getElementById("startGameBtn");
+    const restartGameBtn = document.getElementById("restartGameBtn");
+    const downloadWordBtn = document.getElementById("downloadWordBtn");
+    const soundBtn = document.getElementById("soundBtn");
+
+    // Customer Mood updates
+    function setCustomerMood(moodState) {
+      const mouth = document.getElementById("mouthPath");
+      const eyeL = document.getElementById("eyeL");
+      const eyeR = document.getElementById("eyeR");
+      if (!mouth) return;
+
+      if (moodState === "happy") {
+        mouth.setAttribute("d", "M 44 56 Q 50 66 56 56");
+        mouth.setAttribute("stroke", "#EF476F");
+        mouth.setAttribute("stroke-width", "3.5");
+        elCustomerMood.textContent = "✨😋✨";
+      } else if (moodState === "sad") {
+        mouth.setAttribute("d", "M 44 62 Q 50 54 56 62");
+        mouth.setAttribute("stroke", "#3D2B20");
+        mouth.setAttribute("stroke-width", "2.5");
+        elCustomerMood.textContent = "💧😰";
+      } else if (moodState === "angry") {
+        mouth.setAttribute("d", "M 44 63 L 56 63");
+        mouth.setAttribute("stroke", "#D90429");
+        mouth.setAttribute("stroke-width", "3.5");
+        elCustomerMood.textContent = "💢😡";
+      } else {
+        mouth.setAttribute("d", "M 46 58 Q 50 63 54 58");
+        mouth.setAttribute("stroke", "#3D2B20");
+        mouth.setAttribute("stroke-width", "2.5");
+        elCustomerMood.textContent = GameState.isVIPGuest ? "👑" : "🍵";
+      }
+    }
+
+    function switchRandomCustomer() {
+      const cust = CUSTOMERS[Math.floor(Math.random() * CUSTOMERS.length)];
+      elCustomerName.textContent = GameState.isVIPGuest ? `👑 大富翁貴賓 (${cust.name})` : cust.name;
+      elCustomerName.className = GameState.isVIPGuest 
+        ? "mt-1 text-center bg-gradient-to-r from-amber-600 to-yellow-500 text-white font-black py-0.5 px-3 rounded-full shadow border border-yellow-200"
+        : "mt-1 text-center bg-amber-700 text-amber-50 text-[11px] font-bold py-0.5 px-2.5 rounded-full shadow";
+
+      setCustomerMood("normal");
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // Filter questions based on game progress (difficulty)
+    function pickNextQuestion() {
+      // Check for VIP Guest (every 5 consecutive correct answers)
+      if (GameState.consecutiveCorrect > 0 && GameState.consecutiveCorrect % 5 === 0) {
+        GameState.isVIPGuest = true;
+        elVIPBadge.classList.remove("hidden");
+        sounds.playVIPArrival();
+      } else {
+        GameState.isVIPGuest = false;
+        elVIPBadge.classList.add("hidden");
+      }
+
+      // Progression curve:
+      // Early game: Easy idioms, belt slower (speed 2.0)
+      // Mid game: (solved >= 4): Speed 2.6
+      // Late game: (solved >= 8): Speed 3.2, patience drops slightly faster, double blanks possible
+      let pool = IDIOM_BANK;
+      if (GameState.questionsSolved < 6) {
+        // Exclude double blanks early on
+        pool = IDIOM_BANK.filter(q => !q.isDouble);
+        GameState.baseSpeed = 2.1;
+      } else if (GameState.questionsSolved < 12) {
+        GameState.baseSpeed = 2.6;
+      } else {
+        GameState.baseSpeed = 3.2;
+      }
+      GameState.conveyorSpeed = GameState.isSlowed ? GameState.baseSpeed * 0.5 : GameState.baseSpeed;
+
+      // Pick a random question that wasn't used right immediately
+      const candidate = pool[Math.floor(Math.random() * pool.length)];
+      GameState.currentQuestion = candidate;
+      GameState.doubleBlankStep = 0;
+
+      renderQuestion(candidate);
+      switchRandomCustomer();
+      clearAndRepopulateBelt(candidate);
+    }
+
+    function renderQuestion(q) {
+      elExplanationBox.classList.add("opacity-0", "translate-y-1");
+      document.getElementById("questionTypeBadge").textContent = q.category || "常用成語";
+
+      // Reset central board prompt for incoming question
+      elCenterIdiomTag.classList.add("hidden");
+      elCenterExplanationText.textContent = "🎯 點擊傳送帶上的正確成語壽司，這裡將為你即時解鎖精闢解釋！";
+      elCenterCard.className = "w-full my-2 bg-gradient-to-r from-[#FFF9EE] via-[#FFF3D6] to-[#FFF9EE] border-2 border-amber-300 rounded-2xl px-3 sm:px-4 py-2 shadow-sm transition-all duration-300 flex items-center justify-between gap-3";
+      elCenterIcon.textContent = "💡";
+      elCenterIcon.className = "w-9 h-9 rounded-xl bg-amber-400 text-white flex items-center justify-center font-black text-lg shrink-0 shadow-sm transition-transform";
+
+      if (q.isDouble) {
+        elBlankInstruction.textContent = "雙格挑戰：請先點選第 ① 格成語！";
+        elBlankInstruction.className = "text-xs font-black text-rose-600 animate-pulse";
+        
+        // Render two slot spans with IDs
+        const html = q.sentence
+          .replace("【①___】", `<span id="blankSlot1" class="inline-flex items-center justify-center px-3 py-1 mx-1 bg-amber-100 border-2 border-dashed border-amber-400 text-amber-900 rounded-xl min-w-[90px] font-black transition-all scale-105 shadow-inner">① 格等待點選</span>`)
+          .replace("【②___】", `<span id="blankSlot2" class="inline-flex items-center justify-center px-3 py-1 mx-1 bg-gray-100 border-2 border-dashed border-gray-300 text-gray-400 rounded-xl min-w-[90px] font-black transition-all">② 格等待點選</span>`);
+        elSentence.innerHTML = html;
+      } else {
+        elBlankInstruction.textContent = "請選取壽司填入空格！";
+        elBlankInstruction.className = "text-xs font-bold text-amber-600";
+        
+        const html = q.sentence.replace("【___】", `<span id="blankSlot1" class="inline-flex items-center justify-center px-4 py-1 mx-1 bg-pink-50 border-2 border-dashed border-pink-400 text-pink-700 rounded-xl min-w-[100px] font-black transition-all shadow-inner animate-pulse">待上菜 🍣</span>`);
+        elSentence.innerHTML = html;
+      }
+    }
+
+    // Helper to build cute SVG sushi on plate
+    function createPlateElement(idiomText, isTarget, targetOrder = 0) {
+      const plate = document.createElement("div");
+      const sushiStyle = SUSHI_TYPES[Math.floor(Math.random() * SUSHI_TYPES.length)];
+      
+      plate.className = "absolute top-1/2 -translate-y-1/2 cursor-pointer transition-transform transform active:scale-90 touch-none";
+      plate.style.width = "136px";
+      plate.style.height = "120px";
+      plate.dataset.idiom = idiomText;
+      plate.dataset.isTarget = isTarget ? "true" : "false";
+      plate.dataset.targetOrder = targetOrder; // 1 or 2 for double blanks
+      plate.dataset.clicked = "false";
+
+      // SVG Plate with Sushi
+      plate.innerHTML = `
+        <div class="relative w-full h-full flex flex-col items-center justify-center filter drop-shadow-md">
+          <!-- Plate Base -->
+          <svg viewBox="0 0 120 70" class="w-28 sm:w-32 h-auto absolute bottom-0 z-0">
+            <!-- Plate Rim Shadow & Texture -->
+            <ellipse cx="60" cy="40" rx="56" ry="24" fill="#EAE5D9" />
+            <ellipse cx="60" cy="38" rx="54" ry="22" fill="#FFFFFF" stroke="#D3B89D" stroke-width="2.5" />
+            <ellipse cx="60" cy="38" rx="42" ry="15" fill="#FAF5EB" />
+          </svg>
+
+          <!-- Sushi Graphic -->
+          <div class="relative z-10 -mt-3 flex flex-col items-center">
+            <svg viewBox="0 0 70 42" class="w-16 h-10">
+              <!-- Rice ball -->
+              <ellipse cx="35" cy="24" rx="26" ry="13" fill="#FFFBF5" stroke="#E2DAC9" stroke-width="1.5" />
+              <!-- Fish Topping -->
+              <path d="M 12 18 C 12 8, 58 8, 58 18 C 58 28, 12 28, 12 18 Z" fill="${sushiStyle.color}" />
+              <!-- Nori seaweed belt / garnish line -->
+              <rect x="31" y="8" width="8" height="22" rx="2" fill="${sushiStyle.garnish}" opacity="0.85"/>
+            </svg>
+          </div>
+
+          <!-- Idiom Text Tag Badge -->
+          <div class="relative z-20 -mt-1 bg-white border-2 border-[#D88D70] rounded-xl px-2 py-0.5 shadow-md flex items-center justify-center">
+            <span class="text-sm sm:text-base font-black text-[#5C2B1D] tracking-wider whitespace-nowrap">
+              ${idiomText}
+            </span>
+          </div>
+        </div>
+      `;
+
+      // Plate click / touch listener
+      plate.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        onPlateClicked(plate);
+      });
+
+      return plate;
+    }
+
+    function clearAndRepopulateBelt(q) {
+      elPlatesStage.innerHTML = "";
+      GameState.activePlates = [];
+
+      // Determine items to spawn
+      let items = [];
+      if (q.isDouble) {
+        items.push({ text: q.idioms[0], isTarget: true, targetOrder: 1 });
+        items.push({ text: q.idioms[1], isTarget: true, targetOrder: 2 });
+        q.distractors.forEach(d => items.push({ text: d, isTarget: false, targetOrder: 0 }));
+      } else {
+        items.push({ text: q.idiom, isTarget: true, targetOrder: 0 });
+        q.distractors.forEach(d => items.push({ text: d, isTarget: false, targetOrder: 0 }));
+      }
+
+      // Shuffle order of plates on the belt so answer isn't predictable
+      items = shuffleArray(items);
+
+      // Space them out starting from right edge
+      const containerWidth = elTrackArea.clientWidth || 600;
+      const spacing = Math.max(160, Math.floor(containerWidth / 3.2));
+
+      items.forEach((item, idx) => {
+        const plateEl = createPlateElement(item.text, item.isTarget, item.targetOrder);
+        const startX = containerWidth + idx * spacing;
+        plateEl.style.left = `${startX}px`;
+        elPlatesStage.appendChild(plateEl);
+
+        GameState.activePlates.push({
+          el: plateEl,
+          x: startX,
+          isTarget: item.isTarget,
+          targetOrder: item.targetOrder,
+          text: item.text,
+          missedChecked: false
+        });
+      });
+    }
+
+    function onPlateClicked(plateEl) {
+      if (!GameState.isPlaying) return;
+      if (plateEl.dataset.clicked === "true") return;
+
+      sounds.playPlateClick();
+      const idiom = plateEl.dataset.idiom;
+      const isTarget = plateEl.dataset.isTarget === "true";
+      const targetOrder = parseInt(plateEl.dataset.targetOrder, 10);
+      const q = GameState.currentQuestion;
+
+      if (q.isDouble) {
+        // Double Blank handling: must hit targetOrder 1 then targetOrder 2
+        if (GameState.doubleBlankStep === 0) {
+          // Expecting step 1
+          if (isTarget && targetOrder === 1) {
+            handleCorrectHit(plateEl, 1, idiom);
+            GameState.doubleBlankStep = 1;
+            // Highlight next slot
+            const slot1 = document.getElementById("blankSlot1");
+            const slot2 = document.getElementById("blankSlot2");
+            if (slot1) slot1.className = "inline-flex items-center justify-center px-3 py-1 mx-1 bg-emerald-500 text-white rounded-xl min-w-[90px] font-black shadow";
+            if (slot2) {
+              slot2.className = "inline-flex items-center justify-center px-3 py-1 mx-1 bg-pink-100 border-2 border-dashed border-pink-400 text-pink-700 rounded-xl min-w-[90px] font-black animate-pulse shadow-inner";
+              slot2.textContent = "待上第 ② 格 🍣";
+            }
+            elBlankInstruction.textContent = "太棒了！請接著點選第 ② 格成語！";
+          } else {
+            handleWrongHit(plateEl, "順序錯誤或成語不合！");
+          }
+        } else if (GameState.doubleBlankStep === 1) {
+          // Expecting step 2
+          if (isTarget && targetOrder === 2) {
+            handleCorrectHit(plateEl, 2, idiom);
+            // Completed double question!
+            finishQuestionSuccess(q);
+          } else {
+            handleWrongHit(plateEl, "這件不是第 ② 格成語哦！");
+          }
+        }
+      } else {
+        // Single Blank
+        if (isTarget) {
+          handleCorrectHit(plateEl, 1, idiom);
+          finishQuestionSuccess(q);
+        } else {
+          handleWrongHit(plateEl, "成語不符合句意哦！");
+        }
+      }
+    }
+
+    function handleCorrectHit(plateEl, slotNum, idiomText) {
+      plateEl.dataset.clicked = "true";
+      sounds.playCorrect();
+
+      // Trigger Sushi Fly Animation to blank slot
+      const targetSlot = document.getElementById(`blankSlot${slotNum}`);
+      if (targetSlot) {
+        animateFlyToTarget(plateEl, targetSlot, idiomText);
+      }
+
+      // Remove from active plates tracking
+      removePlateFromState(plateEl);
+    }
+
+    function finishQuestionSuccess(q) {
+      // Calculate Combo & Score
+      GameState.combo++;
+      GameState.consecutiveCorrect++;
+      if (GameState.combo > GameState.maxCombo) {
+        GameState.maxCombo = GameState.combo;
+      }
+      GameState.questionsSolved++;
+
+      // Multipliers: 3+ combo gives 1.5x, 5+ gives 2x, 8+ gives 3x
+      let multiplier = 1;
+      if (GameState.combo >= 8) multiplier = 3.0;
+      else if (GameState.combo >= 5) multiplier = 2.0;
+      else if (GameState.combo >= 3) multiplier = 1.5;
+
+      // VIP Guest doubles the score!
+      const vipBonus = GameState.isVIPGuest ? 2.0 : 1.0;
+
+      const baseScore = 100;
+      const earned = Math.round(baseScore * multiplier * vipBonus);
+      GameState.score += earned;
+
+      // Restore some customer patience on success
+      GameState.patience = Math.min(100, GameState.patience + 20);
+
+      // Customer reaction
+      setCustomerMood("happy");
+
+      // Show Popup Score on screen
+      showScoreFloatingPopup(`+${earned}`, multiplier > 1 || GameState.isVIPGuest);
+
+      // Show Streak Feedback
+      if (GameState.combo >= 3) {
+        sounds.playComboFanfare();
+        elStreakFeedback.textContent = `🔥 ${GameState.combo} 連擊! 得分 x${multiplier * vipBonus}!`;
+        // Confetti burst for big combo
+        if (typeof confetti === 'function' && GameState.combo % 3 === 0) {
+          confetti({
+            particleCount: 35,
+            spread: 60,
+            origin: { y: 0.4 }
+          });
+        }
+      } else {
+        elStreakFeedback.textContent = "";
+      }
+
+      // Display Explanation Box
+      elExplanationText.textContent = `【${q.isDouble ? q.idioms.join(' / ') : q.idiom}】：${q.explanation}`;
+      elExplanationBox.classList.remove("opacity-0", "translate-y-1");
+
+      // Prominently update Central Explanation Card (在畫面中間位置加上正確成語的解釋)
+      const correctIdiomTitle = q.isDouble ? q.idioms.join(' · ') : q.idiom;
+      elCenterIdiomTag.textContent = correctIdiomTitle;
+      elCenterIdiomTag.classList.remove("hidden");
+      elCenterExplanationText.textContent = q.explanation;
+      elCenterIcon.textContent = "✨";
+      elCenterIcon.className = "w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-black text-lg shrink-0 shadow-md scale-110 transition-transform";
+      elCenterCard.className = "w-full my-2 bg-gradient-to-r from-emerald-50 via-amber-50 to-emerald-50 border-2 border-emerald-400 rounded-2xl px-3 sm:px-4 py-2 shadow-md transition-all duration-300 flex items-center justify-between gap-3 transform scale-[1.01]";
+
+      // Save into session idioms log for End Game Compendium
+      const record = {
+        idiom: q.isDouble ? q.idioms.join("、") : q.idiom,
+        sentence: q.isDouble 
+          ? q.sentence.replace("【①___】", `「${q.idioms[0]}」`).replace("【②___】", `「${q.idioms[1]}」`)
+          : q.sentence.replace("【___】", `「${q.idiom}」`),
+        explanation: q.explanation
+      };
+      if (!GameState.usedIdiomsInSession.some(item => item.idiom === record.idiom)) {
+        GameState.usedIdiomsInSession.push(record);
+      }
+
+      updateHUD();
+
+      // Proceed to next customer order after a sweet 1.1s delay
+      setTimeout(() => {
+        if (GameState.isPlaying) {
+          pickNextQuestion();
+        }
+      }, 1100);
+    }
+
+    function handleWrongHit(plateEl, hintMsg) {
+      plateEl.dataset.clicked = "true";
+      sounds.playWrong();
+
+      // Fall off conveyor animation
+      plateEl.classList.add("plate-falling");
+      setTimeout(() => {
+        plateEl.remove();
+      }, 600);
+
+      removePlateFromState(plateEl);
+
+      // Combo broken, patience drops
+      GameState.combo = 0;
+      GameState.consecutiveCorrect = 0;
+      GameState.patience = Math.max(0, GameState.patience - 22);
+
+      setCustomerMood("sad");
+      showScoreFloatingPopup(hintMsg || "答錯了！", false, true);
+      elStreakFeedback.textContent = "連擊中斷！小心選盤！";
+      updateHUD();
+
+      checkPatienceGameOver();
+    }
+
+    function handleMissedPlate(plateData) {
+      // If a required target plate scrolled past the left edge without being clicked
+      if (!GameState.isPlaying) return;
+      sounds.playWrong();
+      
+      GameState.combo = 0;
+      GameState.consecutiveCorrect = 0;
+      // Missed order penalizes patience
+      GameState.patience = Math.max(0, GameState.patience - 18);
+      
+      setCustomerMood("angry");
+      showScoreFloatingPopup("漏單了！客人久等了！", false, true);
+      elStreakFeedback.textContent = "漏掉了正確壽司！";
+      updateHUD();
+
+      checkPatienceGameOver();
+    }
+
+    function checkPatienceGameOver() {
+      if (GameState.patience <= 0) {
+        endGame("客人耐心耗盡離店！考核結束。");
+      }
+    }
+
+    function removePlateFromState(plateEl) {
+      GameState.activePlates = GameState.activePlates.filter(p => p.el !== plateEl);
+    }
+
+    // Fly animation from conveyor into blank slot
+    function animateFlyToTarget(sourceEl, targetEl, text) {
+      const sourceRect = sourceEl.getBoundingClientRect();
+      const targetRect = targetEl.getBoundingClientRect();
+
+      const flyer = document.createElement("div");
+      flyer.className = "fixed z-50 bg-gradient-to-r from-orange-400 to-rose-400 text-white font-black text-sm px-3 py-1.5 rounded-xl shadow-2xl transition-all duration-500 ease-out pointer-events-none";
+      flyer.textContent = text;
+      flyer.style.left = `${sourceRect.left + sourceRect.width / 4}px`;
+      flyer.style.top = `${sourceRect.top}px`;
+      document.body.appendChild(flyer);
+
+      // Hide plate original
+      sourceEl.style.opacity = "0";
+
+      // Trigger movement
+      requestAnimationFrame(() => {
+        flyer.style.transform = `translate(${targetRect.left - sourceRect.left}px, ${targetRect.top - sourceRect.top}px) scale(1.1)`;
+      });
+
+      setTimeout(() => {
+        flyer.remove();
+        sourceEl.remove();
+        targetEl.textContent = text;
+        targetEl.className = "inline-flex items-center justify-center px-3 py-1 mx-1 bg-emerald-500 text-white font-black rounded-xl shadow transform scale-105 transition";
+      }, 500);
+    }
+
+    function showScoreFloatingPopup(text, isBonus = false, isError = false) {
+      const popup = document.createElement("div");
+      popup.className = `score-popup left-1/2 top-1/2 font-black text-lg sm:text-2xl px-4 py-1.5 rounded-2xl shadow-xl border-2 ${
+        isError 
+          ? "bg-rose-500 text-white border-rose-300"
+          : isBonus 
+            ? "bg-gradient-to-r from-amber-400 to-yellow-300 text-amber-900 border-white shadow-amber-300/50" 
+            : "bg-emerald-500 text-white border-emerald-300"
+      }`;
+      popup.textContent = text;
+      elTrackArea.appendChild(popup);
+      setTimeout(() => popup.remove(), 900);
+    }
+
+    function gameLoop() {
+      if (!GameState.isPlaying) return;
+
+      const trackWidth = elTrackArea.clientWidth || 600;
+
+      // Move active plates towards the left
+      for (let i = GameState.activePlates.length - 1; i >= 0; i--) {
+        const plate = GameState.activePlates[i];
+        plate.x -= GameState.conveyorSpeed;
+        plate.el.style.left = `${plate.x}px`;
+
+        // Check if passed left boundary
+        if (plate.x < -140) {
+          // If this was an unclicked target plate -> missed!
+          if (plate.isTarget && !plate.missedChecked && plate.el.dataset.clicked !== "true") {
+            // Check if current blank still needs this plate
+            const q = GameState.currentQuestion;
+            let stillNeeded = false;
+            if (q.isDouble) {
+              if (GameState.doubleBlankStep === 0 && plate.targetOrder === 1) stillNeeded = true;
+              if (GameState.doubleBlankStep === 1 && plate.targetOrder === 2) stillNeeded = true;
+            } else {
+              stillNeeded = true;
+            }
+
+            if (stillNeeded) {
+              plate.missedChecked = true;
+              handleMissedPlate(plate);
+            }
+          }
+
+          // Cycle plate back to the right so conveyor doesn't run empty
+          // Find rightmost plate X position
+          let maxX = trackWidth;
+          GameState.activePlates.forEach(p => {
+            if (p.x > maxX) maxX = p.x;
+          });
+          plate.x = maxX + 160;
+          plate.el.style.left = `${plate.x}px`;
+          plate.missedChecked = false;
+        }
+      }
+
+      // Natural slight patience decay over time (gives game urgency)
+      // Drops ~1.2% every second
+      GameState.patience = Math.max(0, GameState.patience - 0.02);
+      updateHUD();
+
+      if (GameState.patience <= 0) {
+        endGame("客人等待超時，耐心歸零！");
+        return;
+      }
+
+      GameState.animFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function updateHUD() {
+      elScore.textContent = GameState.score;
+      elCombo.textContent = GameState.combo;
+      elTimer.textContent = GameState.timeLeft;
+      elPatience.style.width = `${GameState.patience}%`;
+
+      // Update Prop Counters and disabled state
+      propTeaCount.textContent = `x${GameState.props.tea}`;
+      propTeaBtn.disabled = GameState.props.tea <= 0 || !GameState.isPlaying;
+      propTeaBtn.style.opacity = GameState.props.tea <= 0 ? "0.45" : "1";
+
+      propWasabiCount.textContent = `x${GameState.props.wasabi}`;
+      propWasabiBtn.disabled = GameState.props.wasabi <= 0 || !GameState.isPlaying || GameState.isSlowed;
+      propWasabiBtn.style.opacity = (GameState.props.wasabi <= 0 || GameState.isSlowed) ? "0.45" : "1";
+
+      propChopsticksCount.textContent = `x${GameState.props.chopsticks}`;
+      propChopsticksBtn.disabled = GameState.props.chopsticks <= 0 || !GameState.isPlaying;
+      propChopsticksBtn.style.opacity = GameState.props.chopsticks <= 0 ? "0.45" : "1";
+
+      // Multiplier pill
+      if (GameState.combo >= 8) {
+        elMultiplierBadge.textContent = "x3.0";
+        elMultiplierBadge.classList.remove("hidden");
+      } else if (GameState.combo >= 5) {
+        elMultiplierBadge.textContent = "x2.0";
+        elMultiplierBadge.classList.remove("hidden");
+      } else if (GameState.combo >= 3) {
+        elMultiplierBadge.textContent = "x1.5";
+        elMultiplierBadge.classList.remove("hidden");
+      } else {
+        elMultiplierBadge.classList.add("hidden");
+      }
+    }
+
+    // Prop 1: Green Tea handler
+    function usePropTea() {
+      if (!GameState.isPlaying || GameState.props.tea <= 0) return;
+      sounds.playPlateClick();
+      GameState.props.tea--;
+      GameState.patience = Math.min(100, GameState.patience + 35);
+      setCustomerMood("happy");
+      showScoreFloatingPopup("🍵 暖胃熱茶：耐心+35%！", true);
+      updateHUD();
+    }
+
+    // Prop 2: Slow Wasabi handler
+    function usePropWasabi() {
+      if (!GameState.isPlaying || GameState.props.wasabi <= 0 || GameState.isSlowed) return;
+      sounds.playPlateClick();
+      GameState.props.wasabi--;
+      GameState.isSlowed = true;
+      GameState.conveyorSpeed = GameState.baseSpeed * 0.5;
+      showScoreFloatingPopup("🧊 冰鎮芥末：減速50%！", true);
+      updateHUD();
+
+      clearTimeout(GameState.slowTimerId);
+      GameState.slowTimerId = setTimeout(() => {
+        GameState.isSlowed = false;
+        GameState.conveyorSpeed = GameState.baseSpeed;
+        if (GameState.isPlaying) {
+          showScoreFloatingPopup("傳送帶恢復原速", false);
+          updateHUD();
+        }
+      }, 6000);
+    }
+
+    // Prop 3: Golden Chopsticks handler
+    function usePropChopsticks() {
+      if (!GameState.isPlaying || GameState.props.chopsticks <= 0) return;
+      sounds.playPlateClick();
+      GameState.props.chopsticks--;
+
+      // Highlight target plates with bright golden frame
+      GameState.activePlates.forEach(plate => {
+        if (plate.isTarget) {
+          plate.el.classList.add("ring-4", "ring-amber-300", "rounded-full", "scale-105", "animate-pulse");
+        } else {
+          // Drop one distractor plate off the belt
+          plate.el.classList.add("opacity-40");
+        }
+      });
+
+      showScoreFloatingPopup("🥢 金筷顯威：已標記正解！", true);
+      updateHUD();
+    }
+
+    function startGame() {
+      startModal.classList.add("hidden");
+      gameOverModal.classList.add("hidden");
+
+      GameState.score = 0;
+      GameState.combo = 0;
+      GameState.maxCombo = 0;
+      GameState.patience = 100;
+      GameState.timeLeft = 60;
+      GameState.questionsSolved = 0;
+      GameState.consecutiveCorrect = 0;
+      GameState.usedIdiomsInSession = [];
+      GameState.isPlaying = true;
+      GameState.isSlowed = false;
+      GameState.props = {
+        tea: 2,
+        wasabi: 2,
+        chopsticks: 2
+      };
+
+      updateHUD();
+      pickNextQuestion();
+
+      // Countdown timer: mistakes do NOT deduct time!
+      clearInterval(GameState.timerId);
+      GameState.timerId = setInterval(() => {
+        if (!GameState.isPlaying) return;
+        GameState.timeLeft--;
+        updateHUD();
+
+        if (GameState.timeLeft <= 0) {
+          endGame("60秒營業時間結束！大獲全勝！");
+        }
+      }, 1000);
+
+      // Start Conveyor Animation Loop
+      cancelAnimationFrame(GameState.animFrameId);
+      GameState.animFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function endGame(reasonMsg) {
+      GameState.isPlaying = false;
+      clearInterval(GameState.timerId);
+      clearTimeout(GameState.slowTimerId);
+      cancelAnimationFrame(GameState.animFrameId);
+
+      // Show Game Over Modal
+      document.getElementById("endSubtitle").textContent = reasonMsg;
+      document.getElementById("finalScore").textContent = GameState.score;
+      document.getElementById("finalCombo").textContent = `${GameState.maxCombo} 連擊`;
+      document.getElementById("finalCount").textContent = `${GameState.questionsSolved} 題`;
+
+      // Star rating calculation
+      let stars = "⭐⭐⭐ 特級壽司掌門人";
+      if (GameState.score < 500) stars = "⭐ 初級學徒 (再接再厲)";
+      else if (GameState.score < 1200) stars = "⭐⭐ 中級壽司師傅 (技藝純熟)";
+      document.getElementById("finalRank").textContent = stars;
+
+      // Populate Session Compendium (成語圖鑑)
+      renderCompendium();
+
+      gameOverModal.classList.remove("hidden");
+
+      // Celebrate with confetti if score is decent
+      if (GameState.score >= 500 && typeof confetti === 'function') {
+        confetti({
+          particleCount: 80,
+          spread: 80,
+          origin: { y: 0.5 }
+        });
+      }
+    }
+
+    function renderCompendium() {
+      const listEl = document.getElementById("compendiumList");
+      const countEl = document.getElementById("compendiumCount");
+      listEl.innerHTML = "";
+      countEl.textContent = `共 ${GameState.usedIdiomsInSession.length} 條成語`;
+
+      if (GameState.usedIdiomsInSession.length === 0) {
+        listEl.innerHTML = `<div class="text-center text-gray-400 py-6">本局未完成成語訂單，下局加把勁！</div>`;
+        return;
+      }
+
+      GameState.usedIdiomsInSession.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "bg-amber-50/90 border border-amber-200 rounded-2xl p-3 shadow-sm hover:shadow transition";
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-base font-black text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-lg">
+              ${index + 1}. ${item.idiom}
+            </span>
+          </div>
+          <p class="text-xs text-[#3D2B20] font-bold mb-1">
+            <span class="text-amber-800">【應用原句】：</span>${item.sentence}
+          </p>
+          <p class="text-xs text-emerald-800 font-medium">
+            <span class="font-bold">【成語釋義】：</span>${item.explanation}
+          </p>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    // Export Word Document (.doc) with complete lesson revision worksheet
+    function downloadWordWorksheet() {
+      const idioms = GameState.usedIdiomsInSession;
+      if (idioms.length === 0) {
+        showScoreFloatingPopup("尚未積累成語，先玩一局吧！", false, true);
+        return;
+      }
+
+      const today = new Date().toLocaleDateString('zh-HK');
+      
+      let rowsHtml = "";
+      idioms.forEach((item, idx) => {
+        rowsHtml += `
+          <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 10px; font-weight: bold; color: #b91c1c; width: 20%;">${idx + 1}. ${item.idiom}</td>
+            <td style="padding: 10px; width: 45%;">${item.sentence}</td>
+            <td style="padding: 10px; width: 35%; color: #047857;">${item.explanation}</td>
+          </tr>
+        `;
+      });
+
+      const wordContent = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset="utf-8">
+          <title>成語迴轉壽司店 - 課後學習單</title>
+          <style>
+            body { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; padding: 20px; color: #333; }
+            h1 { color: #c2410c; text-align: center; margin-bottom: 5px; }
+            .subtitle { text-align: center; color: #78350f; font-size: 14px; margin-bottom: 25px; }
+            .info-box { border: 1px solid #fed7aa; background-color: #fff7ed; padding: 12px; margin-bottom: 20px; border-radius: 6px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th { background-color: #ea580c; color: white; padding: 10px; text-align: left; }
+            .exercise-box { margin-top: 30px; border-top: 2px dashed #ea580c; padding-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <h1>🍣《成語迴轉壽司店》課後自主溫習單</h1>
+          <div class="subtitle">香港小學四至六年級常見成語專項複習 | 產生日期：${today}</div>
+          
+          <div class="info-box">
+            <strong>學徒姓名：</strong> ______________ &nbsp;&nbsp;&nbsp;&nbsp;
+            <strong>班別：</strong> ______ 班 &nbsp;&nbsp;&nbsp;&nbsp;
+            <strong>本局營業額：</strong> ${GameState.score} 分 &nbsp;&nbsp;&nbsp;&nbsp;
+            <strong>最高連擊：</strong> ${GameState.maxCombo} 次
+          </div>
+
+          <h2>第一部分：成語圖鑑與例句精解</h2>
+          <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+            <thead>
+              <tr>
+                <th>成語</th>
+                <th>應用例句</th>
+                <th>成語釋義</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <div class="exercise-box">
+            <h2>第二部分：動動筆練一練</h2>
+            <p>1. 請從上表挑選一個最喜歡的成語，自行造一句日常生活句子：</p>
+            <p style="border-bottom: 1px solid #999; height: 35px;"></p>
+            <p style="border-bottom: 1px solid #999; height: 35px;"></p>
+            <br/>
+            <p>2. 家長 / 老師評語及蓋印：</p>
+            <div style="border: 1px solid #ccc; height: 70px; border-radius: 4px;"></div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff' + wordContent], {
+        type: 'application/msword'
+      });
+      const url = URL.createObjectURL(blob);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      downloadLink.download = `成語壽司店學習單_${today.replace(/\//g, '-')}.doc`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(url);
+    }
+
+    startGameBtn.addEventListener("click", () => {
+      sounds.init();
+      startGame();
+    });
+
+    restartGameBtn.addEventListener("click", () => {
+      sounds.init();
+      startGame();
+    });
+
+    downloadWordBtn.addEventListener("click", downloadWordWorksheet);
+
+    soundBtn.addEventListener("click", () => {
+      sounds.muted = !sounds.muted;
+      soundBtn.textContent = sounds.muted ? "🔇" : "🔊";
+    });
+
+    propTeaBtn.addEventListener("click", usePropTea);
+    propWasabiBtn.addEventListener("click", usePropWasabi);
+    propChopsticksBtn.addEventListener("click", usePropChopsticks);
+
+    // Handle Window Resize gracefully
+    window.addEventListener("resize", () => {
+      if (GameState.isPlaying && GameState.currentQuestion) {
+        // adjust positions smoothly if needed
+      }
+    });
+  </script>
+</body>
+</html>

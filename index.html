@@ -174,6 +174,11 @@
         border: 0; background: transparent; color: var(--goai-blue); font: inherit; font-weight: 800;
         cursor: pointer; padding: 4px 2px;
     }
+    .game-frame {
+        display: block; width: 100%; height: calc(100vh - 250px); min-height: 720px;
+        border: 0; border-radius: 18px; background: #fffbf0;
+    }
+    body.playing-game #app { max-width: 1100px; }
     @media (max-width: 768px) {
         header { padding: 10px 16px; }
         .header-container { flex-direction: column; text-align: center; gap: 8px; }
@@ -813,7 +818,8 @@ function renderPrompting() {
 }
 
 function renderHelper() {
-    return "";
+    if (state.band !== "pri") return "";
+    return '<iframe class="game-frame" title="成語迴轉壽司店" src="games/idiom-sushi.html"></iframe>';
 }
 
 function renderMake() {
@@ -853,6 +859,7 @@ function render() {
         if (state.activity === "make") below = renderMake();
         html = '<section class="column">' + back + nav + below + "</section>";
     }
+    document.body.classList.toggle("playing-game", state.band === "pri" && state.activity === "helper");
     document.getElementById("app").innerHTML = html;
     saveState();
     state._viewKey = viewKey;
