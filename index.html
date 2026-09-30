@@ -275,20 +275,30 @@
 <script>
 const STORAGE_KEY = "pcws-coach-v1";
 const LOCK_PASS = { vibe: "jcgoai", make: "pcws", help: "clear" };
-const MAKE_SCAFFOLD = {
-    role: "你是一位擅長製作______教育遊戲的前端工程師。",
-    task: "請建立可直接遊玩的單頁遊戲《______》：______。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家是______。畫面上有______。玩家要______。\n2. 答對就______。答錯就______。______就遊戲結束。\n3. 連續答對會______。難度會______。\n4. 題目包括______。結束後先顯示______。",
-    limit: "- 香港書面語繁體中文，適合小四至小六\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個正確答案\n- 動畫要流暢：物件移動、答對有反應、答錯有反應、得分特效"
-};
-const MAKE_TIPS = [
-    "你是一位製作小遊戲的工程師。",
-    "請做一個可以打開就玩的網頁遊戲。",
-    "玩家選出正確答案。選對會加分。選錯可以再試。",
-    "畫面要似遊戲，不要似工作紙。",
-    "用繁體中文，適合小四至小六。",
-    "全部放在一個檔案，打開就可以玩。"
-];
-const MAKE_EXAMPLES = [
+function makeGrade() {
+    return state.band === "sec" ? "中一至中三" : "小四至小六";
+}
+
+function makeScaffold() {
+    return {
+        role: "你是一位擅長製作______教育遊戲的前端工程師。",
+        task: "請建立可直接遊玩的單頁遊戲《______》：______。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家是______。畫面上有______。玩家要______。\n2. 答對就______。答錯就______。______就遊戲結束。\n3. 連續答對會______。難度會______。\n4. 題目包括______。結束後先顯示______。",
+        limit: "- 香港書面語繁體中文，適合" + makeGrade() + "\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個正確答案\n- 動畫要流暢：物件移動、答對有反應、答錯有反應、得分特效"
+    };
+}
+
+function makeTips() {
+    return [
+        "你是一位製作小遊戲的工程師。",
+        "請做一個可以打開就玩的網頁遊戲。",
+        "玩家選出正確答案。選對會加分。選錯可以再試。",
+        "畫面要似遊戲，不要似工作紙。",
+        "用繁體中文，適合" + makeGrade() + "。",
+        "全部放在一個檔案，打開就可以玩。"
+    ];
+}
+
+const MAKE_EXAMPLES_PRI = [
     {
         id: "vocab",
         label: "英文生字",
@@ -309,6 +319,29 @@ const MAKE_EXAMPLES = [
         role: "你是一位擅長製作常識教育遊戲的前端工程師。",
         task: "請建立可直接遊玩的單頁遊戲《車站配對》：淺色的香港街道地圖，車站標示要大，字體清晰。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家是導遊。上方給一個香港地名，下面有三個港鐵站，只有一個最接近。玩家要點選正確車站。\n2. 點中就路線亮起、加分，並顯示一句簡單說明，隨即下一題。點錯就該選項淡出，可以再試，連續錯誤會減少耐心。耐心歸零或 60 秒完結，遊戲結束。\n3. 連續答對累積 Combo，三連擊起分數提高，並有得分特效。難度逐步提升：開局地名著名、車站相差較遠；中段加入鄰近車站；尾段地名較細。\n4. 題目隨機抽取，以香港常見地名和港鐵站為主，不少於 30 題，每題一句說明。結束後先顯示該局地名和正確車站，再可下載 Word 檔。",
         limit: "- 香港書面語繁體中文，適合小四至小六\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個最接近的車站\n- 動畫要流暢：選項出現、答對亮起、答錯淡出、得分特效"
+    }
+];
+const MAKE_EXAMPLES_SEC = [
+    {
+        id: "sec-eng",
+        label: "英文文法",
+        role: "你是一位擅長製作英文教育遊戲的前端工程師。",
+        task: "請建立可直接遊玩的單頁遊戲《英文文法》：清晰的課室畫面，句子卡要大，字體清楚。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家是語文編輯。上方有一句挖空的英文句子，下面有三個英文選項，只有一個文法正確。玩家要點選正確選項。\n2. 點中就句子補全、加分，並顯示一句簡單中文說明，隨即下一題。點錯就選項淡出，可以再試，連續錯誤會減少耐心。耐心歸零或 60 秒完結，遊戲結束。\n3. 連續答對累積 Combo，三連擊起分數提高，並有得分特效。難度逐步提升：開局是現在式和複數；中段加入過去式和比較級；尾段加入容易混淆的文法。\n4. 題目隨機抽取，以香港中一至中三常見文法為主，不少於 40 題，每題一句說明。結束後先顯示該局句子和正確答案，再可下載 Word 檔。",
+        limit: "- 中英對照，適合中一至中三\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個正確答案\n- 動畫要流暢：選項出現、答對補全、答錯淡出、得分特效"
+    },
+    {
+        id: "sec-math",
+        label: "方程挑戰",
+        role: "你是一位擅長製作數學教育遊戲的前端工程師。",
+        task: "請建立可直接遊玩的單頁遊戲《方程挑戰》：淺色的計算板，數字要大，字體清晰。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家是解題員。上方顯示一條一元一次方程，例如 2x+3=11，下面有三個 x 的值，只有一個正確。玩家要點選正確答案。\n2. 點中就答案亮起、加分，隨即下一題。點錯就該選項划掉，Combo 中斷，耐心下降。耐心歸零或 60 秒完結，遊戲結束。\n3. 連續答對累積 Combo，三連擊起分數以 1.5、2、3 倍計算，並有得分特效。難度逐步提升：開局是一步方程；中段要先移項；尾段加入括號。\n4. 題目隨機抽取，以香港中一至中三的一元一次方程為主，不少於 40 題。結束後先顯示該局題目和正確答案，再可下載 Word 檔。",
+        limit: "- 繁體中文，適合中一至中三\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個正確答案\n- 動畫要流暢：選項出現、答對亮起、答錯划掉、得分特效"
+    },
+    {
+        id: "sec-sci",
+        label: "公平測試",
+        role: "你是一位擅長製作科學教育遊戲的前端工程師。",
+        task: "請建立可直接遊玩的單頁遊戲《公平測試》：淺色的實驗室，圖示要大，字體清晰。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家是實驗員。上方描述一個實驗，下面有三個選項。每題只問其中一種：應改變的變量、要保持不變的東西，或量度的結果，只有一個正確。玩家要點選正確選項。\n2. 點中就該項亮起、加分，並顯示一句簡單說明，隨即下一題。點錯就選項淡出，可以再試，連續錯誤會減少耐心。耐心歸零或 60 秒完結，遊戲結束。\n3. 連續答對累積 Combo，三連擊起分數提高，並有得分特效。難度逐步提升：開局是生活實驗；中段加入對照；尾段兩個變量容易混淆。\n4. 題目隨機抽取，以香港中一至中三的科學探究為主，不少於 30 題，每題一句說明。結束後先顯示該局題目和正確答案，再可下載 Word 檔。",
+        limit: "- 香港書面語繁體中文，適合中一至中三\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個正確答案\n- 動畫要流暢：選項出現、答對亮起、答錯淡出、得分特效"
     }
 ];
 
@@ -576,7 +609,7 @@ function loadState() {
         if (typeof saved.makeRole === "string") base.makeRole = saved.makeRole;
         if (typeof saved.makeTask === "string") base.makeTask = saved.makeTask;
         if (typeof saved.makeLimit === "string") base.makeLimit = saved.makeLimit;
-        if (MAKE_EXAMPLES.some(function (item) { return item.id === saved.makeExample; })) base.makeExample = saved.makeExample;
+        if (["blank", "base"].indexOf(saved.makeExample) >= 0 || MAKE_EXAMPLES_PRI.concat(MAKE_EXAMPLES_SEC).some(function (item) { return item.id === saved.makeExample; })) base.makeExample = saved.makeExample;
     } catch (e) {}
     return base;
 }
@@ -1002,6 +1035,10 @@ function insideLockedCopy(node) {
     return !!(el && el.closest && el.closest(".nocopy"));
 }
 
+function makeExamples() {
+    return state.band === "sec" ? MAKE_EXAMPLES_SEC : MAKE_EXAMPLES_PRI;
+}
+
 function syncMakeFields() {
     const role = document.getElementById("make-role");
     const task = document.getElementById("make-task");
@@ -1026,7 +1063,7 @@ function renderMake() {
     const helped = lockOpen("help");
     const copied = state.copyMsg === "make-all";
     const tips = state.makeTips
-        ? '<div class="tip-panel">' + MAKE_TIPS.map(function (line, index) {
+        ? '<div class="tip-panel">' + makeTips().map(function (line, index) {
             const ok = state.copyMsg === "tip-" + index;
             return '<div class="tip-item"><p>' + escapeHtml(line) + "</p>" +
                 '<button type="button" class="pill-btn" data-action="copy-tip" data-value="' + index + '">複製</button>' +
@@ -1035,7 +1072,7 @@ function renderMake() {
         : "";
     const examples = helped
         ? '<div class="make-examples"><p class="lede">如果想不到，可以選擇例子。</p><div class="chip-row">' +
-            MAKE_EXAMPLES.map(function (item) {
+            makeExamples().map(function (item) {
                 return '<button type="button" class="pill-btn' + (state.makeExample === item.id ? " on" : "") + '" data-action="make-example" data-value="' + item.id + '">' + escapeHtml(item.label) + "</button>";
             }).join("") + "</div></div>"
         : "";
@@ -1060,6 +1097,10 @@ function renderMake() {
         examples +
         "</div><div class=\"make-side\">" +
         '<button type="button" class="pill-btn' + (state.makeTips ? " on" : "") + '" data-action="toggle-tips" aria-expanded="' + (state.makeTips ? "true" : "false") + '">小錦囊</button>' +
+        (helped
+            ? '<button type="button" class="pill-btn' + (state.makeExample === "blank" ? " on" : "") + '" data-action="make-blank">空白版</button>' +
+                '<button type="button" class="pill-btn' + (state.makeExample === "base" ? " on" : "") + '" data-action="make-base">基礎版</button>'
+            : "") +
         helpBtn + tips +
         "</div></div>" + modal;
 }
@@ -1193,6 +1234,10 @@ document.addEventListener("click", function (event) {
         if (state.band !== value) {
             state.band = value;
             state.makeId = "";
+            state.makeRole = "";
+            state.makeTask = "";
+            state.makeLimit = "";
+            state.makeExample = "";
         }
     } else if (action === "open") {
         state.page = value;
@@ -1227,7 +1272,7 @@ document.addEventListener("click", function (event) {
                 if (wrap) wrap.outerHTML = vibeToolsMarkup();
                 return;
             }
-            if (value === "help") applyMakePrompt(MAKE_SCAFFOLD, "");
+            if (value === "help") applyMakePrompt(makeScaffold(), "base");
         } else {
             state.lockError = value;
             if (value === "vibe" || value === "help") {
@@ -1253,14 +1298,21 @@ document.addEventListener("click", function (event) {
         return;
     } else if (action === "toggle-tips") {
         state.makeTips = !state.makeTips;
+    } else if (action === "make-blank") {
+        state.makeRole = "";
+        state.makeTask = "";
+        state.makeLimit = "";
+        state.makeExample = "blank";
+    } else if (action === "make-base") {
+        applyMakePrompt(makeScaffold(), "base");
     } else if (action === "make-example") {
-        const example = MAKE_EXAMPLES.filter(function (item) { return item.id === value; })[0];
+        const example = makeExamples().filter(function (item) { return item.id === value; })[0];
         if (example) applyMakePrompt(example, example.id);
     } else if (action === "copy-make") {
         copyText(makePromptText(), "make-all");
         return;
     } else if (action === "copy-tip") {
-        const line = MAKE_TIPS[Number(value)];
+        const line = makeTips()[Number(value)];
         if (line) copyText(line, "tip-" + value);
         return;
     } else if (action === "copy") {
