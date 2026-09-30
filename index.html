@@ -141,6 +141,18 @@
     .pass-box { max-width: 420px; margin: 16px auto 0; background: #f7f9fc; border-radius: 16px; padding: 16px; border: 2px solid #e2e8f0; }
     .pass-box .btn-row { justify-content: center; }
     .pass-box .primary-btn { width: 100%; }
+    .game-lock-row { display: flex; justify-content: flex-start; margin-top: 14px; }
+    .modal-back {
+        position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center;
+        padding: 20px; background: rgba(15, 23, 42, 0.45); box-sizing: border-box;
+    }
+    .modal-back[hidden] { display: none; }
+    .modal-card {
+        width: min(100%, 420px); background: #fff; border-radius: 20px; padding: 24px;
+        box-shadow: 0 20px 50px rgba(2, 33, 105, 0.22); box-sizing: border-box;
+    }
+    .modal-card .lede { margin-bottom: 14px; }
+    .modal-card .btn-row { justify-content: center; }
     .site-footer {
         width: 100%; margin-top: 48px; padding: 28px 20px; background: #f7f8fb; color: #8a9099;
         font-size: 13px; text-align: center; line-height: 1.6; box-sizing: border-box;
@@ -551,6 +563,19 @@ function lockBox(id, label) {
         (label || "進入") + "</button></div></div>";
 }
 
+function vibeLockMarkup() {
+    return '<div id="vibe-gate-wrap">' +
+        '<div class="game-lock-row"><button type="button" class="pill-btn" data-action="open-vibe-lock">按下解鎖Prompt</button></div>' +
+        '<div class="modal-back" id="vibe-gate" data-action="close-vibe-lock" hidden>' +
+        '<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="vibe-lock-title">' +
+        '<p class="lede" id="vibe-lock-title">請輸入密碼，以獲得完整 Prompt 及代碼。</p>' +
+        '<input type="password" id="lock-pass" placeholder="密碼" autocomplete="off">' +
+        '<p class="error-text" hidden>密碼不正確</p>' +
+        '<div class="btn-row"><button type="button" class="primary-btn" data-action="unlock" data-value="vibe">確認</button>' +
+        '<button type="button" class="ghost-btn" data-action="close-vibe-lock">關閉</button></div>' +
+        "</div></div></div>";
+}
+
 function vibeToolsMarkup() {
     return '<div class="game-tools">' +
         '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">展示prompt</button>' +
@@ -890,7 +915,7 @@ const GAME_PROMPT = [
 function renderHelper() {
     if (state.band !== "pri") return "";
     const frame = '<iframe class="game-frame" title="成語迴轉壽司店" src="games/idiom-sushi.html"></iframe>';
-    if (!lockOpen("vibe")) return frame + lockBox("vibe", "解鎖Vibe Coding");
+    if (!lockOpen("vibe")) return frame + vibeLockMarkup();
     return frame + vibeToolsMarkup();
 }
 
@@ -1057,26 +1082,36 @@ document.addEventListener("click", function (event) {
         state.playId = value;
     } else if (action === "make") {
         state.makeId = value;
+    } else if (action === "open-vibe-lock") {
+        const gate = document.getElementById("vibe-gate");
+        if (gate) {
+            gate.hidden = false;
+            const err = gate.querySelector(".error-text");
+            if (err) err.hidden = true;
+            const input = document.getElementById("lock-pass");
+            if (input) input.focus();
+        }
+        return;
+    } else if (action === "close-vibe-lock") {
+        if (event.target !== btn) return;
+        const gate = document.getElementById("vibe-gate");
+        if (gate) gate.hidden = true;
+        return;
     } else if (action === "unlock") {
         const typed = (document.getElementById("lock-pass").value || "").trim();
         if (typed === LOCK_PASS[value]) {
             try { sessionStorage.setItem("pcws-lock-" + value, "1"); } catch (e) {}
             state.lockError = "";
             if (value === "vibe") {
-                const gate = document.getElementById("vibe-gate");
-                if (gate) gate.outerHTML = vibeToolsMarkup();
+                const wrap = document.getElementById("vibe-gate-wrap");
+                if (wrap) wrap.outerHTML = vibeToolsMarkup();
                 return;
             }
         } else {
             state.lockError = value;
             if (value === "vibe") {
-                const box = document.getElementById("vibe-gate");
-                if (box && !box.querySelector(".error-text")) {
-                    const err = document.createElement("p");
-                    err.className = "error-text";
-                    err.textContent = "密碼不正確";
-                    box.insertBefore(err, box.querySelector(".btn-row"));
-                }
+                const err = document.querySelector("#vibe-gate .error-text");
+                if (err) err.hidden = false;
                 return;
             }
         }
@@ -1128,9 +1163,14 @@ document.addEventListener("keydown", function (event) {
 }, true);
 
 document.getElementById("app").addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        const gate = document.getElementById("vibe-gate");
+        if (gate && !gate.hidden) gate.hidden = true;
+        return;
+    }
     if (event.key !== "Enter" || event.target.id !== "lock-pass") return;
     event.preventDefault();
-    const btn = document.querySelector('[data-action="unlock"]');
+    const btn = document.querySelector('#vibe-gate [data-action="unlock"]');
     if (btn) btn.click();
 });
 
