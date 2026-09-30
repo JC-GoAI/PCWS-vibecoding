@@ -153,6 +153,21 @@
     }
     .modal-card .lede { margin-bottom: 14px; }
     .modal-card .btn-row { justify-content: center; }
+    .make-layout { display: flex; align-items: flex-start; gap: 18px; }
+    .make-main { flex: 1 1 auto; min-width: 0; }
+    .make-side { flex: 0 0 220px; display: flex; flex-direction: column; align-items: stretch; gap: 10px; position: sticky; top: 12px; }
+    .make-side .pill-btn { width: 100%; }
+    .make-block { margin: 0 0 16px; }
+    .make-block h3 { margin: 0 0 8px; color: var(--goai-blue); font-size: 1.15rem; }
+    .make-block textarea { min-height: 96px; resize: vertical; }
+    .make-hint { margin: 8px 0 0; color: #4a5568; font-weight: 700; line-height: 1.55; }
+    .make-examples { margin-top: 8px; }
+    .make-examples .lede { text-align: left; margin-bottom: 10px; }
+    .make-examples .chip-row { justify-content: flex-start; }
+    .tip-panel { display: flex; flex-direction: column; gap: 8px; }
+    .tip-item { background: #f7f9fc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 10px; }
+    .tip-item p { margin: 0 0 8px; line-height: 1.5; font-weight: 700; }
+    .tip-item .pill-btn { width: auto; min-height: 34px; }
     .site-footer {
         width: 100%; margin-top: 48px; padding: 28px 20px; background: #f7f8fb; color: #8a9099;
         font-size: 13px; text-align: center; line-height: 1.6; box-sizing: border-box;
@@ -238,6 +253,8 @@
         .column { padding: 20px; }
         .seg-bar { flex-direction: column; }
         .band-card { max-width: none; min-height: 180px; }
+        .make-layout { flex-direction: column; }
+        .make-side { width: 100%; flex-basis: auto; position: static; }
     }
     </style>
 </head>
@@ -257,7 +274,43 @@
 <footer class="site-footer">© 2026 CLEAR, The Chinese University of Hong Kong · Parent–Child Workshop</footer>
 <script>
 const STORAGE_KEY = "pcws-coach-v1";
-const LOCK_PASS = { vibe: "jcgoai", make: "pcws" };
+const LOCK_PASS = { vibe: "jcgoai", make: "pcws", help: "clear" };
+const MAKE_SCAFFOLD = {
+    role: "你是一位擅長製作______教育遊戲的前端工程師。",
+    task: "請建立可直接遊玩的單頁遊戲《______》。\n畫面要有遊戲感，不要像測驗卷。\n玩家是______。答對就______。答錯就______。",
+    limit: "- 香港書面語繁體中文，適合小四至小六\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- （可加一條自己的限制）"
+};
+const MAKE_TIPS = [
+    "你是一位製作小遊戲的工程師。",
+    "請做一個可以打開就玩的網頁遊戲。",
+    "玩家選出正確答案。選對會加分。選錯可以再試。",
+    "畫面要似遊戲，不要似工作紙。",
+    "用繁體中文，適合小四至小六。",
+    "全部放在一個檔案，打開就可以玩。"
+];
+const MAKE_EXAMPLES = [
+    {
+        id: "vocab",
+        label: "英文生字",
+        role: "你是一位製作英文小遊戲的工程師。",
+        task: "請做一個網頁遊戲《英文生字》。\n畫面上有一個中文意思，下面有三個英文生字，只有一個正確。\n玩家點中正確的生字就加分。點錯就再試。",
+        limit: "- 中英對照，適合小四至小六\n- 全部放在一個檔案，打開就可以玩\n- 畫面要似遊戲，不要似工作紙"
+    },
+    {
+        id: "times",
+        label: "乘法快車",
+        role: "你是一位製作數學小遊戲的工程師。",
+        task: "請做一個網頁遊戲《乘法快車》。\n畫面上顯示一題乘法，例如 7×8，下面有三個答案，只有一個正確。\n玩家點中正確答案就加分。點錯就再試。",
+        limit: "- 繁體中文，適合小四至小六\n- 全部放在一個檔案，打開就可以玩\n- 畫面要似遊戲，不要似工作紙"
+    },
+    {
+        id: "station",
+        label: "車站配對",
+        role: "你是一位製作常識小遊戲的工程師。",
+        task: "請做一個網頁遊戲《車站配對》。\n畫面上給一個香港地名，下面有三個港鐵站，只有一個最接近。\n玩家點中正確車站就加分。點錯就再試。",
+        limit: "- 香港書面語繁體中文，適合小四至小六\n- 全部放在一個檔案，打開就可以玩\n- 畫面要似遊戲，不要似工作紙"
+    }
+];
 
 const PLAY = [
     {
@@ -503,7 +556,7 @@ const MAKE = {
 let state = loadState();
 
 function loadState() {
-    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", makeId: "", copyMsg: "", lockError: "" };
+    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", makeId: "", copyMsg: "", lockError: "", makeRole: "", makeTask: "", makeLimit: "", makeTips: false, makeExample: "" };
     try {
         const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "{}");
         if (saved.activity === "prompt" || saved.activity === "helper" || saved.activity === "make") base.activity = saved.activity;
@@ -520,6 +573,10 @@ function loadState() {
         if (themes.some(function (t) { return t.id === saved.makeId; })) {
             base.makeId = saved.makeId;
         }
+        if (typeof saved.makeRole === "string") base.makeRole = saved.makeRole;
+        if (typeof saved.makeTask === "string") base.makeTask = saved.makeTask;
+        if (typeof saved.makeLimit === "string") base.makeLimit = saved.makeLimit;
+        if (MAKE_EXAMPLES.some(function (item) { return item.id === saved.makeExample; })) base.makeExample = saved.makeExample;
     } catch (e) {}
     return base;
 }
@@ -532,7 +589,11 @@ function saveState() {
         page: state.page,
         playMode: state.playMode,
         playId: state.playId,
-        makeId: state.makeId
+        makeId: state.makeId,
+        makeRole: state.makeRole,
+        makeTask: state.makeTask,
+        makeLimit: state.makeLimit,
+        makeExample: state.makeExample
     }));
 }
 
@@ -941,8 +1002,69 @@ function insideLockedCopy(node) {
     return !!(el && el.closest && el.closest(".nocopy"));
 }
 
+function syncMakeFields() {
+    const role = document.getElementById("make-role");
+    const task = document.getElementById("make-task");
+    const limit = document.getElementById("make-limit");
+    if (role) state.makeRole = role.value;
+    if (task) state.makeTask = task.value;
+    if (limit) state.makeLimit = limit.value;
+}
+
+function makePromptText() {
+    return "# 角色\n" + (state.makeRole || "") + "\n\n# 背景與任務\n" + (state.makeTask || "") + "\n\n# 指導與限制\n" + (state.makeLimit || "");
+}
+
+function applyMakePrompt(parts, exampleId) {
+    state.makeRole = parts.role;
+    state.makeTask = parts.task;
+    state.makeLimit = parts.limit;
+    state.makeExample = exampleId || "";
+}
+
 function renderMake() {
-    return "";
+    const helped = lockOpen("help");
+    const copied = state.copyMsg === "make-all";
+    const tips = state.makeTips
+        ? '<div class="tip-panel">' + MAKE_TIPS.map(function (line, index) {
+            const ok = state.copyMsg === "tip-" + index;
+            return '<div class="tip-item"><p>' + escapeHtml(line) + "</p>" +
+                '<button type="button" class="pill-btn" data-action="copy-tip" data-value="' + index + '">複製</button>' +
+                (ok ? '<span class="copy-ok">已複製</span>' : "") + "</div>";
+        }).join("") + "</div>"
+        : "";
+    const examples = helped
+        ? '<div class="make-examples"><p class="lede">如果想不到，可以選擇例子。</p><div class="chip-row">' +
+            MAKE_EXAMPLES.map(function (item) {
+                return '<button type="button" class="pill-btn' + (state.makeExample === item.id ? " on" : "") + '" data-action="make-example" data-value="' + item.id + '">' + escapeHtml(item.label) + "</button>";
+            }).join("") + "</div></div>"
+        : "";
+    const helpBtn = helped
+        ? ""
+        : '<button type="button" class="pill-btn" data-action="open-make-help">需要幫忙</button>';
+    const modal = helped
+        ? ""
+        : '<div class="modal-back" id="make-gate" data-action="close-make-help" hidden>' +
+            '<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="make-lock-title">' +
+            '<p class="lede" id="make-lock-title">請輸入密碼，以取得填空提示。</p>' +
+            '<input type="password" id="lock-pass" placeholder="密碼" autocomplete="off">' +
+            '<p class="error-text" hidden>密碼不正確</p>' +
+            '<div class="btn-row"><button type="button" class="primary-btn" data-action="unlock" data-value="help">確認</button>' +
+            '<button type="button" class="ghost-btn" data-action="close-make-help">關閉</button></div></div></div>';
+    return '<div class="make-layout"><div class="make-main">' +
+        '<div class="make-block"><h3># 角色</h3><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea>" +
+        '<p class="make-hint">你可以請 AI 當哪一種人？</p></div>' +
+        '<div class="make-block"><h3># 背景與任務</h3><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea>" +
+        '<p class="make-hint">遊戲叫什麼？玩家要做什麼？答對和答錯分別發生什麼？</p></div>' +
+        '<div class="make-block"><h3># 指導與限制</h3><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea>" +
+        '<p class="make-hint">用什麼語言、給哪個年級？有什麼一定要做，或一定不要做？</p></div>' +
+        '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy-make">' + icon("copy") + "複製全部</button>" +
+        (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div>" +
+        examples +
+        "</div><div class=\"make-side\">" +
+        '<button type="button" class="pill-btn' + (state.makeTips ? " on" : "") + '" data-action="toggle-tips" aria-expanded="' + (state.makeTips ? "true" : "false") + '">小錦囊</button>' +
+        helpBtn + tips +
+        "</div></div>" + modal;
 }
 
 function bandIcon(kind) {
@@ -1061,8 +1183,9 @@ document.addEventListener("click", function (event) {
     if (!btn) return;
     const action = btn.getAttribute("data-action");
     const value = btn.getAttribute("data-value");
+    syncMakeFields();
     if (action !== "unlock") state.lockError = "";
-    state.copyMsg = "";
+    if (action !== "copy-tip" && action !== "copy-make") state.copyMsg = "";
     if (action === "home") {
         state.band = "";
     } else if (action === "activity") {
@@ -1107,14 +1230,42 @@ document.addEventListener("click", function (event) {
                 if (wrap) wrap.outerHTML = vibeToolsMarkup();
                 return;
             }
+            if (value === "help") applyMakePrompt(MAKE_SCAFFOLD, "");
         } else {
             state.lockError = value;
-            if (value === "vibe") {
-                const err = document.querySelector("#vibe-gate .error-text");
+            if (value === "vibe" || value === "help") {
+                const err = document.querySelector(value === "vibe" ? "#vibe-gate .error-text" : "#make-gate .error-text");
                 if (err) err.hidden = false;
                 return;
             }
         }
+    } else if (action === "open-make-help") {
+        const gate = document.getElementById("make-gate");
+        if (gate) {
+            gate.hidden = false;
+            const err = gate.querySelector(".error-text");
+            if (err) err.hidden = true;
+            const input = document.getElementById("lock-pass");
+            if (input) input.focus();
+        }
+        return;
+    } else if (action === "close-make-help") {
+        if (event.target !== btn) return;
+        const gate = document.getElementById("make-gate");
+        if (gate) gate.hidden = true;
+        return;
+    } else if (action === "toggle-tips") {
+        state.makeTips = !state.makeTips;
+    } else if (action === "make-example") {
+        const example = MAKE_EXAMPLES.filter(function (item) { return item.id === value; })[0];
+        if (example) applyMakePrompt(example, example.id);
+    } else if (action === "copy-make") {
+        copyText(makePromptText(), "make-all");
+        return;
+    } else if (action === "copy-tip") {
+        const line = MAKE_TIPS[Number(value)];
+        if (line) copyText(line, "tip-" + value);
+        return;
     } else if (action === "copy") {
         const text = value === "make"
             ? currentPrompt()
@@ -1164,13 +1315,16 @@ document.addEventListener("keydown", function (event) {
 
 document.getElementById("app").addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
-        const gate = document.getElementById("vibe-gate");
-        if (gate && !gate.hidden) gate.hidden = true;
+        ["vibe-gate", "make-gate"].forEach(function (id) {
+            const gate = document.getElementById(id);
+            if (gate && !gate.hidden) gate.hidden = true;
+        });
         return;
     }
     if (event.key !== "Enter" || event.target.id !== "lock-pass") return;
     event.preventDefault();
-    const btn = document.querySelector('#vibe-gate [data-action="unlock"]');
+    const openGate = event.target.closest(".modal-back");
+    const btn = openGate ? openGate.querySelector('[data-action="unlock"]') : null;
     if (btn) btn.click();
 });
 
