@@ -302,9 +302,9 @@ const MAKE_EXAMPLES_PRI = [
     {
         id: "vocab",
         label: "英文生字",
-        role: "你是一位擅長製作英文教育遊戲的前端工程師。",
-        task: "請建立可直接遊玩的單頁遊戲《英文生字》：明亮的書店，糖果色，生字卡要大，字體清晰。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家是書店學徒。上方顯示一個中文意思，下面有三張英文生字卡，只有一張正確。玩家要點選正確那張。\n2. 點中就翻開生字卡、加分，並顯示一句簡單解釋，隨即下一題。點錯就卡片移走，可以再試，連續錯誤會減少耐心。耐心歸零或 60 秒完結，遊戲結束。\n3. 連續答對累積 Combo，三連擊起分數提高，並有得分特效。難度逐步提升：開局生字常見、選項相差較遠；中段加入詞性相近的字；尾段選項更相似。\n4. 題目隨機抽取，以香港小四至小六常見英文生字為主，不少於 40 個，每個附中文意思。結束後先顯示該局生字表，再可下載 Word 檔。",
-        limit: "- 中英對照，適合小四至小六\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個正確生字\n- 動畫要流暢：生字卡移動、答對翻開、答錯移走、得分特效"
+        role: "You are a front-end engineer who is good at making English learning games.",
+        task: "Build a single-page game that can be played immediately, called Word Shop: a bright bookshop, candy colours, large word cards, and clear text. It should feel like a game, not a worksheet.\nGame rules:\n1. The player is a bookshop apprentice. A Chinese meaning is shown at the top. Three English word cards are below, and only one is correct. The player taps the correct card.\n2. A correct tap flips the card, adds points, shows a short meaning, then moves to the next item. A wrong tap moves the card away. The player may try again. Repeated mistakes reduce patience. The game ends when patience reaches zero or after 60 seconds.\n3. Correct answers in a row build a Combo. From three in a row, the score increases, with a score effect. Difficulty rises: common words and clearly different choices at the start; similar parts of speech in the middle; closer choices at the end.\n4. Items are drawn at random from English words common for Hong Kong Primary 4 to Primary 6, at least 40 words, each with a Chinese meaning. At the end, show that round's word list, then allow a Word file download.",
+        limit: "- Chinese and English together, for Primary 4 to Primary 6\n- Support mouse, touch, phones, and computers\n- Put HTML, CSS, and JavaScript in one file that runs when opened\n- Each item has only one correct word\n- Keep the animation smooth: cards move, a correct card flips open, a wrong card leaves, and the score effect plays"
     },
     {
         id: "times",
@@ -325,9 +325,9 @@ const MAKE_EXAMPLES_SEC = [
     {
         id: "sec-eng",
         label: "英文文法",
-        role: "你是一位擅長製作英文教育遊戲的前端工程師。",
-        task: "請建立可直接遊玩的單頁遊戲《英文文法》：清晰的課室畫面，句子卡要大，字體清楚。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家是語文編輯。上方有一句挖空的英文句子，下面有三個英文選項，只有一個文法正確。玩家要點選正確選項。\n2. 點中就句子補全、加分，並顯示一句簡單中文說明，隨即下一題。點錯就選項淡出，可以再試，連續錯誤會減少耐心。耐心歸零或 60 秒完結，遊戲結束。\n3. 連續答對累積 Combo，三連擊起分數提高，並有得分特效。難度逐步提升：開局是現在式和複數；中段加入過去式和比較級；尾段加入容易混淆的文法。\n4. 題目隨機抽取，以香港中一至中三常見文法為主，不少於 40 題，每題一句說明。結束後先顯示該局句子和正確答案，再可下載 Word 檔。",
-        limit: "- 中英對照，適合中一至中三\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個正確答案\n- 動畫要流暢：選項出現、答對補全、答錯淡出、得分特效"
+        role: "You are a front-end engineer who is good at making English learning games.",
+        task: "Build a single-page game that can be played immediately, called Grammar Lab: a clear classroom, large sentence cards, and readable text. It should feel like a game, not a worksheet.\nGame rules:\n1. The player is an editor. A gapped English sentence is shown at the top. Three English choices are below, and only one is grammatically correct. The player taps the correct choice.\n2. A correct tap completes the sentence, adds points, shows a short explanation, then moves to the next item. A wrong tap fades that choice. The player may try again. Repeated mistakes reduce patience. The game ends when patience reaches zero or after 60 seconds.\n3. Correct answers in a row build a Combo. From three in a row, the score increases, with a score effect. Difficulty rises: present tense and plurals at the start; past tense and comparatives in the middle; easily confused grammar at the end.\n4. Items are drawn at random from grammar common for Hong Kong Secondary 1 to Secondary 3, at least 40 items, each with a short explanation. At the end, show that round's sentences and correct answers, then allow a Word file download.",
+        limit: "- Chinese and English together, for Secondary 1 to Secondary 3\n- Support mouse, touch, phones, and computers\n- Put HTML, CSS, and JavaScript in one file that runs when opened\n- Each item has only one correct answer\n- Keep the animation smooth: choices appear, a correct answer completes the sentence, a wrong choice fades, and the score effect plays"
     },
     {
         id: "sec-math",
@@ -1049,7 +1049,11 @@ function syncMakeFields() {
 }
 
 function makePromptText() {
-    return "# 角色\n" + (state.makeRole || "") + "\n\n# 背景與任務\n" + (state.makeTask || "") + "\n\n# 指導與限制\n" + (state.makeLimit || "");
+    const english = state.makeExample === "vocab" || state.makeExample === "sec-eng";
+    const role = english ? "# Role" : "# 角色";
+    const task = english ? "# Background and task" : "# 背景與任務";
+    const limit = english ? "# Instructions and limits" : "# 指導與限制";
+    return role + "\n" + (state.makeRole || "") + "\n\n" + task + "\n" + (state.makeTask || "") + "\n\n" + limit + "\n" + (state.makeLimit || "");
 }
 
 function applyMakePrompt(parts, exampleId) {
