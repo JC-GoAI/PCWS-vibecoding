@@ -154,13 +154,13 @@
     .modal-card .lede { margin-bottom: 14px; }
     .modal-card .btn-row { justify-content: center; }
     .make-layout { display: flex; align-items: flex-start; gap: 18px; }
-    .make-main { flex: 1 1 auto; min-width: 0; }
-    .make-side { flex: 0 0 220px; display: flex; flex-direction: column; align-items: stretch; gap: 10px; position: sticky; top: 12px; }
+    .make-main { flex: 2 1 0; min-width: 0; }
+    .make-side { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 10px; position: sticky; top: 12px; }
     .make-side .pill-btn { width: 100%; }
     .make-block { margin: 0 0 16px; }
-    .make-block h3 { margin: 0 0 8px; color: var(--goai-blue); font-size: 1.15rem; }
+    .make-block h3 { margin: 0 0 6px; color: var(--goai-blue); font-size: 1.15rem; }
     .make-block textarea { min-height: 96px; resize: vertical; }
-    .make-hint { margin: 8px 0 0; color: #4a5568; font-weight: 700; line-height: 1.55; }
+    .make-hint { margin: 0 0 8px; color: #4a5568; font-weight: 700; line-height: 1.55; }
     .make-examples { margin-top: 8px; }
     .make-examples .lede { text-align: left; margin-bottom: 10px; }
     .make-examples .chip-row { justify-content: flex-start; }
@@ -1052,12 +1052,9 @@ function renderMake() {
             '<div class="btn-row"><button type="button" class="primary-btn" data-action="unlock" data-value="help">確認</button>' +
             '<button type="button" class="ghost-btn" data-action="close-make-help">關閉</button></div></div></div>';
     return '<div class="make-layout"><div class="make-main">' +
-        '<div class="make-block"><h3># 角色</h3><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea>" +
-        '<p class="make-hint">你可以請 AI 當哪一種人？</p></div>' +
-        '<div class="make-block"><h3># 背景與任務</h3><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea>" +
-        '<p class="make-hint">遊戲叫什麼？玩家要做什麼？答對和答錯分別發生什麼？</p></div>' +
-        '<div class="make-block"><h3># 指導與限制</h3><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea>" +
-        '<p class="make-hint">用什麼語言、給哪個年級？有什麼一定要做，或一定不要做？</p></div>' +
+        '<div class="make-block"><h3># 角色</h3><p class="make-hint">你希望AI是甚麼身份？</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
+        '<div class="make-block"><h3># 背景與任務</h3><p class="make-hint">遊戲叫什麼？玩家要做什麼？答對和答錯分別發生什麼？</p><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea></div>" +
+        '<div class="make-block"><h3># 指導與限制</h3><p class="make-hint">用什麼語言、給哪個年級？有什麼一定要做，或一定不要做？</p><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea></div>" +
         '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy-make">' + icon("copy") + "複製全部</button>" +
         (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div>" +
         examples +
