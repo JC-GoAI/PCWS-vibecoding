@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>尋找桃花源 - 香港教育局《桃花源記》篇章互動探索</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- jsPDF for direct PDF compilation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --ink: #382c23;
+      --paper: #fdfbf7;
+      --peach-light: #fff2ee;
+      --peach-border: #f2bfb3;
+      --gold: #b38536;
+      --jade: #366d58;
+    }
+    
+    body {
+      font-family: 'Noto Serif TC', serif;
+      background-color: #f7f1e6;
+      color: var(--ink);
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow: hidden;
+    }
+
+    .font-calligraphy {
+      font-family: 'Ma Shan Zheng', cursive, 'Noto Serif TC', serif;
+    }
+
+    /* Map Camera Stage with soft light gradient vignette */
+    #viewport {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #fbf7ef 0%, #efe5d5 100%);
+    }
+
+    #camera-rig {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transform-origin: 0 0;
+      transition: transform 1.25s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
+    #map-canvas {
+      position: absolute;
+      width: 2000px;
+      height: 1250px;
+      background-image: url('https://i.imgur.com/gIqahgj.jpeg');
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 0 40px rgba(130, 95, 60, 0.25) inset;
+    }
+
+    /* Ancient Elegant Paper Texture & Soft Glows */
+    .paper-panel {
+      background: linear-gradient(135deg, rgba(255, 253, 248, 0.96) 0%, rgba(253, 246, 235, 0.94) 100%);
+      border: 1.5px solid #d8be92;
+      box-shadow: 0 10px 30px rgba(110, 80, 50, 0.15);
+    }
+
+    .paper-border-gold {
+      border: 1.5px solid #c8a364;
+      position: relative;
+    }
+    .paper-border-gold::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border: 1px dashed rgba(200, 163, 100, 0.45);
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    /* Node Ping Animation */
+    .node-pulse {
+      animation: peachPulse 2s infinite ease-in-out;
+    }
+    @keyframes peachPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(220, 108, 108, 0.8)); }
+      50% { transform: scale(1.18); filter: drop-shadow(0 0 18px rgba(230, 85, 95, 0.95)); }
+    }
+
+    .glow-gold {
+      filter: drop-shadow(0 0 10px rgba(212, 150, 55, 0.8));
+    }
+
+    /* Fisherman Floating Token */
+    #fisherman-marker {
+      transition: left 1.25s cubic-bezier(0.22, 1, 0.36, 1), top 1.25s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: left, top;
+    }
+
+    /* Modal Animation */
+    .modal-enter {
+      animation: modalFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .drag-item {
+      cursor: grab;
+      touch-action: none;
+    }
+    .drag-item:active {
+      cursor: grabbing;
+    }
+    .drop-zone.hovered {
+      background-color: rgba(254, 237, 230, 0.8) !important;
+      border-color: #d67a6d !important;
+    }
+  </style>
+</head>
+<body class="w-full h-full">
+
+  <div id="viewport">
+    <!-- Camera container with map and interactive pins -->
+    <div id="camera-rig">
+      <div id="map-canvas">
+        <!-- SVG Canvas for Path and connections -->
+        <svg id="route-svg" class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#e27474" stop-opacity="0.85" />
+              <stop offset="100%" stop-color="#dfa04b" stop-opacity="0.95" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <path id="journey-path" d="" fill="none" stroke="url(#pathGradient)" stroke-width="4.5" stroke-dasharray="8 8" filter="url(#glow)"/>
+        </svg>
+
+        <!-- Checkpoints container -->
+        <div id="nodes-container" class="absolute inset-0 pointer-events-auto"></div>
+
+        <!-- Fisherman Avatar Marker -->
+        <div id="fisherman-marker" class="absolute z-20 pointer-events-none -translate-x-1/2 -translate-y-1/2">
+          <div class="relative flex flex-col items-center">
+            <div class="w-13 h-13 p-2 bg-amber-50/95 rounded-full border-2 border-amber-600 shadow-lg flex items-center justify-center animate-bounce">
+              <span class="text-2xl">🚣‍♂️</span>
+            </div>
+            <div class="px-2.5 py-0.5 mt-1 bg-amber-950/85 text-amber-100 text-xs font-bold rounded-full border border-amber-400/50 shadow whitespace-nowrap">
+              武陵漁人
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 桃花飄落動態畫布：落英繽紛環境特效（穿透點擊、全屏覆蓋） -->
+    <canvas id="petals-canvas" class="absolute inset-0 z-20 pointer-events-none w-full h-full"></canvas>
+
+    <!-- UI Overlay: Top Navigation Bar -->
+    <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between p-3 sm:p-4 pointer-events-none">
+      <div class="flex items-center space-x-3 pointer-events-auto">
+        <div class="paper-panel px-4 py-2 rounded-2xl flex items-center space-x-3 shadow-md border-amber-800/30">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-500 to-amber-700 text-white flex items-center justify-center font-calligraphy text-2xl shadow-inner">
+            桃
+          </div>
+          <div>
+            <h1 class="text-base sm:text-lg font-bold tracking-wider text-amber-950 flex items-center gap-1.5">
+              尋找桃花源
+              <span class="text-[11px] font-normal text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">教育局建議篇章</span>
+            </h1>
+            <p id="station-indicator" class="text-xs text-amber-800 font-medium">第 1 站：緣溪桃林</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Control Buttons -->
+      <div class="flex items-center space-x-2 pointer-events-auto">
+        <button id="btn-codex" onclick="openCodexModal()" class="paper-panel px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-amber-950 hover:bg-amber-100/60 active:scale-95 transition flex items-center gap-1.5 shadow">
+          <span>📜</span>
+          <span class="hidden sm:inline">文言圖鑑</span>
+          <span id="badge-count" class="bg-rose-700 text-white rounded-full px-2 py-0.5 text-[10px] font-bold">0/7</span>
+        </button>
+        <button id="btn-petals" onclick="togglePetalsAnimation()" class="paper-panel p-2.5 rounded-xl text-amber-950 hover:bg-amber-100/60 active:scale-95 transition shadow text-sm" title="桃花飄落切換">
+          <span id="petal-icon">🌸</span>
+        </button>
+        <button id="btn-sound" onclick="toggleAudio()" class="paper-panel p-2.5 rounded-xl text-amber-950 hover:bg-amber-100/60 active:scale-95 transition shadow text-sm" title="音效切換">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button id="btn-reset" onclick="promptResetGame()" class="paper-panel p-2.5 rounded-xl text-amber-950 hover:bg-amber-100/60 active:scale-95 transition shadow text-sm" title="重新出發">
+          <span>🔄</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 簡潔自適應的浮動導引條（已刪除原本左下角顯示不全的說明框架） -->
+    <div id="floating-guide-bar" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 pointer-events-auto flex items-center gap-2">
+      <button id="btn-quick-next" onclick="triggerNextFromBar()" class="paper-panel px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-amber-900 border border-amber-600/50 shadow-lg hover:bg-amber-100 active:scale-95 transition flex items-center gap-1.5">
+        <span id="quick-bar-icon">🚣‍♂️</span>
+        <span id="quick-bar-text">點擊地圖發光站點開始探索</span>
+      </button>
+    </div>
+
+    <!-- Map Zoom and Exploration Tool (Available throughout, minimum size locked to viewport) -->
+    <div id="free-explore-tools" class="fixed bottom-20 right-3 sm:right-5 z-30 flex flex-col gap-2 pointer-events-auto">
+      <button onclick="zoomStep(0.25)" class="paper-panel w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg text-amber-900 shadow hover:bg-amber-100 active:scale-90 transition" title="放大探索">+</button>
+      <button onclick="zoomStep(-0.25)" class="paper-panel w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg text-amber-900 shadow hover:bg-amber-100 active:scale-90 transition" title="縮小至視窗大小">-</button>
+      <button onclick="resetOverviewCamera()" class="paper-panel px-3 py-1.5 rounded-full text-xs font-bold text-amber-900 shadow hover:bg-amber-100 active:scale-90 transition" title="恢復全景">全景</button>
+    </div>
+  </div>
+
+  <!-- Dialog Overlay Backdrop (Light Warm Aesthetic) -->
+  <div id="modal-container" class="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div id="modal-card" class="paper-panel paper-border-gold w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-3xl p-5 sm:p-7 relative modal-enter text-amber-950">
+    </div>
+  </div>
+  <script>
+    // --- 學習內容數據庫（嚴格依據上載圖片教育局建議篇章課本注釋與原文）---
+    const STATIONS_DATA = [
+      {
+        id: 1,
+        title: "第一站：緣溪桃林",
+        verse: "晉太元中，武陵人捕魚為業。緣溪行，忘路之遠近。忽逢桃花林，夾岸數百步，中無雜樹，芳草鮮美，落英繽紛，漁人甚異之。復前行，欲窮其林。",
+        mapPos: { x: 380, y: 1040 },
+        cameraZoom: 1.85,
+        type: "drag_match",
+        question: "漁人沿溪行舟忽逢桃林。請將文言字詞拖放配對至課文注釋之字解：",
+        items: [
+          { word: "落英", meaning: "落花", hint: "【注釋②】落英：落花。" },
+          { word: "繽紛", meaning: "繁雜。此處形容飄落的花朵，千姿百態", hint: "【注釋②】繽紛：繁雜。此處形容飄落的花朵，千姿百態。" },
+          { word: "窮", meaning: "窮盡，作動詞用", hint: "【注釋③】窮：窮盡，作動詞用。" }
+        ],
+        knowledge: "【課文注釋規約】\n• 太元：東晉孝武帝司馬曜年號。\n• 落英：落花。\n• 繽紛：繁雜。此處形容飄落的花朵，千姿百態。\n• 窮：窮盡，作動詞用。"
+      },
+      {
+        id: 2,
+        title: "第二站：水源山洞",
+        verse: "林盡水源，便得一山。山有小口，彷彿若有光。便舍船，從口入。初極狹，才通人。復行數十步，豁然開朗。",
+        mapPos: { x: 690, y: 880 },
+        cameraZoom: 1.9,
+        type: "chest_choice",
+        question: "漁人尋至水源入洞探奇。請開寶箱選取課文規定的標準注釋：",
+        chestWord: "舍 與 才",
+        subQuestions: [
+          {
+            q: "「便舍船，從口入」之「舍」依課文注釋解作：",
+            options: ["通「捨」，捨棄", "客棧住宿之所", "房屋舍宅", "暫時停泊放置"],
+            ans: 0,
+            hint: "【注釋④】舍：通「捨」，捨棄。"
+          },
+          {
+            q: "「初極狹，才通人」之「才」依課文注釋解作：",
+            options: ["才能學識", "僅", "剛剛才好", "才智出眾"],
+            ans: 1,
+            hint: "【注釋⑤】才：僅。"
+          }
+        ],
+        knowledge: "【課文注釋規約】\n• 舍：通「捨」，捨棄。\n• 才：僅。"
+      },
+      {
+        id: 3,
+        title: "第三站：豁然開朗",
+        verse: "復行數十步，豁然開朗，土地平曠，屋舍儼然，有良田、美池、桑竹之屬，阡陌交通，雞犬相聞。",
+        mapPos: { x: 980, y: 720 },
+        cameraZoom: 1.8,
+        type: "word_detect",
+        question: "步出山洞，眼前頓時開闊。請根據課本注釋辨析以下名詞詞義：",
+        clues: [
+          {
+            term: "儼然",
+            targetDef: "形容房屋排列整齊",
+            distractors: ["莊嚴嚴肅的容貌", "彷彿好像如真", "房屋高大雄偉"],
+            hint: "【注釋⑥】儼然：形容房屋排列整齊。"
+          },
+          {
+            term: "阡陌",
+            targetDef: "田間的縱橫小路，以區隔田畝",
+            distractors: ["古代四通八達的官道", "山谷狹窄通道", "河流分叉水道"],
+            hint: "【注釋⑦】阡陌：田間的縱橫小路，以區隔田畝。《風俗通》云：「南北曰阡，東西曰陌。」"
+          },
+          {
+            term: "交通",
+            targetDef: "交錯相通，四通八達",
+            distractors: ["現代車輛運輸往來", "彼此心意相通", "暗中勾結往來"],
+            hint: "【注釋⑦】交通：交錯相通，四通八達。"
+          }
+        ],
+        knowledge: "【課文注釋規約】\n• 儼然：形容房屋排列整齊。\n• 阡陌：田間的縱橫小路，以區隔田畝。《風俗通》云：「南北曰阡，東西曰陌。」\n• 交通：交錯相通，四通八達。"
+      },
+      {
+        id: 4,
+        title: "第四站：往來衣著",
+        verse: "其中往來種作，男女衣著，悉如外人。黃髮垂髫，並怡然自樂。",
+        mapPos: { x: 1260, y: 640 },
+        cameraZoom: 1.85,
+        type: "chest_choice",
+        question: "桃花源中男女勤懇耕作。請選出正確的課文典故與字詞理解：",
+        chestWord: "雞犬相聞 與 外人",
+        subQuestions: [
+          {
+            q: "「雞犬相聞」一句在課本注釋中指出其語源自何處？",
+            options: [
+              "源於《老子》就「小國寡民」的構想",
+              "源於《莊子》逍遙無為之說",
+              "源於《詩經》描繪農家樂趣之篇章",
+              "源於《論語》天下大同之理念"
+            ],
+            ans: 0,
+            hint: "【注釋⑧】雞犬相聞：此句源於《老子》就「小國寡民」的構想：「鄰國相望，雞犬之聲相聞，民至老死，不相往來。」"
+          },
+          {
+            q: "「男女衣著，悉如外人」中之「外人」，依注釋其意為：",
+            options: ["方外或塵外之人", "外國之人", "桃花源外之俗人", "外地訪客"],
+            ans: 0,
+            hint: "【注釋⑨】外人：方外或塵外之人。"
+          }
+        ],
+        knowledge: "【課文注釋規約】\n• 雞犬相聞：此句源於《老子》就「小國寡民」的構想。\n• 外人：方外或塵外之人。（注意與下文「遂與外人間隔」之「外人」不同）"
+      },
+      {
+        id: 5,
+        title: "第五站：黃髮垂髫",
+        verse: "黃髮垂髫，並怡然自樂。見漁人，乃大驚，問所從來。具答之。便要還家，設酒殺雞作食。",
+        mapPos: { x: 1480, y: 520 },
+        cameraZoom: 1.9,
+        type: "drag_match",
+        question: "村中老幼和樂融融。請依照課文注釋配對借代修辭與字詞含義：",
+        items: [
+          { word: "黃髮", meaning: "指老人，因其髮已由白轉黃", hint: "【注釋⑩】黃髮：指老人，因其髮已由白轉黃。" },
+          { word: "垂髫", meaning: "指年幼者，因其多並髻為飾", hint: "【注釋⑩】垂髫：指年幼者，因其多並髻為飾。髫：小童未束髻，額前垂下的頭髮。" },
+          { word: "怡然", meaning: "和悅喜樂的樣子", hint: "形容生活平靜欣悅自得。" }
+        ],
+        knowledge: "【課文注釋規約】\n• 黃髮：指老人，因其髮已由白轉黃。\n• 垂髫：指年幼者，因其多並髻為飾。髫：小童未束髻，額前垂下的頭髮。"
+      },
+      {
+        id: 6,
+        title: "第六站：設酒問訊",
+        verse: "見漁人，乃大驚，問所從來。具答之。便要還家，設酒殺雞作食。……自云：先世避秦時亂，率妻子邑人來此絕境，不復出焉，遂與外人間隔。問今是何世，乃不知有漢，無論魏、晉。",
+        mapPos: { x: 1360, y: 340 },
+        cameraZoom: 1.85,
+        type: "word_detect",
+        question: "村民熱情延請並細訴身世。請辨析通假字與古今異義：",
+        clues: [
+          {
+            term: "具",
+            targetDef: "通「俱」，全部",
+            distractors: ["具體詳細", "準備妥當", "工具齊全"],
+            hint: "【注釋⑪】具：通「俱」，全部。"
+          },
+          {
+            term: "要",
+            targetDef: "通「邀」，邀約、邀請",
+            distractors: ["主要條件", "要求歸還", "想要索取"],
+            hint: "【注釋⑫】要：通「邀」，邀約、邀請。"
+          },
+          {
+            term: "妻子",
+            targetDef: "妻子及子女",
+            distractors: ["僅指男子的配偶妻子", "妻子與父母", "親戚家族"],
+            hint: "【注釋⑬】妻子：妻子及子女。絕境：與世人隔絕之境。"
+          },
+          {
+            term: "無論",
+            targetDef: "更不必說",
+            distractors: ["不管任何條件", "無須討論", "沒有定論"],
+            hint: "【注釋⑮】無論：更不必說。"
+          }
+        ],
+        knowledge: "【課文注釋規約】\n• 具：通「俱」，全部。\n• 要：通「邀」，邀約、邀請。\n• 妻子：妻子及子女。絕境：與世人隔絕之境。\n• 外人：此處指桃花源以外的人，與上文「悉如外人」之「外人」意思不同。\n• 無論：更不必說。\n• 不足為外人道：不值得對外面的人說。"
+      },
+      {
+        id: 7,
+        title: "第七站：尋訪無門",
+        verse: "既出，得其船，便扶向路，處處誌之。及郡下，詣太守，說如此。……南陽劉子驥，高尚士也，聞之，欣然規往，未果，尋病終。後遂無問津者。",
+        mapPos: { x: 1680, y: 220 },
+        cameraZoom: 1.75,
+        type: "drag_match",
+        question: "漁人出桃源後太守與高士皆探訪無功。請配對終章關鍵注釋字解：",
+        items: [
+          { word: "扶", meaning: "沿着、順着", hint: "【注釋⑰】扶：沿着、順着。" },
+          { word: "向路", meaning: "即舊路，謂昔日來時之路", hint: "【注釋⑰】向路：即舊路，謂昔日來時之路。" },
+          { word: "詣", meaning: "前往，引申為拜訪", hint: "【注釋⑱】詣：前往，引申為拜訪。" },
+          { word: "規往", meaning: "謀劃前往", hint: "【注釋⑲】規往：謀劃前往。" },
+          { word: "問津", meaning: "詢問渡口之所在，引申為尋訪或探求的意思", hint: "【注釋㉑】問津：詢問渡口之所在，引申為尋訪或探求的意思。津：渡口。" }
+        ],
+        knowledge: "【課文注釋規約】\n• 扶：沿着、順着。\n• 向路：即舊路，謂昔日來時之路。\n• 詣：前往，引申為拜訪。\n• 規往：謀劃前往。\n• 尋：不久。\n• 問津：詢問渡口之所在，引申為尋訪或探求的意思。津：渡口。"
+      }
+    ];
+
+    // Game runtime state
+    let gameState = {
+      currentStationIndex: 0,
+      clearedStations: [],
+      collectedCodex: [],
+      firstAttemptSuccessCount: 0,
+      stationAttempts: {},
+      soundEnabled: true,
+      petalsEnabled: true,
+      audioCtx: null,
+      activeModalStation: null, // Track currently opened challenge for "返回圖片"
+      camera: {
+        x: 0,
+        y: 0,
+        scale: 1,
+        minScale: 1
+      },
+      panState: {
+        isDragging: false,
+        startX: 0,
+        startY: 0,
+        camStartX: 0,
+        camStartY: 0
+      }
+    };
+
+    // 原生 Web Audio API 古韻音效
+    function initAudio() {
+      if (!gameState.audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          gameState.audioCtx = new AudioContext();
+        }
+      }
+      if (gameState.audioCtx && gameState.audioCtx.state === 'suspended') {
+        gameState.audioCtx.resume();
+      }
+    }
+    function playTone(freq, type = 'sine', duration = 0.3, gainPeak = 0.15) {
+      if (!gameState.soundEnabled) return;
+      try {
+        initAudio();
+        if (!gameState.audioCtx) return;
+        const ctx = gameState.audioCtx;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(gainPeak, ctx.currentTime + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {
+        console.warn("Audio prevented:", e);
+      }
+    }
+
+    function playChime(kind = 'correct') {
+      if (!gameState.soundEnabled) return;
+      initAudio();
+      if (kind === 'correct') {
+        setTimeout(() => playTone(523.25, 'triangle', 0.35, 0.2), 0);
+        setTimeout(() => playTone(659.25, 'triangle', 0.45, 0.22), 120);
+        setTimeout(() => playTone(783.99, 'sine', 0.65, 0.25), 240);
+      } else if (kind === 'fanfare') {
+        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((f, idx) => {
+          setTimeout(() => playTone(f, 'sine', 1.1, 0.18), idx * 140);
+        });
+      } else if (kind === 'wrong') {
+        playTone(220, 'sawtooth', 0.25, 0.12);
+      } else if (kind === 'step') {
+        playTone(440, 'triangle', 0.15, 0.08);
+      }
+    }
+
+    function toggleAudio() {
+      gameState.soundEnabled = !gameState.soundEnabled;
+      document.getElementById('sound-icon').textContent = gameState.soundEnabled ? '🔊' : '🔇';
+    }
+
+    // --- 桃花「落英繽紛」柔美粒子系統 ---
+    const PetalSystem = {
+      canvas: null,
+      ctx: null,
+      width: 0,
+      height: 0,
+      petals: [],
+      maxPetals: 36,
+      animationFrameId: null,
+
+      init() {
+        this.canvas = document.getElementById('petals-canvas');
+        if (!this.canvas) return;
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+
+        this.petals = [];
+        for (let i = 0; i < this.maxPetals; i++) {
+          this.petals.push(this.createPetal(true));
+        }
+
+        window.addEventListener('resize', () => this.resize());
+        this.start();
+      },
+
+      resize() {
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
+        if (this.canvas) {
+          this.canvas.width = this.width;
+          this.canvas.height = this.height;
+        }
+      },
+
+      createPetal(randomY = false) {
+        return {
+          x: Math.random() * this.width,
+          y: randomY ? Math.random() * this.height : -30,
+          size: 10 + Math.random() * 12,
+          speedY: 1.1 + Math.random() * 1.5,
+          speedX: 0.6 + Math.random() * 1.2,
+          wobble: Math.random() * Math.PI * 2,
+          wobbleSpeed: 0.025 + Math.random() * 0.03,
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.035,
+          flip: Math.random() * Math.PI,
+          flipSpeed: 0.03 + Math.random() * 0.04,
+          opacity: 0.65 + Math.random() * 0.3
+        };
+      },
+
+      drawPetal(p) {
+        const ctx = this.ctx;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.scale(Math.cos(p.flip), 1);
+        ctx.globalAlpha = p.opacity;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-p.size * 0.65, -p.size * 0.45, -p.size * 0.75, -p.size * 1.15, 0, -p.size * 1.35);
+        ctx.bezierCurveTo(p.size * 0.75, -p.size * 1.15, p.size * 0.65, -p.size * 0.45, 0, 0);
+
+        const grad = ctx.createLinearGradient(0, 0, 0, -p.size * 1.35);
+        grad.addColorStop(0, '#ffe4e6');   // 柔粉花托
+        grad.addColorStop(0.5, '#fecdd3'); // 淺桃紅
+        grad.addColorStop(1, '#f43f5e');   // 艷紅花尖
+
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // 柔和的花瓣經脈筆觸
+        ctx.strokeStyle = 'rgba(244, 63, 94, 0.2)';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(0, -p.size * 0.7, 0, -p.size * 1.15);
+        ctx.stroke();
+
+        ctx.restore();
+      },
+
+      update() {
+        if (!gameState.petalsEnabled) {
+          this.ctx.clearRect(0, 0, this.width, this.height);
+          return;
+        }
+
+        this.ctx.clearRect(0, 0, this.width, this.height);
+
+        for (let i = 0; i < this.petals.length; i++) {
+          const p = this.petals[i];
+          p.wobble += p.wobbleSpeed;
+          p.x += p.speedX + Math.sin(p.wobble) * 1.2;
+          p.y += p.speedY;
+          p.rotation += p.rotSpeed;
+          p.flip += p.flipSpeed;
+
+          this.drawPetal(p);
+
+          // 超出屏幕重置回頂部與左側
+          if (p.y > this.height + 30 || p.x > this.width + 30) {
+            this.petals[i] = this.createPetal(false);
+          }
+        }
+      },
+
+      start() {
+        const loop = () => {
+          this.update();
+          this.animationFrameId = requestAnimationFrame(loop);
+        };
+        loop();
+      }
+    };
+
+    function togglePetalsAnimation() {
+      gameState.petalsEnabled = !gameState.petalsEnabled;
+      const icon = document.getElementById('petal-icon');
+      if (icon) {
+        icon.textContent = gameState.petalsEnabled ? '🌸' : '🍂';
+      }
+      if (!gameState.petalsEnabled && PetalSystem.ctx) {
+        PetalSystem.ctx.clearRect(0, 0, PetalSystem.width, PetalSystem.height);
+      }
+      showFloatingNotice(gameState.petalsEnabled ? "已開啟落英繽紛特效" : "已關閉桃花飄落特效");
+    }
+
+    // 更新漁人標記在圖片地圖上的位置
+    function updateFishermanPosition(stationIndex, animate = true) {
+      const marker = document.getElementById('fisherman-marker');
+      if (!marker) return;
+      const targetStation = STATIONS_DATA[Math.min(stationIndex, STATIONS_DATA.length - 1)];
+      if (!targetStation) return;
+
+      if (!animate) {
+        marker.style.transition = 'none';
+      } else {
+        marker.style.transition = 'left 1.25s cubic-bezier(0.22, 1, 0.36, 1), top 1.25s cubic-bezier(0.22, 1, 0.36, 1)';
+      }
+
+      marker.style.left = `${targetStation.mapPos.x}px`;
+      marker.style.top = `${targetStation.mapPos.y}px`;
+    }
+
+    // 計算視窗約束比例：保證地圖在最小時恰好固定在視窗大小
+    function calcMinScale() {
+      const viewW = window.innerWidth;
+      const viewH = window.innerHeight;
+      return Math.min(viewW / 2000, viewH / 1250);
+    }
+
+    function applyCameraTransform(durationMs = 1250) {
+      const rig = document.getElementById('camera-rig');
+      rig.style.transition = `transform ${durationMs}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+      rig.style.transform = `translate(${gameState.camera.x}px, ${gameState.camera.y}px) scale(${gameState.camera.scale})`;
+    }
+
+    // 聚焦於指定座標
+    function centerCameraOn(mapX, mapY, targetScale = 1.8, duration = 1250) {
+      const viewW = window.innerWidth;
+      const viewH = window.innerHeight;
+      const minScale = calcMinScale();
+      gameState.camera.minScale = minScale;
+
+      const scale = Math.max(targetScale, minScale);
+
+      let camX = viewW / 2 - mapX * scale;
+      let camY = viewH / 2 - mapY * scale;
+
+      // 邊界限制（防止穿幫）
+      const maxCamX = Math.max(0, (viewW - 2000 * scale) / 2);
+      const minCamX = Math.min(0, viewW - 2000 * scale);
+      const maxCamY = Math.max(0, (viewH - 1250 * scale) / 2);
+      const minCamY = Math.min(0, viewH - 1250 * scale);
+
+      camX = Math.min(maxCamX, Math.max(minCamX, camX));
+      camY = Math.min(maxCamY, Math.max(minCamY, camY));
+
+      gameState.camera = { x: camX, y: camY, scale: scale, minScale: minScale };
+      applyCameraTransform(duration);
+    }
+
+    // 縮小返回全景：固定在視窗大小，居中且不可拖移
+    function resetOverviewCamera(duration = 1400) {
+      const viewW = window.innerWidth;
+      const viewH = window.innerHeight;
+      const fitScale = calcMinScale();
+
+      const camX = (viewW - 2000 * fitScale) / 2;
+      const camY = (viewH - 1250 * fitScale) / 2;
+
+      gameState.camera = { x: camX, y: camY, scale: fitScale, minScale: fitScale };
+      applyCameraTransform(duration);
+    }
+
+    function focusCurrentStation() {
+      if (gameState.currentStationIndex < STATIONS_DATA.length) {
+        const cur = STATIONS_DATA[gameState.currentStationIndex];
+        centerCameraOn(cur.mapPos.x, cur.mapPos.y, cur.cameraZoom);
+      } else {
+        resetOverviewCamera();
+      }
+    }
+
+    function zoomStep(delta) {
+      const viewW = window.innerWidth;
+      const viewH = window.innerHeight;
+      const minScale = calcMinScale();
+      const currentScale = gameState.camera.scale;
+      const newScale = Math.min(3.2, Math.max(minScale, currentScale + delta));
+
+      if (Math.abs(newScale - minScale) < 0.01) {
+        resetOverviewCamera(400);
+        return;
+      }
+
+      const centerX = viewW / 2;
+      const centerY = viewH / 2;
+      const mapCenterX = (centerX - gameState.camera.x) / currentScale;
+      const mapCenterY = (centerY - gameState.camera.y) / currentScale;
+
+      centerCameraOn(mapCenterX, mapCenterY, newScale, 400);
+    }
+
+    function initMap() {
+      const container = document.getElementById('nodes-container');
+      container.innerHTML = '';
+
+      let pathD = '';
+      STATIONS_DATA.forEach((st, idx) => {
+        if (idx === 0) {
+          pathD += `M ${st.mapPos.x} ${st.mapPos.y} `;
+        } else {
+          const prev = STATIONS_DATA[idx - 1];
+          const midX = (prev.mapPos.x + st.mapPos.x) / 2;
+          const midY = (prev.mapPos.y + st.mapPos.y) / 2 - 40;
+          pathD += `Q ${midX} ${midY} ${st.mapPos.x} ${st.mapPos.y} `;
+        }
+
+        const pin = document.createElement('div');
+        pin.id = `node-${st.id}`;
+        pin.className = 'absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-300';
+        pin.style.left = `${st.mapPos.x}px`;
+        pin.style.top = `${st.mapPos.y}px`;
+
+        pin.innerHTML = `
+          <div class="group relative flex flex-col items-center">
+            <button onclick="handleNodeClick(${st.id})" class="pin-btn relative w-11 h-11 rounded-full border-2 border-amber-800 bg-amber-50 text-amber-950 flex items-center justify-center font-bold text-sm shadow-lg transition-transform active:scale-95 group-hover:scale-110">
+              <span class="pin-icon font-calligraphy text-base">${idx + 1}</span>
+            </button>
+            <div class="pin-label mt-1 px-2.5 py-1 bg-amber-50/95 text-amber-950 text-[11px] font-bold rounded-lg border border-amber-600/40 shadow-md whitespace-nowrap pointer-events-none transition-opacity">
+              ${st.title}
+            </div>
+          </div>
+        `;
+        container.appendChild(pin);
+      });
+
+      document.getElementById('journey-path').setAttribute('d', pathD);
+      refreshNodesVisual();
+      updateFishermanPosition(0, false);
+      setupPanAndZoomGestures();
+    }
+
+    function refreshNodesVisual() {
+      STATIONS_DATA.forEach((st, idx) => {
+        const pinEl = document.getElementById(`node-${st.id}`);
+        if (!pinEl) return;
+        const btn = pinEl.querySelector('.pin-btn');
+        const icon = pinEl.querySelector('.pin-icon');
+
+        const isCleared = gameState.clearedStations.includes(st.id);
+        const isCurrent = idx === gameState.currentStationIndex;
+
+        if (isCleared) {
+          btn.className = 'pin-btn relative w-11 h-11 rounded-full border-2 border-amber-600 bg-gradient-to-br from-amber-300 to-amber-500 text-stone-900 flex items-center justify-center font-bold text-sm shadow-xl glow-gold';
+          icon.innerHTML = '🌸';
+        } else if (isCurrent) {
+          btn.className = 'pin-btn relative w-12 h-12 rounded-full border-2 border-rose-300 bg-gradient-to-br from-rose-500 to-red-600 text-white flex items-center justify-center font-bold text-sm shadow-2xl node-pulse';
+          icon.innerHTML = '✨';
+        } else {
+          btn.className = 'pin-btn relative w-10 h-10 rounded-full border border-stone-400 bg-stone-100/90 text-stone-600 flex items-center justify-center font-semibold text-xs opacity-75';
+          icon.textContent = `${idx + 1}`;
+        }
+      });
+
+      document.getElementById('badge-count').textContent = `${gameState.collectedCodex.length}/${STATIONS_DATA.length}`;
+      updateGuideBar();
+    }
+
+    // 更新底部精簡導引條狀態
+    function updateGuideBar() {
+      const barText = document.getElementById('quick-bar-text');
+      const barIcon = document.getElementById('quick-bar-icon');
+      const indicator = document.getElementById('station-indicator');
+      
+      if (gameState.currentStationIndex < STATIONS_DATA.length) {
+        const cur = STATIONS_DATA[gameState.currentStationIndex];
+        if (indicator) indicator.textContent = cur.title;
+        if (barText) barText.textContent = `前往挑戰：${cur.title}`;
+        if (barIcon) barIcon.textContent = '✨';
+      } else {
+        if (indicator) indicator.textContent = '終章：全景探索';
+        if (barText) barText.textContent = '探索完成！點擊揭曉結局稱號';
+        if (barIcon) barIcon.textContent = '🏵️';
+      }
+    }
+
+    function triggerNextFromBar() {
+      if (gameState.currentStationIndex < STATIONS_DATA.length) {
+        const target = STATIONS_DATA[gameState.currentStationIndex];
+        centerCameraOn(target.mapPos.x, target.mapPos.y, target.cameraZoom, 900);
+        setTimeout(() => {
+          openChallengeModal(target);
+        }, 500);
+      } else {
+        triggerGrandEnding();
+      }
+    }
+
+    function handleNodeClick(stationId) {
+      const station = STATIONS_DATA.find(s => s.id === stationId);
+      if (!station) return;
+
+      const index = STATIONS_DATA.indexOf(station);
+      const isCleared = gameState.clearedStations.includes(station.id);
+      const isCurrent = index === gameState.currentStationIndex;
+
+      if (isCurrent && !isCleared) {
+        openChallengeModal(station);
+      } else if (isCleared) {
+        openReviewCard(station);
+      } else if (index < gameState.currentStationIndex) {
+        openReviewCard(station);
+      } else {
+        showFloatingNotice(`請先完成第 ${gameState.currentStationIndex + 1} 站的探索！`);
+      }
+    }
+
+    function openChallengeModal(station) {
+      gameState.activeModalStation = station;
+      if (!gameState.stationAttempts[station.id]) {
+        gameState.stationAttempts[station.id] = 0;
+      }
+      gameState.stationAttempts[station.id]++;
+
+      centerCameraOn(station.mapPos.x, station.mapPos.y, station.cameraZoom);
+
+      const modal = document.getElementById('modal-container');
+      const card = document.getElementById('modal-card');
+      card.innerHTML = '';
+
+      // 每關必備：返回圖片按鍵（頂部與底部均有配置）
+      let content = `
+        <div class="flex items-center justify-between pb-3 border-b border-amber-900/15 mb-4">
+          <div>
+            <span class="text-xs uppercase tracking-wider text-rose-800 font-bold bg-rose-100/70 px-2.5 py-0.5 rounded-md">桃花源文言挑戰</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-amber-950 mt-1 font-calligraphy">${station.title}</h2>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button onclick="returnToMapPreview()" class="px-3 py-1.5 rounded-xl bg-amber-100/80 hover:bg-amber-200 text-amber-900 font-bold text-xs flex items-center gap-1 shadow-sm transition" title="返回圖片查看全貌">
+              <span>🗺️</span>
+              <span>返回圖片</span>
+            </button>
+            <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 flex items-center justify-center font-bold text-sm transition">✕</button>
+          </div>
+        </div>
+
+        <!-- 原文語境展示 -->
+        <div class="mb-5 p-3.5 bg-amber-100/50 rounded-2xl border border-amber-300/60 shadow-sm">
+          <div class="text-xs font-bold text-amber-900 mb-1 flex items-center gap-1">
+            <span>📜</span>《桃花源記》課本原文語境：
+          </div>
+          <p class="text-sm sm:text-base leading-relaxed text-amber-950 italic font-medium">${station.verse}</p>
+        </div>
+
+        <p class="text-sm font-bold text-amber-900 mb-3">${station.question}</p>
+      `;
+
+      if (station.type === 'drag_match') {
+        content += renderDragMatchChallenge(station);
+      } else if (station.type === 'chest_choice') {
+        content += renderChestChoiceChallenge(station);
+      } else if (station.type === 'word_detect') {
+        content += renderWordDetectChallenge(station);
+      }
+
+      // 底部常駐：返回圖片與反饋提示
+      content += `
+        <div id="challenge-feedback" class="mt-4 hidden p-3 rounded-xl text-sm font-medium"></div>
+        <div class="mt-5 flex items-center justify-between gap-2 border-t border-amber-900/10 pt-3">
+          <button onclick="returnToMapPreview()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-amber-800 bg-amber-100/60 hover:bg-amber-100 transition flex items-center gap-1.5">
+            <span>🗺️</span> 返回圖片查看
+          </button>
+          <span class="text-[11px] text-stone-500">依據教育局課本注釋字解為唯一標準</span>
+        </div>
+      `;
+
+      card.innerHTML = content;
+      modal.classList.remove('hidden');
+
+      if (station.type === 'drag_match') {
+        setupDragDropEvents();
+      }
+    }
+
+    // 返回圖片按鍵：縮小關閉彈窗，讓玩家可在地圖自由觀察，並在浮動按鈕中可立即重開
+    function returnToMapPreview() {
+      closeModal();
+      showFloatingNotice("已返回圖片！點擊發光站點隨時繼續作答。");
+    }
+
+    function renderDragMatchChallenge(station) {
+      const shuffledMeanings = [...station.items].sort(() => Math.random() - 0.5);
+
+      return `
+        <div class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="space-y-2">
+              <div class="text-xs font-bold text-stone-600">文言字詞（點選或拖曳）</div>
+              ${station.items.map(item => `
+                <div id="drag-${item.word}" data-word="${item.word}" draggable="true" class="drag-item p-3 bg-white hover:bg-rose-50/70 border border-amber-300 rounded-xl shadow-sm text-center font-bold text-amber-950 text-base active:scale-95 transition flex items-center justify-between">
+                  <span class="font-calligraphy text-xl text-amber-900">${item.word}</span>
+                  <span class="text-xs font-normal text-rose-800 bg-rose-50 px-2 py-0.5 rounded">配對字解</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="space-y-2">
+              <div class="text-xs font-bold text-stone-600">教育局課文指定注釋</div>
+              ${shuffledMeanings.map(item => `
+                <div class="drop-zone p-2.5 bg-amber-50/70 border-2 border-dashed border-amber-300/80 rounded-xl min-h-[58px] flex flex-col justify-center transition" data-target-word="${item.word}" data-filled="">
+                  <div class="text-xs text-amber-950 font-semibold mb-1">${item.meaning}</div>
+                  <div class="slot-content text-xs text-stone-400 italic">尚未放置詞語</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <button onclick="verifyDragMatch(${station.id})" class="w-full mt-3 py-2.5 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition">
+            提交字詞配對
+          </button>
+        </div>
+      `;
+    }
+
+    let selectedWordItem = null;
+    function setupDragDropEvents() {
+      const draggables = document.querySelectorAll('.drag-item');
+      const dropZones = document.querySelectorAll('.drop-zone');
+
+      draggables.forEach(elem => {
+        elem.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', elem.getAttribute('data-word'));
+        });
+        elem.addEventListener('click', () => {
+          draggables.forEach(d => d.classList.remove('ring-2', 'ring-rose-500'));
+          selectedWordItem = elem.getAttribute('data-word');
+          elem.classList.add('ring-2', 'ring-rose-500');
+        });
+      });
+
+      dropZones.forEach(zone => {
+        zone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          zone.classList.add('hovered');
+        });
+        zone.addEventListener('dragleave', () => {
+          zone.classList.remove('hovered');
+        });
+        zone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          zone.classList.remove('hovered');
+          const word = e.dataTransfer.getData('text/plain');
+          placeWordInZone(zone, word);
+        });
+
+        zone.addEventListener('click', () => {
+          if (selectedWordItem) {
+            placeWordInZone(zone, selectedWordItem);
+            selectedWordItem = null;
+            draggables.forEach(d => d.classList.remove('ring-2', 'ring-rose-500'));
+          }
+        });
+      });
+    }
+
+    function placeWordInZone(zone, word) {
+      zone.setAttribute('data-filled', word);
+      const slot = zone.querySelector('.slot-content');
+      slot.innerHTML = `<span class="inline-block px-2.5 py-0.5 bg-amber-800 text-amber-50 rounded-md text-xs font-bold font-calligraphy text-sm shadow-sm">${word}</span>`;
+      playTone(520, 'sine', 0.1);
+    }
+
+    function verifyDragMatch(stationId) {
+      const station = STATIONS_DATA.find(s => s.id === stationId);
+      const dropZones = document.querySelectorAll('.drop-zone');
+      let allCorrect = true;
+      let unfilled = false;
+
+      dropZones.forEach(zone => {
+        const expected = zone.getAttribute('data-target-word');
+        const filled = zone.getAttribute('data-filled');
+        if (!filled) unfilled = true;
+        if (filled !== expected) allCorrect = false;
+      });
+
+      const feedback = document.getElementById('challenge-feedback');
+
+      if (unfilled) {
+        feedback.className = 'mt-3 p-3 rounded-xl text-sm font-medium bg-amber-100 text-amber-900 border border-amber-300';
+        feedback.textContent = '請先完成所有詞語與注釋的配對！';
+        feedback.classList.remove('hidden');
+        playChime('wrong');
+        return;
+      }
+
+      if (allCorrect) {
+        completeStation(station);
+      } else {
+        feedback.className = 'mt-3 p-3 rounded-xl text-sm font-medium bg-rose-100 text-rose-950 border border-rose-300';
+        feedback.innerHTML = `⚠️ 配對未符課本注釋！提示：請細察原句語境（如「落英」為落花，「繽紛」指花朵千姿百態）。請再試一次！`;
+        feedback.classList.remove('hidden');
+        playChime('wrong');
+      }
+    }
+
+    function renderChestChoiceChallenge(station) {
+      let html = `<div class="space-y-3.5">`;
+      station.subQuestions.forEach((sq, qIdx) => {
+        html += `
+          <div class="p-3.5 bg-amber-50/70 rounded-xl border border-amber-200">
+            <p class="font-bold text-sm text-amber-950 mb-2">${qIdx + 1}. ${sq.q}</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              ${sq.options.map((opt, optIdx) => `
+                <button onclick="handleOptionSelect(${station.id}, ${qIdx}, ${optIdx})" id="q-${qIdx}-opt-${optIdx}" class="option-btn text-left p-2.5 bg-white hover:bg-amber-100/70 border border-amber-300/80 rounded-lg text-xs sm:text-sm font-medium text-amber-950 transition">
+                  <span class="inline-block w-5 h-5 rounded-full bg-amber-200 text-amber-900 text-center leading-5 text-xs font-bold mr-1.5">${['A','B','C','D'][optIdx]}</span>
+                  ${opt}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+        <button onclick="verifyChestChoice(${station.id})" class="w-full mt-2 py-2.5 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition">
+          開啟智慧寶箱
+        </button>
+      </div>`;
+      return html;
+    }
+
+    const selectedOptionsMap = {};
+    function handleOptionSelect(stationId, qIndex, optIndex) {
+      if (!selectedOptionsMap[stationId]) selectedOptionsMap[stationId] = {};
+      selectedOptionsMap[stationId][qIndex] = optIndex;
+
+      document.querySelectorAll(`[id^="q-${qIndex}-opt-"]`).forEach((btn, idx) => {
+        if (idx === optIndex) {
+          btn.className = 'option-btn text-left p-2.5 bg-amber-800 text-white border border-amber-900 rounded-lg text-xs sm:text-sm font-bold shadow-sm';
+          const badge = btn.querySelector('span');
+          if (badge) badge.className = 'inline-block w-5 h-5 rounded-full bg-amber-950 text-amber-200 text-center leading-5 text-xs font-bold mr-1.5';
+        } else {
+          btn.className = 'option-btn text-left p-2.5 bg-white hover:bg-amber-100/70 border border-amber-300/80 rounded-lg text-xs sm:text-sm font-medium text-amber-950 transition';
+          const badge = btn.querySelector('span');
+          if (badge) badge.className = 'inline-block w-5 h-5 rounded-full bg-amber-200 text-amber-900 text-center leading-5 text-xs font-bold mr-1.5';
+        }
+      });
+      playTone(480, 'sine', 0.08);
+    }
+
+    function verifyChestChoice(stationId) {
+      const station = STATIONS_DATA.find(s => s.id === stationId);
+      const chosen = selectedOptionsMap[stationId] || {};
+      const feedback = document.getElementById('challenge-feedback');
+
+      if (Object.keys(chosen).length < station.subQuestions.length) {
+        feedback.className = 'mt-3 p-3 rounded-xl text-sm font-medium bg-amber-100 text-amber-900 border border-amber-300';
+        feedback.textContent = '請先回答所有題目再開啟寶箱！';
+        feedback.classList.remove('hidden');
+        playChime('wrong');
+        return;
+      }
+
+      let allCorrect = true;
+      let wrongHint = '';
+      station.subQuestions.forEach((sq, idx) => {
+        if (chosen[idx] !== sq.ans) {
+          allCorrect = false;
+          wrongHint = sq.hint;
+        }
+      });
+
+      if (allCorrect) {
+        completeStation(station);
+      } else {
+        feedback.className = 'mt-3 p-3 rounded-xl text-sm font-medium bg-rose-100 text-rose-950 border border-rose-300';
+        feedback.innerHTML = `⚠️ 寶箱鎖具未解開！提示：${wrongHint}。`;
+        feedback.classList.remove('hidden');
+        playChime('wrong');
+      }
+    }
+
+    function renderWordDetectChallenge(station) {
+      let html = `<div class="space-y-3.5">`;
+      station.clues.forEach((clue, idx) => {
+        const allDefs = [clue.targetDef, ...clue.distractors].sort(() => Math.random() - 0.5);
+        html += `
+          <div class="p-3.5 bg-amber-50/70 rounded-xl border border-amber-200">
+            <div class="text-sm font-bold text-amber-950 mb-1 flex items-center gap-1.5">
+              <span>🔍</span> 為文言關鍵詞「<span class="text-rose-800 font-calligraphy text-xl font-bold">${clue.term}</span>」選取課文注釋之解釋：
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+              ${allDefs.map((def, optIdx) => `
+                <button onclick="handleDetectSelect(${station.id}, ${idx}, '${def}')" id="detect-${idx}-${optIdx}" class="detect-btn text-left p-2.5 bg-white hover:bg-amber-100 border border-amber-300/80 rounded-lg text-xs sm:text-sm font-medium text-amber-950 transition">
+                  ${def}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+        <button onclick="verifyWordDetect(${station.id})" class="w-full mt-2 py-2.5 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition">
+          核驗文言詞解
+        </button>
+      </div>`;
+      return html;
+    }
+
+    const selectedDetectMap = {};
+    function handleDetectSelect(stationId, clueIdx, def) {
+      if (!selectedDetectMap[stationId]) selectedDetectMap[stationId] = {};
+      selectedDetectMap[stationId][clueIdx] = def;
+
+      const container = document.getElementById('modal-card');
+      const buttons = container.querySelectorAll(`[id^="detect-${clueIdx}-"]`);
+      buttons.forEach(btn => {
+        if (btn.textContent.trim() === def) {
+          btn.className = 'detect-btn text-left p-2.5 bg-amber-800 text-white border border-amber-900 rounded-lg text-xs sm:text-sm font-bold shadow-sm';
+        } else {
+          btn.className = 'detect-btn text-left p-2.5 bg-white hover:bg-amber-100 border border-amber-300/80 rounded-lg text-xs sm:text-sm font-medium text-amber-950 transition';
+        }
+      });
+      playTone(460, 'sine', 0.08);
+    }
+
+    function verifyWordDetect(stationId) {
+      const station = STATIONS_DATA.find(s => s.id === stationId);
+      const chosen = selectedDetectMap[stationId] || {};
+      const feedback = document.getElementById('challenge-feedback');
+
+      if (Object.keys(chosen).length < station.clues.length) {
+        feedback.className = 'mt-3 p-3 rounded-xl text-sm font-medium bg-amber-100 text-amber-900 border border-amber-300';
+        feedback.textContent = '請先為所有字詞選取課本注釋解釋！';
+        feedback.classList.remove('hidden');
+        playChime('wrong');
+        return;
+      }
+
+      let allCorrect = true;
+      let wrongHint = '';
+      station.clues.forEach((clue, idx) => {
+        if (chosen[idx] !== clue.targetDef) {
+          allCorrect = false;
+          wrongHint = clue.hint;
+        }
+      });
+
+      if (allCorrect) {
+        completeStation(station);
+      } else {
+        feedback.className = 'mt-3 p-3 rounded-xl text-sm font-medium bg-rose-100 text-rose-950 border border-rose-300';
+        feedback.innerHTML = `⚠️ 解釋有偏差！提示：${wrongHint}。`;
+        feedback.classList.remove('hidden');
+        playChime('wrong');
+      }
+    }
+    function completeStation(station) {
+      playChime('correct');
+
+      if (gameState.stationAttempts[station.id] === 1) {
+        gameState.firstAttemptSuccessCount++;
+      }
+
+      if (!gameState.clearedStations.includes(station.id)) {
+        gameState.clearedStations.push(station.id);
+      }
+      if (!gameState.collectedCodex.includes(station.id)) {
+        gameState.collectedCodex.push(station.id);
+      }
+
+      // 即時推進站點索引，保證返回地圖時下一站立即處於可挑戰狀態
+      const currentIdx = STATIONS_DATA.findIndex(s => s.id === station.id);
+      const nextIdx = currentIdx + 1;
+      gameState.currentStationIndex = nextIdx;
+
+      const hasNext = nextIdx < STATIONS_DATA.length;
+      if (hasNext) {
+        updateFishermanPosition(nextIdx, true);
+      }
+      refreshNodesVisual();
+
+      const card = document.getElementById('modal-card');
+      card.innerHTML = `
+        <div class="text-center py-4">
+          <div class="w-16 h-16 mx-auto rounded-full bg-rose-50 border-2 border-rose-300 flex items-center justify-center text-3xl mb-3 shadow-md glow-gold animate-bounce">
+            🌸
+          </div>
+          <span class="text-xs uppercase tracking-wider text-rose-800 font-bold bg-rose-100 px-3 py-1 rounded-full border border-rose-300">站點成功點亮</span>
+          <h2 class="text-2xl font-bold text-amber-950 mt-2 font-calligraphy">${station.title}</h2>
+          
+          <div class="mt-4 p-4 bg-amber-50/90 rounded-2xl border border-amber-300/80 text-left text-xs sm:text-sm text-stone-800 whitespace-pre-line leading-relaxed shadow-sm">
+            ${station.knowledge}
+          </div>
+
+          <div class="mt-4 text-xs text-amber-900 flex items-center justify-center gap-1.5 font-semibold">
+            <span>✨</span> 字詞注釋已收錄至「文言圖鑑」！
+          </div>
+
+          <div class="mt-6 flex flex-col sm:flex-row gap-2">
+            <button onclick="advanceToNextStation()" class="w-full py-3 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 hover:from-amber-600 text-white font-bold text-base rounded-xl shadow-md active:scale-98 transition flex items-center justify-center gap-2">
+              <span>${hasNext ? '前往下一站' : '完成探索，查看結局'}</span>
+              <span>➔</span>
+            </button>
+            <button onclick="returnToMapPreviewAfterClear(${station.id})" class="w-full sm:w-auto px-5 py-3 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-sm rounded-xl transition shadow-sm">
+              返回圖片
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // 專門處理通關結算後點擊「返回圖片」的過渡
+    function returnToMapPreviewAfterClear(completedStationId) {
+      closeModal();
+      const nextIdx = gameState.currentStationIndex;
+
+      if (nextIdx < STATIONS_DATA.length) {
+        const nextStation = STATIONS_DATA[nextIdx];
+        // 鏡頭平滑聚焦在下一站，便於玩家觀察地圖
+        centerCameraOn(nextStation.mapPos.x, nextStation.mapPos.y, nextStation.cameraZoom, 1100);
+        showFloatingNotice(`已解鎖：${nextStation.title}！點擊發光站點或下方按鈕開始挑戰。`);
+      } else {
+        // 若已是最後一關，返回圖片後允許檢視全圖
+        resetOverviewCamera(1200);
+        showFloatingNotice("所有站點已全部點亮！點擊下方按鈕揭曉結局。");
+      }
+    }
+
+    function advanceToNextStation() {
+      closeModal();
+      const curIdx = gameState.currentStationIndex;
+
+      if (curIdx < STATIONS_DATA.length) {
+        const nextStation = STATIONS_DATA[curIdx];
+        updateFishermanPosition(curIdx, true);
+        playChime('step');
+
+        centerCameraOn(nextStation.mapPos.x, nextStation.mapPos.y, nextStation.cameraZoom, 1100);
+        setTimeout(() => {
+          openChallengeModal(nextStation);
+        }, 550);
+      } else {
+        triggerGrandEnding();
+      }
+    }
+
+    // 完成所有探索：鏡頭逐步拉遠並升高，返回完整全景圖並觸發多重結局
+    function triggerGrandEnding() {
+      refreshNodesVisual();
+      resetOverviewCamera(2000);
+      playChime('fanfare');
+
+      setTimeout(() => {
+        showEndingSummaryModal();
+      }, 2100);
+    }
+
+    // 依據玩家表現判定結局稱號：
+    // 「桃花源博學者」（90%以上）、「桃花源通」（75%-89%）、「桃花源知音」（50%-74%）、「桃花源新客」（50%以下）
+    function showEndingSummaryModal() {
+      const modal = document.getElementById('modal-container');
+      const card = document.getElementById('modal-card');
+
+      const total = STATIONS_DATA.length;
+      const firstSuccess = gameState.firstAttemptSuccessCount;
+      const accuracyRate = Math.round((firstSuccess / total) * 100);
+
+      let endingTitle = "";
+      let endingBadge = "";
+      let endingColor = "";
+      let endingComment = "";
+
+      if (accuracyRate >= 90) {
+        endingTitle = "桃花源博學者";
+        endingBadge = "🏵️ 絕頂大師・通曉古今";
+        endingColor = "from-amber-600 to-yellow-600 text-amber-950";
+        endingComment = "【桃花源博學者・文心徹悟】\n你對香港教育局《桃花源記》課文注釋洞若觀火，古今異義、通假借代絲絲入扣，首次答對率近乎完美！如同親歷晉宋風骨，陶公筆下「芳草鮮美，落英繽紛」之怡然世界，已盡入君懷！";
+      } else if (accuracyRate >= 75) {
+        endingTitle = "桃花源通";
+        endingBadge = "🌸 嫻熟行者・豁然開朗";
+        endingColor = "from-rose-600 to-amber-700 text-rose-950";
+        endingComment = "【桃花源通・游刃有餘】\n你熟知桃花源各處要隘，能精準辨明「阡陌交通」、「黃髮垂髫」與「要還家」之詞解。只要稍加溫習「問津」與「外人」之深層語意，必能登堂入室，通曉全篇！";
+      } else if (accuracyRate >= 50) {
+        endingTitle = "桃花源知音";
+        endingBadge = "🌿 欣然探秘・漸入佳境";
+        endingColor = "from-emerald-600 to-teal-700 text-emerald-950";
+        endingComment = "【桃花源知音・心領神會】\n你隨武陵漁人溯流而上，雖偶遇山重水複，但終能「豁然開朗」。細品課文注釋，反覆比對，定能更加體會陶淵明歸隱田園、與世無爭之心志！";
+      } else {
+        endingTitle = "桃花源新客";
+        endingBadge = "🛶 緣溪初探・篤學前行";
+        endingColor = "from-stone-600 to-amber-800 text-stone-900";
+        endingComment = "【桃花源新客・初涉桃源】\n你剛踏上探索桃源之途，宛如昔日南陽劉子驥「欣然規往」。只要多翻閱「文言圖鑑」，溫故知新，定能找到通往桃花源的智慧渡口！";
+      }
+
+      card.innerHTML = `
+        <div class="text-center py-2">
+          <div class="inline-block px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-xs font-bold mb-2">
+            ${endingBadge}
+          </div>
+          <h2 class="text-3xl font-extrabold text-amber-950 font-calligraphy tracking-wider mb-1">
+            尋找桃花源完成
+          </h2>
+          <div class="text-2xl font-black text-rose-800 font-calligraphy my-2 py-1 px-4 bg-amber-100/70 inline-block rounded-2xl border border-amber-300">
+            榮獲稱號：【${endingTitle}】
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 my-4">
+            <div class="p-3 bg-white/80 rounded-2xl border border-amber-200 shadow-sm">
+              <div class="text-[11px] text-stone-500 font-semibold">點亮站點</div>
+              <div class="text-lg font-bold text-amber-950 mt-0.5">${total} / ${total}</div>
+            </div>
+            <div class="p-3 bg-white/80 rounded-2xl border border-amber-200 shadow-sm">
+              <div class="text-[11px] text-stone-500 font-semibold">首試答對率</div>
+              <div class="text-lg font-bold text-rose-700 mt-0.5">${accuracyRate}%</div>
+            </div>
+            <div class="p-3 bg-white/80 rounded-2xl border border-amber-200 shadow-sm">
+              <div class="text-[11px] text-stone-500 font-semibold">圖鑑收藏</div>
+              <div class="text-lg font-bold text-amber-950 mt-0.5">${gameState.collectedCodex.length} 篇</div>
+            </div>
+          </div>
+
+          <div class="p-4 bg-white/80 rounded-2xl border border-amber-300/80 text-left text-xs sm:text-sm text-stone-800 whitespace-pre-line leading-relaxed my-3 shadow-sm">
+            ${endingComment}
+          </div>
+
+          <p class="text-xs text-stone-600 mb-4">
+            已開放自由探索：地圖最小固定在視窗中，放大後可自由拖移平移，點擊各站點可重溫注釋！
+          </p>
+
+          <div class="p-3.5 mb-4 rounded-2xl bg-gradient-to-br from-amber-50 to-rose-50 border border-amber-300 shadow-sm text-left">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-lg">📥</span>
+              <span class="font-bold text-amber-950 text-sm">課後典藏：教育局《桃花源記》課本篇章</span>
+            </div>
+            <p class="text-xs text-stone-700 leading-relaxed mb-3">
+              恭喜完成全篇探索！已為你備妥香港教育局《桃花源記》原文雙頁典藏，包含第 30-31 頁課文與 21 條標準注釋。你可以直接下載 PDF 檔案隨身溫習，亦可查閱官方手冊。
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button onclick="downloadEdbChapterPDF()" class="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-rose-700 via-amber-800 to-amber-900 hover:from-rose-600 text-white font-bold text-xs sm:text-sm shadow flex items-center justify-center gap-1.5 active:scale-95 transition">
+                <span>📑</span>
+                <span>下載建議篇章 PDF (雙頁高清)</span>
+              </button>
+              <button onclick="downloadEdbChapterImage()" class="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 hover:from-amber-600 text-white font-bold text-xs sm:text-sm shadow flex items-center justify-center gap-1.5 active:scale-95 transition">
+                <span>🖼️</span>
+                <span>下載課本篇章圖 (PNG)</span>
+              </button>
+            </div>
+            <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button onclick="previewEdbChapterModal()" class="px-3 py-2 rounded-xl bg-white hover:bg-amber-100/70 border border-amber-300 text-amber-950 font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition">
+                <span>📖</span>
+                <span>線上雙頁全覽</span>
+              </button>
+              <a href="https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-white hover:bg-amber-100/70 border border-amber-300 text-amber-950 font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition">
+                <span>🔗</span>
+                <span>教育局官方篇章原檔 (PDF)</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <button onclick="closeModal()" class="w-full py-2.5 bg-gradient-to-r from-stone-700 to-amber-800 hover:from-stone-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition">
+              自由漫遊全景地圖
+            </button>
+            <button onclick="openCodexModal()" class="w-full py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 font-bold text-sm rounded-xl active:scale-98 transition">
+              📜 檢視完整字詞圖鑑
+            </button>
+          </div>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function openCodexModal() {
+      const modal = document.getElementById('modal-container');
+      const card = document.getElementById('modal-card');
+
+      let html = `
+        <div class="flex items-center justify-between pb-3 border-b border-amber-900/15 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">📜</span>
+            <div>
+              <h2 class="text-xl font-bold text-amber-950 font-calligraphy">桃花源記・文言字詞圖鑑</h2>
+              <p class="text-xs text-amber-800">香港教育局建議篇章標準注釋規範</p>
+            </div>
+          </div>
+          <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 flex items-center justify-center font-bold text-sm transition">✕</button>
+        </div>
+
+        <div class="p-3 mb-3 bg-amber-50/80 rounded-xl border border-amber-200 flex flex-wrap items-center justify-between gap-2">
+          <div class="text-xs text-amber-900">
+            <strong>課本原件：</strong>香港教育局建議篇章課本雙頁版
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button onclick="downloadEdbChapterPDF()" class="px-3 py-1.5 bg-rose-800 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1 active:scale-95 transition">
+              <span>📑</span> 下載 PDF
+            </button>
+            <button onclick="downloadEdbChapterImage()" class="px-3 py-1.5 bg-amber-800 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1 active:scale-95 transition">
+              <span>🖼️</span> 下載圖片
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3 max-h-[55vh] overflow-y-auto pr-1">
+      `;
+
+      STATIONS_DATA.forEach(st => {
+        const isUnlocked = gameState.collectedCodex.includes(st.id);
+        if (isUnlocked) {
+          html += `
+            <div class="p-3.5 bg-white/80 rounded-2xl border border-amber-200 text-left shadow-sm">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="font-bold text-amber-950 font-calligraphy text-base">${st.title}</span>
+                <span class="text-[10px] font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">已收錄</span>
+              </div>
+              <p class="text-xs text-stone-700 italic mb-2">「${st.verse.slice(0, 48)}...」</p>
+              <div class="text-xs text-amber-900 whitespace-pre-line bg-amber-50/70 p-2.5 rounded-xl border border-amber-200 leading-relaxed font-medium">
+                ${st.knowledge}
+              </div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="p-3.5 bg-stone-100/60 rounded-2xl border border-stone-200 opacity-60 text-left flex items-center justify-between">
+              <div>
+                <span class="font-bold text-stone-500 text-sm">${st.title}</span>
+                <p class="text-xs text-stone-400">尚未探索此站點，繼續前行即可解鎖</p>
+              </div>
+              <span class="text-stone-400 text-lg">🔒</span>
+            </div>
+          `;
+        }
+      });
+
+      html += `
+        </div>
+        <div class="mt-4 flex justify-between items-center">
+          <button onclick="returnToMapPreview()" class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl text-xs sm:text-sm font-bold transition">
+            返回圖片
+          </button>
+          <button onclick="closeModal()" class="px-5 py-2 bg-amber-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow hover:bg-amber-700 transition">
+            關閉圖鑑
+          </button>
+        </div>
+      `;
+
+      card.innerHTML = html;
+      modal.classList.remove('hidden');
+    }
+
+    function openReviewCard(station) {
+      const modal = document.getElementById('modal-container');
+      const card = document.getElementById('modal-card');
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between pb-3 border-b border-amber-900/15 mb-3">
+          <div>
+            <span class="text-xs text-rose-800 font-bold bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">已點亮站點</span>
+            <h2 class="text-xl font-bold text-amber-950 mt-1 font-calligraphy">${station.title}</h2>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button onclick="returnToMapPreview()" class="px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs flex items-center gap-1 shadow-sm transition">
+              <span>🗺️</span>
+              <span>返回圖片</span>
+            </button>
+            <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 flex items-center justify-center font-bold text-sm transition">✕</button>
+          </div>
+        </div>
+
+        <div class="p-3 bg-amber-50/70 rounded-2xl border border-amber-200 mb-3">
+          <p class="text-sm italic text-stone-800">「${station.verse}」</p>
+        </div>
+
+        <div class="p-4 bg-white/80 rounded-2xl border border-amber-200 text-left text-xs sm:text-sm text-stone-800 whitespace-pre-line leading-relaxed mb-4 shadow-sm">
+          ${station.knowledge}
+        </div>
+
+        <div class="flex justify-between items-center gap-2">
+          <button onclick="returnToMapPreview()" class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl text-xs sm:text-sm font-bold transition">
+            返回圖片
+          </button>
+          <button onclick="closeModal()" class="px-5 py-2 bg-amber-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow hover:bg-amber-700 transition">
+            完成溫習
+          </button>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    // 生成香港教育局《桃花源記》課本高解析度雙頁圖像畫布
+    function createEdbTextbookCanvas() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      // 設置 2400 x 1580 高清畫質，長寬比貼合兩頁課本
+      canvas.width = 2400;
+      canvas.height = 1580;
+
+      // 1. 溫潤宣紙與課本底色
+      ctx.fillStyle = '#faf6ef';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 書脊中線陰影
+      const gradMid = ctx.createLinearGradient(1200 - 30, 0, 1200 + 30, 0);
+      gradMid.addColorStop(0, 'rgba(180, 150, 120, 0.02)');
+      gradMid.addColorStop(0.5, 'rgba(150, 120, 90, 0.12)');
+      gradMid.addColorStop(1, 'rgba(180, 150, 120, 0.02)');
+      ctx.fillStyle = gradMid;
+      ctx.fillRect(1170, 0, 60, canvas.height);
+
+      // 2. 左側古雅棕金色側書籤 (Page 30)
+      ctx.fillStyle = '#b78943';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, 110, 880, [0, 0, 32, 0]);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 50px "Noto Serif TC", serif';
+      ctx.textAlign = 'center';
+      const titleChars = ['桃', '花', '源', '記'];
+      titleChars.forEach((c, idx) => {
+        ctx.fillText(c, 55, 160 + idx * 75);
+      });
+
+      ctx.font = '30px "Noto Serif TC", serif';
+      ctx.fillStyle = '#fceada';
+      ctx.fillText('陶', 55, 530);
+      ctx.fillText('潛', 55, 575);
+
+      // 3. 左頁 (Page 30) 原文正文
+      ctx.fillStyle = '#2b231d';
+      ctx.textAlign = 'left';
+      ctx.font = '38px/1.8 "Noto Serif TC", serif';
+
+      const leftParagraphs = [
+        "晉太元中，武陵人捕魚為業。緣溪行，",
+        "忘路之遠近。忽逢桃花林，夾岸數百步，中",
+        "無雜樹，芳草鮮美，落英繽紛，漁人甚異",
+        "之。復前行，欲窮其林。",
+        "",
+        "林盡水源，便得一山。山有小口，彷",
+        "彿若有光。便舍船，從口入。初極狹，才通",
+        "人。復行數十步，豁然開朗，土地平曠，屋",
+        "舍儼然，有良田、美池、桑竹之屬，阡陌交",
+        "通，雞犬相聞。其中往來種作，男女衣著，",
+        "悉如外人。黃髮垂髫，並怡然自樂。",
+        "",
+        "見漁人，乃大驚，問所從來。具答之。",
+        "便要還家，設酒殺雞作食。村中聞有此人，",
+        "咸來問訊。自云：先世避秦時亂，率妻子",
+        "邑人來此絕境，不復出焉，遂與外人間隔。",
+        "問今是何世，乃不知有漢，無論魏、晉。此",
+        "人一一為具言所聞，皆歎惋。餘人各復延至",
+        "其家，皆出酒食。停數日，辭去。此中人語",
+        "云：「不足為外人道也。」"
+      ];
+
+      let startY = 145;
+      const leftX = 180;
+      leftParagraphs.forEach((line) => {
+        if (line === "") {
+          startY += 26;
+        } else {
+          ctx.fillText(line, leftX, startY);
+          startY += 58;
+        }
+      });
+
+      // 4. 左頁底部水墨桃花林意象淡繪
+      ctx.fillStyle = '#9fb99b';
+      ctx.beginPath();
+      ctx.ellipse(340, 1500, 280, 80, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#c5d8bf';
+      ctx.beginPath();
+      ctx.ellipse(580, 1520, 220, 70, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 粉嫩桃花簇
+      const petalSpots = [
+        { x: 230, y: 1400, r: 18 }, { x: 260, y: 1380, r: 24 }, { x: 300, y: 1395, r: 20 },
+        { x: 420, y: 1430, r: 22 }, { x: 460, y: 1410, r: 26 }, { x: 500, y: 1435, r: 20 }
+      ];
+      petalSpots.forEach(pt => {
+        ctx.fillStyle = 'rgba(235, 120, 135, 0.45)';
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 頁碼 30
+      ctx.strokeStyle = '#c0a882';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(60, 1495, 26, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = '#5c4530';
+      ctx.font = 'bold 24px "Noto Serif TC", serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('30', 60, 1503);
+
+      // 5. 右頁 (Page 31) 原文後半段
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#2b231d';
+      ctx.font = '38px/1.8 "Noto Serif TC", serif';
+
+      const rightParagraphs = [
+        "既出，得其船，便扶向路，處處誌之。",
+        "及郡下，詣太守，說如此。太守即遣人隨其",
+        "往，尋向所誌，遂迷不復得路。",
+        "",
+        "南陽劉子驥，高尚士也，聞之，欣然規",
+        "往，未果，尋病終。後遂無問津者。"
+      ];
+
+      let rStartY = 145;
+      const rightX = 1300;
+      rightParagraphs.forEach((line) => {
+        if (line === "") {
+          rStartY += 26;
+        } else {
+          ctx.fillText(line, rightX, rStartY);
+          rStartY += 58;
+        }
+      });
+
+      // 6. 右頁雙欄注釋 (① ~ ㉑) 課本正統排版
+      ctx.font = '24px/1.7 "Noto Serif TC", serif';
+      const col1Notes = [
+        "① 太元：東晉孝武帝司馬曜年號。",
+        "② 落英：落花。繽紛：繁雜。此處",
+        "   形容飄落的花朵，千姿百態。",
+        "③ 窮：窮盡，作動詞用。",
+        "④ 舍：通「捨」，捨棄。",
+        "⑤ 才：僅。",
+        "⑥ 儼然：形容房屋排列整齊。",
+        "⑦ 阡陌：田間的縱橫小路，以區隔",
+        "   田畝。《風俗通》云：「南北曰",
+        "   阡，東西曰陌。」交通：交錯相",
+        "   通，四通八達。",
+        "⑧ 雞犬相聞：此句源於《老子》就",
+        "   「小國寡民」的構想：「鄰國相",
+        "   望，雞犬之聲相聞，民至老死，",
+        "   不相往來。」",
+        "⑨ 外人：方外或塵外之人。",
+        "⑩ 黃髮：指老人，因其髮已由白轉",
+        "   黃。垂髫：指年幼者，因其多並",
+        "   髻為飾。髫：小童未束髻，額前",
+        "   垂下的頭髮。粵[條]，[tiu4]；",
+        "   普[tiáo]。"
+      ];
+
+      const col2Notes = [
+        "⑪ 具：通「俱」，全部。",
+        "⑫ 要：通「邀」，邀約、邀請。粵",
+        "   [邀]，[jiu1]；普[yāo]。",
+        "⑬ 妻子：妻子及子女。絕境：與世",
+        "   人隔絕之境。",
+        "⑭ 外人：此處指桃花源以外的人，",
+        "   與上文「悉如外人」之「外人」的",
+        "   意思不同。",
+        "⑮ 無論：更不必說。",
+        "⑯ 不足為外人道：不值得對外面的",
+        "   人說。",
+        "⑰ 扶：沿着、順着。向路：即舊",
+        "   路，謂昔日來時之路。",
+        "⑱ 詣：前往，引申為拜訪。粵",
+        "   [藝]，[ngai6]；普[yì]。",
+        "⑲ 規往：謀劃前往。",
+        "⑳ 尋：不久。",
+        "㉑ 問津：詢問渡口之所在，引申為",
+        "   尋訪或探求的意思。津：渡口。"
+      ];
+
+      // 注釋左欄
+      let noteY1 = 660;
+      col1Notes.forEach(txt => {
+        if (txt.includes('①') || txt.includes('②') || txt.includes('③') || txt.includes('④') || txt.includes('⑤') || txt.includes('⑥') || txt.includes('⑦') || txt.includes('⑧') || txt.includes('⑨') || txt.includes('⑩')) {
+          ctx.fillStyle = '#0f6b92';
+        } else {
+          ctx.fillStyle = '#44372e';
+        }
+        ctx.fillText(txt, 1260, noteY1);
+        noteY1 += 39;
+      });
+
+      // 注釋右欄
+      let noteY2 = 660;
+      col2Notes.forEach(txt => {
+        if (txt.includes('⑪') || txt.includes('⑫') || txt.includes('⑬') || txt.includes('⑭') || txt.includes('⑮') || txt.includes('⑯') || txt.includes('⑰') || txt.includes('⑱') || txt.includes('⑲') || txt.includes('⑳') || txt.includes('㉑')) {
+          ctx.fillStyle = '#0f6b92';
+        } else {
+          ctx.fillStyle = '#44372e';
+        }
+        ctx.fillText(txt, 1830, noteY2);
+        noteY2 += 39;
+      });
+
+      // 7. 頁腳與右下角標註
+      ctx.fillStyle = '#5c4530';
+      ctx.font = '24px "Noto Serif TC", serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('桃花源記 | 陶潛    31', 2320, 1515);
+
+      return canvas;
+    }
+
+    // 觸發生成並下載教育局建議篇章標準雙頁 PDF 檔案
+    function downloadEdbChapterPDF() {
+      try {
+        showFloatingNotice('正在生成教育局《桃花源記》課本 PDF...');
+        const canvas = createEdbTextbookCanvas();
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+        // 使用 jsPDF 生成 A4 橫向 (Landscape) PDF
+        const { jsPDF } = window.jspdf;
+        if (!jsPDF) {
+          // 若 CDN 加載受限，回退至直接在新分頁開啟或官方下載
+          window.open('https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf', '_blank');
+          return;
+        }
+
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        // 保持 2400:1580 比例居中置入 PDF
+        const imgRatio = 2400 / 1580;
+        let renderW = pdfWidth;
+        let renderH = pdfWidth / imgRatio;
+        let posX = 0;
+        let posY = (pdfHeight - renderH) / 2;
+
+        if (renderH > pdfHeight) {
+          renderH = pdfHeight;
+          renderW = pdfHeight * imgRatio;
+          posX = (pdfWidth - renderW) / 2;
+          posY = 0;
+        }
+
+        pdf.addImage(imgData, 'JPEG', posX, posY, renderW, renderH);
+        pdf.save('香港教育局建議篇章_桃花源記_課本原件典藏.pdf');
+
+        playChime('correct');
+        showFloatingNotice('《桃花源記》建議篇章 PDF 下載完成！');
+      } catch (err) {
+        console.error('PDF generation error:', err);
+        // 回退直接開啟官方教育局 PDF
+        window.open('https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf', '_blank');
+      }
+    }
+
+    // 觸發下載教育局課本篇章高清圖片
+    function downloadEdbChapterImage() {
+      try {
+        showFloatingNotice('正在生成教育局《桃花源記》課本高清圖檔...');
+        const canvas = createEdbTextbookCanvas();
+        const dataUrl = canvas.toDataURL('image/png');
+
+        const link = document.createElement('a');
+        link.download = '香港教育局建議篇章_桃花源記_課本原件典藏.png';
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        playChime('correct');
+        showFloatingNotice('課本篇章已成功下載！');
+      } catch (err) {
+        console.error('Download error:', err);
+        previewEdbChapterModal();
+      }
+    }
+
+    // 線上高清預覽課本篇章模態窗
+    function previewEdbChapterModal() {
+      const modal = document.getElementById('modal-container');
+      const card = document.getElementById('modal-card');
+
+      const canvas = createEdbTextbookCanvas();
+      const dataUrl = canvas.toDataURL('image/png');
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between pb-3 border-b border-amber-900/15 mb-3">
+          <div>
+            <span class="text-xs uppercase tracking-wider text-rose-800 font-bold bg-rose-100/70 px-2.5 py-0.5 rounded-md">教育局官方建議篇章</span>
+            <h2 class="text-xl sm:text-2xl font-bold text-amber-950 mt-0.5 font-calligraphy">《桃花源記》課本全頁典藏圖</h2>
+          </div>
+          <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 flex items-center justify-center font-bold text-sm transition">✕</button>
+        </div>
+
+        <div class="p-2 bg-stone-100/80 rounded-2xl border border-amber-200 shadow-inner max-h-[62vh] overflow-auto flex items-center justify-center">
+          <img src="${dataUrl}" alt="香港教育局《桃花源記》建議篇章課本圖文" class="max-w-full h-auto rounded-lg shadow cursor-zoom-in" onclick="window.open('${dataUrl}', '_blank')" title="點擊在新分頁檢視原圖">
+        </div>
+
+        <p class="text-xs text-stone-500 text-center mt-2">
+          提示：電腦可點擊下方按鈕或右鍵儲存圖片；手機用戶可長按圖片儲存至相簿。
+        </p>
+
+        <div class="mt-4 flex flex-col sm:flex-row gap-2.5">
+          <button onclick="downloadEdbChapterPDF()" class="w-full py-2.5 bg-gradient-to-r from-rose-700 to-rose-800 hover:from-rose-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
+            <span>📑</span>
+            <span>下載建議篇章 PDF (A4 規格)</span>
+          </button>
+          <a href="${dataUrl}" download="香港教育局建議篇章_桃花源記_課本原件典藏.png" class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
+            <span>🖼️</span>
+            <span>儲存 PNG 圖</span>
+          </a>
+          <a href="https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-amber-100 border border-amber-300 text-amber-950 font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-1.5 transition">
+            <span>🏛️</span>
+            <span>教育局官網 PDF</span>
+          </a>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-container').classList.add('hidden');
+    }
+
+    function showFloatingNotice(msg) {
+      const notice = document.createElement('div');
+      notice.className = 'fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-amber-950/90 text-amber-100 border border-amber-400/60 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-2xl transition-all duration-300 pointer-events-none opacity-0 translate-y-2';
+      notice.textContent = msg;
+      document.body.appendChild(notice);
+
+      setTimeout(() => {
+        notice.classList.remove('opacity-0', 'translate-y-2');
+      }, 20);
+
+      setTimeout(() => {
+        notice.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => notice.remove(), 350);
+      }, 2000);
+    }
+
+    // 重設提示（使用自訂對話框，不使用原生 alert/confirm）
+    function promptResetGame() {
+      const modal = document.getElementById('modal-container');
+      const card = document.getElementById('modal-card');
+
+      card.innerHTML = `
+        <div class="text-center py-4">
+          <div class="text-4xl mb-2">🛶</div>
+          <h3 class="text-xl font-bold text-amber-950 mb-2 font-calligraphy">重新出發探索？</h3>
+          <p class="text-xs sm:text-sm text-stone-600 mb-6">確定要由武陵溪口重新出發探索桃花源嗎？所有進度與站點將重新開始。</p>
+          <div class="flex justify-center gap-3">
+            <button onclick="closeModal()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-stone-600 bg-stone-100 hover:bg-stone-200 transition">
+              繼續當前旅程
+            </button>
+            <button onclick="executeResetGame()" class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-rose-700 hover:bg-rose-800 shadow transition">
+              確認重新出發
+            </button>
+          </div>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function executeResetGame() {
+      closeModal();
+      gameState.currentStationIndex = 0;
+      gameState.clearedStations = [];
+      gameState.collectedCodex = [];
+      gameState.firstAttemptSuccessCount = 0;
+      gameState.stationAttempts = {};
+      
+      initMap();
+      startOpeningSequence();
+    }
+
+    // 拖曳與縮放手勢：保證「圖片最小固定在視窗大小，不可移動；放大時可移動」
+    function setupPanAndZoomGestures() {
+      const viewport = document.getElementById('viewport');
+      let touchStartDist = 0;
+      let initialScale = 1;
+
+      viewport.addEventListener('mousedown', (e) => {
+        const minScale = calcMinScale();
+        // 當縮放到最小（全景）時鎖定不可移動；大於最小縮放時可拖曳
+        if (gameState.camera.scale <= minScale * 1.02) return;
+
+        gameState.panState.isDragging = true;
+        gameState.panState.startX = e.clientX;
+        gameState.panState.startY = e.clientY;
+        gameState.panState.camStartX = gameState.camera.x;
+        gameState.panState.camStartY = gameState.camera.y;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!gameState.panState.isDragging) return;
+        const minScale = calcMinScale();
+        if (gameState.camera.scale <= minScale * 1.02) {
+          gameState.panState.isDragging = false;
+          return;
+        }
+
+        const dx = e.clientX - gameState.panState.startX;
+        const dy = e.clientY - gameState.panState.startY;
+
+        const viewW = window.innerWidth;
+        const viewH = window.innerHeight;
+        const scale = gameState.camera.scale;
+
+        let newX = gameState.panState.camStartX + dx;
+        let newY = gameState.panState.camStartY + dy;
+
+        const minX = viewW - 2000 * scale;
+        const minY = viewH - 1250 * scale;
+        newX = Math.min(0, Math.max(minX, newX));
+        newY = Math.min(0, Math.max(minY, newY));
+
+        gameState.camera.x = newX;
+        gameState.camera.y = newY;
+        applyCameraTransform(0);
+      });
+
+      window.addEventListener('mouseup', () => {
+        gameState.panState.isDragging = false;
+      });
+
+      // 滾輪縮放
+      viewport.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.15 : -0.15;
+        zoomStep(delta);
+      }, { passive: false });
+
+      // 手機觸控雙指縮放與單指平移
+      viewport.addEventListener('touchstart', (e) => {
+        const minScale = calcMinScale();
+        if (e.touches.length === 1 && gameState.camera.scale > minScale * 1.02) {
+          gameState.panState.isDragging = true;
+          gameState.panState.startX = e.touches[0].clientX;
+          gameState.panState.startY = e.touches[0].clientY;
+          gameState.panState.camStartX = gameState.camera.x;
+          gameState.panState.camStartY = gameState.camera.y;
+        } else if (e.touches.length === 2) {
+          gameState.panState.isDragging = false;
+          touchStartDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          initialScale = gameState.camera.scale;
+        }
+      }, { passive: true });
+
+      viewport.addEventListener('touchmove', (e) => {
+        const minScale = calcMinScale();
+        if (e.touches.length === 1 && gameState.panState.isDragging && gameState.camera.scale > minScale * 1.02) {
+          const dx = e.touches[0].clientX - gameState.panState.startX;
+          const dy = e.touches[0].clientY - gameState.panState.startY;
+
+          const viewW = window.innerWidth;
+          const viewH = window.innerHeight;
+          const scale = gameState.camera.scale;
+
+          let newX = gameState.panState.camStartX + dx;
+          let newY = gameState.panState.camStartY + dy;
+
+          const minX = viewW - 2000 * scale;
+          const minY = viewH - 1250 * scale;
+          newX = Math.min(0, Math.max(minX, newX));
+          newY = Math.min(0, Math.max(minY, newY));
+
+          gameState.camera.x = newX;
+          gameState.camera.y = newY;
+          applyCameraTransform(0);
+        } else if (e.touches.length === 2) {
+          const currentDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          if (touchStartDist > 0) {
+            const factor = currentDist / touchStartDist;
+            const viewW = window.innerWidth;
+            const viewH = window.innerHeight;
+            const targetScale = Math.min(3.2, Math.max(minScale, initialScale * factor));
+            
+            centerCameraOn(
+              (viewW / 2 - gameState.camera.x) / gameState.camera.scale,
+              (viewH / 2 - gameState.camera.y) / gameState.camera.scale,
+              targetScale,
+              0
+            );
+          }
+        }
+      }, { passive: true });
+
+      viewport.addEventListener('touchend', () => {
+        gameState.panState.isDragging = false;
+        touchStartDist = 0;
+      });
+    }
+
+    function startOpeningSequence() {
+      resetOverviewCamera(0);
+
+      setTimeout(() => {
+        const first = STATIONS_DATA[0];
+        centerCameraOn(first.mapPos.x, first.mapPos.y, first.cameraZoom, 2000);
+        playChime('correct');
+      }, 500);
+    }
+
+    window.addEventListener('resize', () => {
+      focusCurrentStation();
+    });
+
+    window.onload = function() {
+      initMap();
+      PetalSystem.init();
+      startOpeningSequence();
+    };
+  </script>
+</body>
+</html>

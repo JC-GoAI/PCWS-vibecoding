@@ -993,6 +993,9 @@ const GAME_PROMPT = [
 ].join("\n");
 
 function renderHelper() {
+    if (state.band === "sec") {
+        return '<iframe class="game-frame" title="尋找桃花源" src="games/peach-blossom.html"></iframe>';
+    }
     if (state.band !== "pri") return "";
     const frame = '<iframe class="game-frame" title="成語迴轉壽司店" src="games/idiom-sushi.html"></iframe>';
     if (!lockOpen("vibe")) return frame + vibeLockMarkup();
@@ -1128,7 +1131,7 @@ function render() {
         if (state.activity === "make") below = renderMake();
         html = '<section class="column">' + back + nav + below + "</section>";
     }
-    document.body.classList.toggle("playing-game", state.band === "pri" && state.activity === "helper");
+    document.body.classList.toggle("playing-game", (state.band === "pri" || state.band === "sec") && state.activity === "helper");
     document.getElementById("app").innerHTML = html;
     saveState();
     state._viewKey = viewKey;
