@@ -168,10 +168,6 @@
     .tip-item { background: #f7f9fc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 10px; }
     .tip-item p { margin: 0 0 8px; line-height: 1.5; font-weight: 700; }
     .tip-item .pill-btn { width: auto; min-height: 34px; }
-    .site-footer {
-        width: 100%; margin-top: 48px; padding: 28px 20px; background: #f7f8fb; color: #8a9099;
-        font-size: 13px; text-align: center; line-height: 1.6; box-sizing: border-box;
-    }
     .ico { width: 1.15em; height: 1.15em; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .pick-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
     .make-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
@@ -274,7 +270,6 @@
     </button>
 </header>
 <main id="app"></main>
-<footer class="site-footer">© 2026 CLEAR, The Chinese University of Hong Kong · Parent–Child Workshop</footer>
 <script>
 const STORAGE_KEY = "pcws-coach-v1";
 const LOCK_PASS = { vibe: "jcgoai", make: "pcws", help: "clear" };
@@ -1255,13 +1250,11 @@ function sizePromptAreas() {
     const make = document.getElementById("make-prompt");
     if (make) {
         const panel = make.closest(".panel");
-        const footer = document.querySelector(".site-footer");
         const makeTop = make.getBoundingClientRect().top + window.scrollY;
         const afterBox = panel
             ? panel.getBoundingClientRect().bottom - make.getBoundingClientRect().bottom
             : 140;
-        const footerSpace = footer ? footer.offsetHeight + 48 : 0;
-        const available = window.innerHeight - makeTop - afterBox - footerSpace - 16;
+        const available = window.innerHeight - makeTop - afterBox - 16;
         const full = promptContentHeight(make);
         make.style.height = Math.max(120, Math.min(full, Math.round(available))) + "px";
         const overflow = document.documentElement.scrollHeight - window.innerHeight;
