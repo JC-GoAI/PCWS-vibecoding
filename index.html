@@ -238,6 +238,9 @@
     #chat-img-1 { max-width: min(100%, 845px); }
     #chat-img-2 { max-width: min(100%, 964px); }
     .chat-shield { position: absolute; inset: 0; }
+    .chat-pager { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 14px; }
+    .chat-pager .ghost-btn { flex: 0 1 140px; }
+    .chat-pager .ghost-btn:disabled { opacity: 0.45; cursor: default; }
     @media print { .nocopy { display: none !important; } }
     @media (max-width: 768px) {
         header { padding: 10px 16px; }
@@ -992,9 +995,107 @@ const GAME_PROMPT = [
     "- 動畫要流暢：帶移動、壽司飛入、答錯跌落、客人表情、得分與 Combo 特效"
 ].join("\n");
 
+const SEC_GAME_PROMPT = [
+    "#角色",
+    "你是一位擅長製作中文教育遊戲的前端工程師。",
+    "",
+    "#背景與任務",
+    "建立可直接遊玩的單頁遊戲《尋找桃花源》。",
+    "重要：",
+    "使用這張桃花源圖片作為唯一遊戲地圖背景：https://i.imgur.com/gIqahgj.jpeg",
+    "遊戲開始時鏡頭由全景縮放至漁人所在位置，之後跟隨玩家探索不同地點；完成所有探索後，鏡頭縮放返回全景圖，展示完整桃花源。",
+    "",
+    "# 學習內容",
+    "以香港教育局《建議篇章》中的《桃花源記》為唯一學習內容來源。",
+    "所有字詞解釋、詞義、題目、答案及提示，必須依照教育局《桃花源記》建議篇章的詞解內容。",
+    "不得自行創作、推測、改寫或引入其他版本的解釋。",
+    "",
+    "遊戲開始時：",
+    "玩家扮演漁人，在桃花源探索各個地點。鏡頭由高空俯視整幅地圖，緩慢放大並平移至漁人所在位置，營造進入桃花源的感覺。地圖設有6-8個探索站點，鏡頭會順暢跟隨漁人移動，並自動聚焦目前探索的站點。",
+    "每到一個地點便觸發一個小挑戰：",
+    "• 拖放字詞配對正確解釋",
+    "• 開寶箱選擇正確詞義",
+    "• 尋找指定文言詞語",
+    "• 解鎖下一個探索地點",
+    "• 可以返回圖片",
+    "答對後：",
+    "• 顯示詞語解釋",
+    "• 該站點被點亮",
+    "• 獲得圖鑑收藏",
+    "• 漁人繼續前進",
+    "• 鏡頭平滑移動到下一個站點",
+    "答錯後：",
+    "• 顯示提示",
+    "• 可再次嘗試",
+    "完成所有探索後：鏡頭逐步拉遠並升高，由局部場景縮放至完整桃花源地圖，展示所有已點亮的探索站點。根據玩家的答題表現、首次答對率及圖鑑收集進度進入不同結局。不同結局須顯示不同稱號、結算畫面及結語，提升重玩價值。最後顯示：「尋找桃花源完成」，並開放自由點擊各站點、自由放大縮小背景圖片，重溫詞語解釋與收藏圖鑑。",
+    "",
+    "#指導與限制",
+    "- 以我提供的圖片探索與發現為核心體驗。圖片最小固定在視窗大小，不可移動，但可以放大，放大時可移動。",
+    "- 鏡頭移動、聚焦與縮放須流暢自然，具有動畫感。",
+    "- 畫面具古風繪本感和探秘感，背景/整體顏色以淺色為主。",
+    "- 人物與互動物件清晰易見。",
+    "- 每次只聚焦一個任務。",
+    "- 詞語解釋簡潔易懂，符合香港中一至中三程度。",
+    "- 支援手機及電腦操作。",
+    "- 完成時必須有鏡頭拉遠展示整幅桃花源全景圖的結算動畫，讓玩家感受到自己完成了一次完整的探索旅程。"
+].join("\n");
+
+const SEC_CHAT_IMAGES = [
+    "games/sec-chat-1.png",
+    "games/sec-chat-2.png",
+    "games/sec-chat-3.png",
+    "games/sec-chat-4.png",
+    "games/sec-chat-5.png",
+    "games/sec-chat-6.png"
+];
+let secChatPage = 0;
+
+function secChatPageCount() {
+    return Math.ceil(SEC_CHAT_IMAGES.length / 2);
+}
+
+function secChatShots(page) {
+    const start = page * 2;
+    return SEC_CHAT_IMAGES.slice(start, start + 2).map(function (src) {
+        return '<div class="chat-shot"><img src="' + src + '" alt="" draggable="false"><div class="chat-shield"></div></div>';
+    }).join("");
+}
+
+function secVibeToolsMarkup() {
+    const pages = secChatPageCount();
+    return '<div class="game-tools">' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">展示prompt</button>' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-chat" aria-expanded="false">展示與AI的完整對話</button>' +
+        '<button type="button" class="ghost-btn" data-action="download-code">下載完整代碼</button>' +
+        "</div>" +
+        '<div id="reveal-prompt" class="reveal-panel nocopy"><pre class="prompt-view">' + escapeHtml(SEC_GAME_PROMPT) + "</pre></div>" +
+        '<div id="reveal-chat" class="reveal-panel nocopy">' +
+        '<div class="chat-row" id="sec-chat-row">' + secChatShots(0) + "</div>" +
+        '<div class="chat-pager">' +
+        '<button type="button" class="ghost-btn" id="sec-chat-prev" data-action="chat-page" data-value="prev" disabled>上一頁</button>' +
+        '<span id="sec-chat-label">1 / ' + pages + "</span>" +
+        '<button type="button" class="ghost-btn" id="sec-chat-next" data-action="chat-page" data-value="next"' + (pages < 2 ? " disabled" : "") + ">下一頁</button>" +
+        "</div></div>";
+}
+
+function showSecChatPage(page) {
+    const pages = secChatPageCount();
+    secChatPage = Math.max(0, Math.min(pages - 1, page));
+    const row = document.getElementById("sec-chat-row");
+    if (row) row.innerHTML = secChatShots(secChatPage);
+    const label = document.getElementById("sec-chat-label");
+    if (label) label.textContent = (secChatPage + 1) + " / " + pages;
+    const prev = document.getElementById("sec-chat-prev");
+    const next = document.getElementById("sec-chat-next");
+    if (prev) prev.disabled = secChatPage === 0;
+    if (next) next.disabled = secChatPage >= pages - 1;
+}
+
 function renderHelper() {
     if (state.band === "sec") {
-        return '<iframe class="game-frame" title="尋找桃花源" src="games/peach-blossom.html"></iframe>';
+        const frame = '<iframe class="game-frame" title="尋找桃花源" src="games/peach-blossom.html"></iframe>';
+        if (!lockOpen("vibe")) return frame + vibeLockMarkup();
+        return frame + secVibeToolsMarkup();
     }
     if (state.band !== "pri") return "";
     const frame = '<iframe class="game-frame" title="成語迴轉壽司店" src="games/idiom-sushi.html"></iframe>';
@@ -1003,7 +1104,8 @@ function renderHelper() {
 }
 
 function downloadGameCode() {
-    fetch("games/idiom-sushi.html").then(function (res) {
+    const sec = state.band === "sec";
+    fetch(sec ? "games/peach-blossom.html" : "games/idiom-sushi.html").then(function (res) {
         if (!res.ok) throw new Error("missing");
         return res.text();
     }).then(function (text) {
@@ -1011,7 +1113,7 @@ function downloadGameCode() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "成語迴轉壽司店.txt";
+        link.download = sec ? "尋找桃花源.txt" : "成語迴轉壽司店.txt";
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -1262,7 +1364,7 @@ document.addEventListener("click", function (event) {
             state.lockError = "";
             if (value === "vibe") {
                 const wrap = document.getElementById("vibe-gate-wrap");
-                if (wrap) wrap.outerHTML = vibeToolsMarkup();
+                if (wrap) wrap.outerHTML = state.band === "sec" ? secVibeToolsMarkup() : vibeToolsMarkup();
                 return;
             }
             if (value === "help") applyMakePrompt(makeScaffold(), "base");
@@ -1329,7 +1431,12 @@ document.addEventListener("click", function (event) {
             btn.setAttribute("aria-expanded", "true");
             panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
-        document.body.classList.toggle("chat-open", document.getElementById("reveal-chat").classList.contains("open"));
+        const chatPanel = document.getElementById("reveal-chat");
+        document.body.classList.toggle("chat-open", !!(chatPanel && chatPanel.classList.contains("open")));
+        if (willOpen && value === "reveal-chat" && state.band === "sec") showSecChatPage(0);
+        return;
+    } else if (action === "chat-page") {
+        showSecChatPage(secChatPage + (value === "next" ? 1 : -1));
         return;
     } else if (action === "download-code") {
         downloadGameCode();
