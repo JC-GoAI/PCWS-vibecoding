@@ -303,34 +303,34 @@ function makeTips() {
 
 const MAKE_EXAMPLES_PRI = [
     {
-        id: "vocab",
-        label: "英文生字",
+        id: "greenhouse",
+        label: "字母溫室",
         role: "You are a front-end engineer who is good at making English learning games for children.",
-        task: "Build a single-page game that can be played at once, called Sky Pop: a bright sky above a bookshop roof. Balloons are large, colours are candy-bright, and the text is clear. It must feel like a game, not a worksheet.\nGame rules:\n1. The player is on the roof. An English clue sits at the bottom, with a patience bar. Balloons rise from below, each carrying one English word. Only one word matches the clue. The player pops that balloon before it floats off the top.\n2. A correct pop bursts into confetti, adds points, and Combo increases by one. A one-line English meaning stays for about one second, then the next clue appears. Popping a wrong balloon costs patience and resets Combo. If the correct balloon escapes, it counts as a miss and patience drops again. The game ends when patience reaches zero or after 60 seconds. Wrong pops and misses reduce patience only, not the remaining time.\n3. Combo builds with correct pops in a row. From three in a row, the score is multiplied by 1.5, then 2, then 3, with a score burst. Every fifth clue in a row releases a gold balloon, and a correct pop scores double. Difficulty rises: balloons rise slowly and the wrong words are unrelated at the start; they rise faster and look or mean alike in the middle; near the end, two correct balloons must be popped in order before they escape.\n4. Clues are drawn at random from everyday English for Hong Kong Primary 4 to Primary 6, including sentence gaps and simple definitions. At least 80 words, each with one English meaning. At the end, show that round's word book (word, clue, meaning), then allow a Word file download.",
-        limit: "- English only, for Primary 4 to Primary 6. Do not show any Chinese characters\n- Support mouse, touch, phones, and computers\n- HTML, CSS, and JavaScript in one file that runs when opened\n- One clue has one correct word; a two-word clue must be popped in order\n- Animation must be smooth: balloons rise, a correct balloon pops, a wrong balloon shreds, and the score and Combo effects play"
+        task: "Build a single-page game that can be played at once, called Letter Greenhouse: a bright glass greenhouse, large pots, and clear letters. It must feel like a game, not a worksheet.\nGame rules:\nThe player is the greenhouse keeper. A picture and an English clue sit at the top, with a patience bar. Letter tiles sit in a tray under the pot. The player drags tiles into the soil slots to spell the one word that matches the clue.\nA correct spelling makes the pot bloom, adds points, and Combo increases by one. A one-line English meaning stays for about one second, then the next pot appears. A wrong spelling bounces the tiles back, resets Combo, and patience drops. If the watering can passes the pot before the word is finished, it counts as a miss and patience drops again. The game ends when patience reaches zero or after 60 seconds. Wrong spellings and misses reduce patience only, not the remaining time.\nCombo builds with correct pots in a row. From three in a row, the score is multiplied by 1.5, then 2, then 3, with a bloom burst. Every fifth pot is a golden pot, and a correct spelling scores double. Difficulty rises: short words and few extra tiles at the start; longer words and similar-looking tiles in the middle; near the end, patience is shorter and some clues need two words spelled in order.\nClues are drawn at random from everyday English for Hong Kong Primary 4 to Primary 6. At least 80 words, each with one English meaning. At the end, show that round's word book (word, clue, meaning), then allow a Word file download.",
+        limit: "- English only, for Primary 4 to Primary 6. Do not show any Chinese characters\n- Support mouse, touch, phones, and computers\n- HTML, CSS, and JavaScript in one file that runs when opened\n- One pot has one correct spelling; a two-word clue must be spelled in order\n- Animation must be smooth: tiles locking, a plant blooming, tiles bouncing back, and the score and Combo effects"
     },
     {
-        id: "times",
-        label: "乘法守門員",
+        id: "factors",
+        label: "因數天平",
         role: "你是一位擅長製作數學教育遊戲的前端工程師。",
-        task: "請建立可直接遊玩的單頁遊戲《乘法守門員》：淺色球場，球要大，數字清晰。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家是守門員。上方顯示一題乘法，例如 7×8，旁邊有耐心條。三個球同時從不同方向飛向龍門，每個球寫一個答案，只有一個正確。玩家要撲向正確那個球。\n2. 撲中後，球抱入懷裡，加分，Combo 加一，約一秒顯示算式，隨即下一題。撲錯就入球，Combo 中斷，耐心下降。正確的球飛過而未撲到，視作失球，耐心再降。耐心歸零或 60 秒完結，遊戲結束。失球只扣耐心，不扣剩餘時間。\n3. 連續撲中累積 Combo，三連擊起分數以 1.5、2、3 倍計算，並有得分特效。連續五題出現十二碼，撲中雙倍分。難度逐步提升：開局球慢、錯誤答案相差遠；中段球快、答案很接近；尾段耐心較短，間中左右兩球都要按順序撲中。\n4. 題目隨機抽取，以小四至小六乘法為主，不少於 60 題。結束後先顯示該局題目和正確答案，再可下載 Word 檔。",
-        limit: "- 繁體中文，適合小四至小六\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個正確答案；連發題要按順序撲中\n- 動畫要流暢：球飛來、撲中抱住、撲錯入網、得分與 Combo 特效"
+        task: "請建立可直接遊玩的單頁遊戲《因數天平》：淺色街市檔口，天平要大，數字清晰。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n玩家是檔口幫手。左邊秤盤顯示目標數，例如 56，旁邊有耐心條。下方砝碼架有多個數字。玩家要拖兩個因數到右邊秤盤，乘積等於目標，天平才會水平。\n平衡後，加分，Combo 加一，約一秒顯示算式，隨即下一位客人。放錯砝碼，天平歪掉，砝碼彈回，Combo 中斷，耐心下降。正確那組還未放上，客人的購物袋已經合上，視作漏單，耐心再降。耐心歸零或 60 秒完結，遊戲結束。放錯或漏單只扣耐心，不扣剩餘時間。\n連續平衡累積 Combo，三連擊起分數以 1.5、2、3 倍計算，並有得分特效。連續五題出現批發客，平衡雙倍分。難度逐步提升：開局客人慢、因數好認；中段客人快、數字很接近；尾段耐心較短，間中要按順序平衡兩台天平。\n題目隨機抽取，以小四至小六乘法為主，不少於 60 題。結束後先顯示該局題目和正確算式，再可下載 Word 檔。",
+        limit: "- 繁體中文，適合小四至小六\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一組正確因數；連題要按順序平衡\n- 動畫要流暢：拖放砝碼、天平傾斜與水平、得分與 Combo 特效"
     }
 ];
 const MAKE_EXAMPLES_SEC = [
     {
-        id: "sec-eng",
-        label: "英文文法",
-        role: "You are a front-end engineer who is good at making English learning games for teenagers.",
-        task: "Build a single-page game that can be played at once, called Castle Grammar: a bright stone fort, a large catapult, and clear text. It must feel like a game, not a worksheet.\nGame rules:\n1. The player is the castle guard. A gapped English sentence is carved on a boulder rolling toward the gate, with a patience bar beside the wall. Three word stones sit by the catapult, and only one is grammatically correct. The player loads that stone and releases the catapult while the boulder is inside the firing zone.\n2. A hit with the correct word smashes the boulder, completes the sentence, adds points, and Combo increases by one. A one-line English explanation stays for about one second, then the next boulder appears. Firing a wrong word lets the boulder through, Combo resets, and patience drops. If the boulder reaches the gate before you fire, it counts as a miss and patience drops again. The game ends when patience reaches zero or after 60 seconds. Wrong shots and misses reduce patience only, not the remaining time.\n3. Combo builds with hits in a row. From three in a row, the score is multiplied by 1.5, then 2, then 3, with a stone-burst effect. Every fifth boulder is a siege tower, and a hit scores double. Difficulty rises: boulders roll slowly and the wrong words are clearly ungrammatical at the start; they roll faster and the words are easily confused in the middle; near the end, patience is shorter and some boulders have two gaps, so you must fire two correct words in order.\n4. Items are drawn at random from grammar common for Hong Kong Secondary 1 to Secondary 3, including present tense, plurals, past tense, and comparatives. At least 60 items, each with one English explanation. At the end, show that round's sentence book (sentence, answer, explanation), then allow a Word file download.",
-        limit: "- English only, for Secondary 1 to Secondary 3. Do not show any Chinese characters\n- Support mouse, touch, phones, and computers\n- HTML, CSS, and JavaScript in one file that runs when opened\n- One gap has one correct word; two gaps must be fired in order\n- Animation must be smooth: the boulder rolls, the catapult fires, a hit smashes the boulder, a miss breaks the gate, and the score and Combo effects play"
+        id: "foodchain",
+        label: "深海食物鏈",
+        role: "你是一位擅長製作科學教育遊戲的前端工程師。",
+        task: "建立可直接遊玩的單頁遊戲《深海食物鏈》。\n重要：\n玩家全程用手指或滑鼠駕駛潛艇，在同一片開放海域追捕生物。生物從四面游來，標記正確後立即換下一環，潛艇不停靠、不換場景。\n開始時鏡頭貼近潛艇；整局完成後才拉遠一次，展示這局連成的食物網。\n\n# 學習內容\n以香港中一至中三科學科的食物鏈、食物網和能量流動為學習內容。\n能量箭嘴由被捕食者指向捕食者。生產者、消費者、分解者的關係必須正確。\n不得自創違反科學的食物關係，也不得混入這範圍以外的課題。\n\n遊戲開始時：\n潛艇已經在海中。畫面上方只顯示現在要標記的一環，例如「標出初級消費者」。玩家駛近正確生物並標記。\n游動中輪流出現這些情況：\n• 海域裡有幾種生物，只可標記題目指定的角色\n• 兩種生物外形相近，要認對能量流去的下一環\n• 掠食者會追潛艇，撞到就要先甩開，再標記正確生物\n• 偶發要連續標記同一條鏈的兩環，第二環緊接出現\n答對後：\n• 顯示生物角色，以及能量由誰流向誰\n• 側邊食物鏈多一節箭嘴\n• 約一秒後上方換成下一環，潛艇繼續開\n答錯後：\n• 顯示一句提示\n• 標錯的生物游走，前方再游來可標記的生物，玩家不用回到原點\n完成整局後：連滿 6 條食物鏈，鏡頭拉遠，側邊的箭嘴收成一張食物網。按首次答對率進入不同結局，顯示不同稱號、結算畫面及結語，稱號可為見習潛航員、海洋觀察員、食物鏈領航員。最後顯示：「深海食物鏈完成」，並可翻閱這局圖鑑，重看每條鏈的生物和能量方向。",
+        limit: "- 以駕駛潛艇、追捕並標記正確生物為核心體驗。\n- 鏡頭跟隨潛艇，轉向和加速要流暢。\n- 畫面清爽，背景以淺色海水為主。\n- 潛艇、生物與能量箭嘴清晰易見。\n- 每次只顯示一個標記目標。\n- 解釋簡潔易懂，符合香港中一至中三程度。\n- 支援手機及電腦操作。\n- 完成時拉遠一次，讓玩家看見整張食物網，而不是沿路回訪。\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行"
     },
     {
-        id: "sec-math",
-        label: "方程對決",
+        id: "slope",
+        label: "斜率滑板",
         role: "你是一位擅長製作數學教育遊戲的前端工程師。",
-        task: "請建立可直接遊玩的單頁遊戲《方程對決》：淺色競技場，算式和按鍵要大，字體清晰。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家面對一個由方程構成的對手，例如 2x+3=11。畫面上有耐心條，以及四個運算攻擊：「兩邊減一個數」「兩邊加一個數」「兩邊乘一個數」「兩邊除一個數」。玩家要按正確的一步去拆方程，而不是直接選最終答案。\n2. 選對一步，對手護盾破裂一層，加分，Combo 加一，算式改寫成下一步，約一秒顯示這一步做了甚麼。選錯一步，對手反擊，Combo 中斷，耐心下降。太久沒有出手，視作漏招，耐心再降。耐心歸零、對手把方程打回原狀，或 60 秒完結，遊戲結束。選錯或漏招只扣耐心，不扣剩餘時間。\n3. 連續選對累積 Combo，三連擊起分數以 1.5、2、3 倍計算，並有破盾特效。連續拆完五條方程，下一條是弱點方程，打中雙倍分。難度逐步提升：開局一步就能求出 x；中段要先移項再除；尾段有括號，而且限時更短，要連續打對兩步。\n4. 題目隨機抽取，以香港中一至中三的一元一次方程為主，不少於 40 題。每題打到求出 x 才算擊倒。結束後先顯示該局方程、x 的值和關鍵一步，再可下載 Word 檔。",
-        limit: "- 繁體中文，適合中一至中三\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每一步只有一個最合適的運算；最後要顯示 x 的值\n- 動畫要流暢：護盾破裂、反擊、算式改寫、得分與 Combo 特效"
+        task: "建立可直接遊玩的單頁遊戲《斜率滑板》。\n重要：\n少年不停向下滑。閘門迎面而來，玩家在到達前拖動斜坡，沒有選擇題按鈕，也不在閘門前停車作答。\n開始時鏡頭跟在少年側後方；整段滑完後才拉遠一次，展示這局每一段的直線。\n\n# 學習內容\n以香港中一至中三數學科的直角坐標、斜率和直線方程 y = mx + c 為學習內容。\n斜率須以兩點計算：(y2 − y1) / (x2 − x1)。水平線斜率為 0。\n不得出垂直線，不得出二次方程或其他超出這個範圍的題目。\n\n遊戲開始時：\n少年已經在滑。下一道閘門寫著這一題，例如「斜率 2」或「經過 (0,1) 和 (2,5)」。玩家拖動斜坡，使斜度等於該條直線。\n下滑中輪流出現這些情況：\n• 閘門只給斜率，斜坡要在撞上前對準\n• 閘門給出兩點，玩家要調出經過這兩點的斜度\n• 改為負斜率，斜坡向下\n• 偶發連續兩道閘，第二道在第一道衝過後立刻出現\n答對後：\n• 少年擦閘而過，顯示斜率及直線方程\n• 這一段收入路線紀錄\n• 下一道閘門立即接近\n答錯後：\n• 少年翻車，並顯示一句提示，例如兩點的垂直距離和水平距離\n• 回到這道閘門前方短距離，可立刻再拖一次斜坡\n完成整局後：衝過 6 道閘，鏡頭拉遠，並排顯示 6 條直線。按首次答對率進入不同結局，顯示不同稱號、結算畫面及結語，稱號可為見習滑手、斜坡騎手、首席滑手。最後顯示：「斜率滑板完成」，並可翻閱這局路線紀錄，重看每道閘的斜率和方程。",
+        limit: "- 以在滑行中拖準斜坡為核心體驗。\n- 鏡頭跟隨少年，滑行、轉坡和翻車要流暢。\n- 畫面清爽，背景以淺色為主。\n- 斜坡、閘門與數字清晰易見。\n- 每次只處理一道閘門。\n- 解釋簡潔易懂，符合香港中一至中三程度。\n- 支援手機及電腦操作。\n- 完成時拉遠一次，讓玩家看見這局全部直線，而不是沿路回訪。\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行"
     }
 ];
 
@@ -1140,7 +1140,7 @@ function syncMakeFields() {
 }
 
 function makePromptText() {
-    const english = state.makeExample === "vocab" || state.makeExample === "sec-eng";
+    const english = state.makeExample === "greenhouse";
     const role = english ? "# Role" : "# 角色";
     const task = english ? "# Background and task" : "# 背景與任務";
     const limit = english ? "# Instructions and limits" : "# 指導與限制";
