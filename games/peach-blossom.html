@@ -239,6 +239,70 @@
     <div id="modal-card" class="paper-panel paper-border-gold w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-3xl p-5 sm:p-7 relative modal-enter text-amber-950">
     </div>
   </div>
+
+  <!-- Start Game Introduction Overlay -->
+  <div id="start-modal" class="fixed inset-0 z-50 bg-stone-900/45 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
+    <div class="paper-panel paper-border-gold w-full max-w-lg rounded-3xl p-6 sm:p-8 modal-enter text-amber-950 shadow-2xl relative text-center">
+      
+      <!-- Top Decorative Emblem -->
+      <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-gradient-to-br from-rose-400 via-rose-500 to-amber-700 text-white flex items-center justify-center font-calligraphy text-4xl sm:text-5xl shadow-lg border-2 border-amber-200">
+        桃
+      </div>
+
+      <div class="mt-3">
+        <span class="text-xs uppercase tracking-wider text-rose-800 font-bold bg-rose-100/80 px-3 py-1 rounded-full border border-rose-200">
+          香港教育局建議篇章互動學習
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-950 font-calligraphy tracking-wider mt-2">
+          尋找桃花源
+        </h2>
+        <p class="text-xs sm:text-sm text-amber-800 font-medium mt-1">
+          晉・陶淵明《桃花源記》文言探索之旅
+        </p>
+      </div>
+
+      <!-- Quick Game Rules & Narrative -->
+      <div class="mt-4 p-4 bg-amber-50/80 rounded-2xl border border-amber-200/80 text-left space-y-2.5 shadow-inner">
+        <div class="flex items-start gap-2.5">
+          <span class="text-base sm:text-lg">🛶</span>
+          <div class="text-xs sm:text-sm text-stone-800 leading-relaxed">
+            <strong>化身武陵漁人：</strong>沿溪探奇，追尋芳草鮮美、落英繽紛的世外仙境。
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-base sm:text-lg">📜</span>
+          <div class="text-xs sm:text-sm text-stone-800 leading-relaxed">
+            <strong>挑戰文言關卡：</strong>途經 7 個故事站點，完成拖放配對、辨析字義與寶箱挑戰，所有解釋依據<strong>教育局課本注釋</strong>為標準。
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-base sm:text-lg">🗺️</span>
+          <div class="text-xs sm:text-sm text-stone-800 leading-relaxed">
+            <strong>地圖自由查看：</strong>答題時可隨時「返回圖片」觀察全局；放大時可自由拖曳探索，縮至全景時固定於視窗。
+          </div>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-base sm:text-lg">🏵️</span>
+          <div class="text-xs sm:text-sm text-stone-800 leading-relaxed">
+            <strong>多重稱號結局：</strong>通關後鏡頭拉回全景，依據答對表現評定稱號，並可下載全篇課本雙頁 PDF！
+          </div>
+        </div>
+      </div>
+
+      <!-- Start Button -->
+      <div class="mt-6 flex flex-col sm:flex-row gap-2.5 justify-center">
+        <button onclick="startGameFromIntro()" class="w-full py-3 sm:py-3.5 bg-gradient-to-r from-rose-700 via-amber-800 to-amber-900 hover:from-rose-600 hover:to-amber-800 text-white font-bold text-base rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+          <span>🚣‍♂️</span>
+          <span>啟程入源・開始探索</span>
+          <span>➔</span>
+        </button>
+      </div>
+
+      <p class="text-[11px] text-stone-500 mt-3">
+        音效與落英飄落效果可於右上角隨時開啟或關閉
+      </p>
+    </div>
+  </div>
   <script>
     // --- 學習內容數據庫（嚴格依據上載圖片教育局建議篇章課本注釋與原文）---
     const STATIONS_DATA = [
@@ -1922,7 +1986,33 @@
       gameState.stationAttempts = {};
       
       initMap();
-      startOpeningSequence();
+      showStartModal();
+    }
+
+    // 顯示遊戲開始說明版面
+    function showStartModal() {
+      const modal = document.getElementById('start-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+      }
+      resetOverviewCamera(0);
+    }
+
+    // 玩家點擊「啟程入源」後，關閉說明視窗並平滑滑入第一站
+    function startGameFromIntro() {
+      const modal = document.getElementById('start-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+      initAudio();
+      playChime('fanfare');
+
+      // 鏡頭由全景平滑推進至武陵溪口第一站
+      setTimeout(() => {
+        const first = STATIONS_DATA[0];
+        centerCameraOn(first.mapPos.x, first.mapPos.y, first.cameraZoom, 1800);
+        showFloatingNotice("已抵達武陵溪口！點擊發光站點開始挑戰。");
+      }, 300);
     }
 
     // 拖曳與縮放手勢：保證「圖片最小固定在視窗大小，不可移動；放大時可移動」
@@ -2051,12 +2141,7 @@
 
     function startOpeningSequence() {
       resetOverviewCamera(0);
-
-      setTimeout(() => {
-        const first = STATIONS_DATA[0];
-        centerCameraOn(first.mapPos.x, first.mapPos.y, first.cameraZoom, 2000);
-        playChime('correct');
-      }, 500);
+      showStartModal();
     }
 
     window.addEventListener('resize', () => {
@@ -2066,7 +2151,8 @@
     window.onload = function() {
       initMap();
       PetalSystem.init();
-      startOpeningSequence();
+      // 初始時保持全景，等待玩家於說明版面點擊啟程
+      resetOverviewCamera(0);
     };
   </script>
 </body>
