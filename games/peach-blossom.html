@@ -125,6 +125,17 @@
       background-color: rgba(254, 237, 230, 0.8) !important;
       border-color: #d67a6d !important;
     }
+
+    #modal-card.chapter-wide {
+      max-width: min(1100px, 96vw);
+    }
+    #chapter-preview-frame.zoomed {
+      max-height: 78vh;
+    }
+    #chapter-preview-frame.zoomed img {
+      max-width: none;
+      width: min(1680px, 220%);
+    }
   </style>
 </head>
 <body class="w-full h-full">
@@ -1798,6 +1809,7 @@
 
       const canvas = createEdbTextbookCanvas();
       const dataUrl = canvas.toDataURL('image/png');
+      card.classList.add('chapter-wide');
 
       card.innerHTML = `
         <div class="flex items-center justify-between pb-3 border-b border-amber-900/15 mb-3">
@@ -1808,12 +1820,12 @@
           <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 flex items-center justify-center font-bold text-sm transition">✕</button>
         </div>
 
-        <div class="p-2 bg-stone-100/80 rounded-2xl border border-amber-200 shadow-inner max-h-[62vh] overflow-auto flex items-center justify-center">
-          <img src="${dataUrl}" alt="香港教育局《桃花源記》建議篇章課本圖文" class="max-w-full h-auto rounded-lg shadow cursor-zoom-in" onclick="window.open('${dataUrl}', '_blank')" title="點擊在新分頁檢視原圖">
+        <div id="chapter-preview-frame" class="p-2 bg-stone-100/80 rounded-2xl border border-amber-200 shadow-inner max-h-[62vh] overflow-auto flex items-center justify-center">
+          <img id="chapter-preview-img" alt="香港教育局《桃花源記》建議篇章課本圖文" class="max-w-full h-auto rounded-lg shadow cursor-zoom-in" title="點擊放大圖片">
         </div>
 
-        <p class="text-xs text-stone-500 text-center mt-2">
-          提示：電腦可點擊下方按鈕或右鍵儲存圖片；手機用戶可長按圖片儲存至相簿。
+        <p id="chapter-zoom-hint" class="text-xs text-stone-500 text-center mt-2">
+          點擊圖片可在此視窗放大，再點一次還原。手機可長按圖片儲存至相簿。
         </p>
 
         <div class="mt-4 flex flex-col sm:flex-row gap-2.5">
@@ -1821,7 +1833,7 @@
             <span>📑</span>
             <span>下載建議篇章 PDF (A4 規格)</span>
           </button>
-          <a href="${dataUrl}" download="香港教育局建議篇章_桃花源記_課本原件典藏.png" class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
+          <a id="chapter-png-link" download="香港教育局建議篇章_桃花源記_課本原件典藏.png" class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
             <span>🖼️</span>
             <span>儲存 PNG 圖</span>
           </a>
@@ -1831,10 +1843,34 @@
           </a>
         </div>
       `;
+      document.getElementById('chapter-preview-img').src = dataUrl;
+      document.getElementById('chapter-preview-img').addEventListener('click', toggleChapterImageZoom);
+      document.getElementById('chapter-png-link').href = dataUrl;
       modal.classList.remove('hidden');
     }
 
+    function toggleChapterImageZoom() {
+      const frame = document.getElementById('chapter-preview-frame');
+      const img = document.getElementById('chapter-preview-img');
+      const hint = document.getElementById('chapter-zoom-hint');
+      if (!frame || !img) return;
+      const zoomed = frame.classList.toggle('zoomed');
+      frame.style.alignItems = zoomed ? 'flex-start' : 'center';
+      frame.style.justifyContent = zoomed ? 'flex-start' : 'center';
+      img.classList.toggle('max-w-full', !zoomed);
+      img.classList.toggle('cursor-zoom-in', !zoomed);
+      img.classList.toggle('cursor-zoom-out', zoomed);
+      img.title = zoomed ? '點擊還原大小' : '點擊放大圖片';
+      if (hint) {
+        hint.textContent = zoomed
+          ? '已放大，可在框內捲動查看。再點圖片還原。'
+          : '點擊圖片可在此視窗放大，再點一次還原。手機可長按圖片儲存至相簿。';
+      }
+    }
+
     function closeModal() {
+      const card = document.getElementById('modal-card');
+      if (card) card.classList.remove('chapter-wide');
       document.getElementById('modal-container').classList.add('hidden');
     }
 
