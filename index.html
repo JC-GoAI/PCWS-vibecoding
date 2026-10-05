@@ -196,10 +196,6 @@
     .make-examples { margin-top: 8px; }
     .make-examples .lede { text-align: left; margin-bottom: 10px; }
     .make-examples .chip-row { justify-content: flex-start; }
-    .tip-panel { display: flex; flex-direction: column; gap: 8px; }
-    .tip-item { background: #f7f9fc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 10px; }
-    .tip-item p { margin: 0 0 8px; line-height: 1.5; font-weight: 700; }
-    .tip-item .pill-btn { width: auto; min-height: 34px; }
     .ico { width: 1.15em; height: 1.15em; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .pick-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
     .make-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
@@ -341,17 +337,6 @@ function makeScaffold() {
         task: "一步步提問並引導使用者，最後幫他們生成一份可直接貼入 Gemini Canvas 的遊戲 Prompt Markdown。\n\n請分階段執行，**每次只問一個問題，並附上 3-5 個建議選項**供他們選擇，建議要跟住他們剛才的答案來想。每題最後都加上「或者你自己講」。他們已經講清楚的部分，就跳過。問題包括：\n1. **學習難題**：詢問最近在學習上（如中文成語、英文、數學分數等）有什麼覺得難記或想溫習的課題？你不肯定的內容，請他們提供例子，不要自己編。\n2. **主題場景**：根據課題，詢問想設定在什麼有趣故事或場景？\n3. **玩法機制**：玩家怎樣操作？答對會怎樣，答錯會怎樣，遊戲怎樣結束？連續答對有沒有獎勵，後面會不會難一點？\n4. **生成 Prompt**：收集完後，用三句話覆述課題、場景和玩法，然後問「可以生成Prompt嗎？」得到同意後，才輸出最終的 Prompt Markdown。",
         limit: "- **語言**：香港書面語繁體中文，親切易懂，適合" + grade + "學生和家長一起看。\n- **節奏**：一問一答，絕不一次過問多個問題。未得到同意前，只可以對話，不要輸出 HTML、CSS 或 JavaScript。\n- 遊戲機制要寫滿四點；題目必須來自他們提供的課題和例子。\n- **最終輸出格式**：必須嚴格符合以下結構：\n\n  ```markdown\n  # 角色\n  你是一位擅長製作[學科/主題]教育遊戲的前端工程師。\n\n  # 背景與任務\n  請建立可直接遊玩的單頁遊戲《[遊戲名稱]》：[視覺風格與畫面要求]。畫面要有遊戲感，不要像工作紙。\n  遊戲機制：[詳細描述故事、操作、得分/Combo、勝負條件、難度遞增與題目來源]。\n\n  # 指導與限制\n  - 香港書面語繁體中文，適合" + grade + "\n  - 支援滑鼠、觸控、手機及電腦\n  - HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n  ```"
     };
-}
-
-function makeTips() {
-    return [
-        "你是一位製作小遊戲的工程師。",
-        "請做一個可以打開就玩的網頁遊戲。",
-        "玩家選出正確答案。選對會加分。選錯可以再試。",
-        "畫面要似遊戲，不要似工作紙。",
-        "用繁體中文，適合" + makeGrade() + "。",
-        "全部放在一個檔案，打開就可以玩。"
-    ];
 }
 
 const MAKE_EXAMPLES_PRI = [
@@ -631,7 +616,7 @@ const MAKE = {
 let state = loadState();
 
 function loadState() {
-    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", makeId: "", copyMsg: "", lockError: "", makeRole: "", makeTask: "", makeLimit: "", makeTips: false, makeExample: "" };
+    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", makeId: "", copyMsg: "", lockError: "", makeRole: "", makeTask: "", makeLimit: "", makeExample: "" };
     try {
         const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "{}");
         if (saved.activity === "prompt" || saved.activity === "helper" || saved.activity === "make") base.activity = saved.activity;
@@ -1312,14 +1297,6 @@ function applyMakePrompt(parts, exampleId) {
 function renderMake() {
     const helped = helpOpen();
     const copied = state.copyMsg === "make-all";
-    const tips = state.makeTips
-        ? '<div class="tip-panel">' + makeTips().map(function (line, index) {
-            const ok = state.copyMsg === "tip-" + index;
-            return '<div class="tip-item"><p>' + escapeHtml(line) + "</p>" +
-                '<button type="button" class="pill-btn" data-action="copy-tip" data-value="' + index + '">複製</button>' +
-                (ok ? '<span class="copy-ok">已複製</span>' : "") + "</div>";
-        }).join("") + "</div>"
-        : "";
     const examples = helped
         ? makeExamples().map(function (item) {
             return '<button type="button" class="pill-btn' + (state.makeExample === item.id ? " on" : "") + '" data-action="make-example" data-value="' + item.id + '">' + escapeHtml(item.label) + "</button>";
@@ -1354,13 +1331,11 @@ function renderMake() {
         : "";
     return '<div class="make-layout"><div class="make-side">' +
         '<div class="chip-row">' +
-        '<button type="button" class="pill-btn' + (state.makeTips ? " on" : "") + '" data-action="toggle-tips" aria-expanded="' + (state.makeTips ? "true" : "false") + '">小錦囊</button>' +
         blankBtn +
         guideBtn +
         helpBtn +
         examples +
         "</div>" +
-        tips +
         '</div><div class="make-main">' +
         guideNote +
         '<div class="make-block"><h3># 角色</h3><p class="make-hint">' + roleHint + '</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
@@ -1500,7 +1475,7 @@ document.addEventListener("click", function (event) {
     const action = btn.getAttribute("data-action");
     const value = btn.getAttribute("data-value");
     syncMakeFields();
-    if (action !== "copy-tip" && action !== "copy-make") state.copyMsg = "";
+    if (action !== "copy-make") state.copyMsg = "";
     if (action === "home") {
         state.band = "";
     } else if (action === "activity") {
@@ -1553,8 +1528,6 @@ document.addEventListener("click", function (event) {
             if (err) err.hidden = false;
             return;
         }
-    } else if (action === "toggle-tips") {
-        state.makeTips = !state.makeTips;
     } else if (action === "make-blank") {
         state.makeRole = "";
         state.makeTask = "";
@@ -1568,10 +1541,6 @@ document.addEventListener("click", function (event) {
         if (example) applyMakePrompt(example, example.id);
     } else if (action === "copy-make") {
         copyText(makePromptText(), "make-all");
-        return;
-    } else if (action === "copy-tip") {
-        const line = makeTips()[Number(value)];
-        if (line) copyText(line, "tip-" + value);
         return;
     } else if (action === "copy") {
         const text = value === "make"
