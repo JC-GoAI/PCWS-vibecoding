@@ -353,14 +353,14 @@ function makeTips() {
 const MAKE_EXAMPLES_PRI = [
     {
         id: "greenhouse",
-        label: "字母溫室",
+        label: "英文科 字母溫室",
         role: "You are a front-end engineer who is good at making English learning games for children.",
         task: "Build a single-page game that can be played at once, called Letter Greenhouse: a bright glass greenhouse, large pots, and clear letters. It must feel like a game, not a worksheet.\nGame rules:\nThe player is the greenhouse keeper. A picture and an English clue sit at the top, with a patience bar. Letter tiles sit in a tray under the pot. The player drags tiles into the soil slots to spell the one word that matches the clue.\nA correct spelling makes the pot bloom, adds points, and Combo increases by one. A one-line English meaning stays for about one second, then the next pot appears. A wrong spelling bounces the tiles back, resets Combo, and patience drops. If the watering can passes the pot before the word is finished, it counts as a miss and patience drops again. The game ends when patience reaches zero or after 60 seconds. Wrong spellings and misses reduce patience only, not the remaining time.\nCombo builds with correct pots in a row. From three in a row, the score is multiplied by 1.5, then 2, then 3, with a bloom burst. Every fifth pot is a golden pot, and a correct spelling scores double. Difficulty rises: short words and few extra tiles at the start; longer words and similar-looking tiles in the middle; near the end, patience is shorter and some clues need two words spelled in order.\nClues are drawn at random from everyday English for Hong Kong Primary 4 to Primary 6. At least 80 words, each with one English meaning. At the end, show that round's word book (word, clue, meaning), then allow a Word file download.",
         limit: "- English only, for Primary 4 to Primary 6. Do not show any Chinese characters\n- Support mouse, touch, phones, and computers\n- HTML, CSS, and JavaScript in one file that runs when opened\n- One pot has one correct spelling; a two-word clue must be spelled in order\n- Animation must be smooth: tiles locking, a plant blooming, tiles bouncing back, and the score and Combo effects"
     },
     {
         id: "supermarket",
-        label: "超級市場",
+        label: "數學科 超級市場",
         role: "你是一位擅長製作數學教育遊戲的前端工程師。",
         task: "請建立可直接遊玩的單頁遊戲《超級市場》：淺色超市，貨物和數字要大，字體清晰。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n玩家是收銀員。左邊是貨架，右邊是手推車，上方是購物單，下面有數字鍵。購物單寫明要拖哪些貨物，以及要輸入哪個數，例如總價、找續、總隻數或每袋幾個。畫面不可顯示總價、總數或算式。玩家把貨物拖進車裡，或把多了的拖回貨架，然後自己輸入計算結果，再按收銀。\n貨物和輸入的數都正確，就印出收據，加分，約一秒顯示算式，隨即下一題。貨物不對或輸入的數不對，貨物彈回，顯示一句提示，同一題可以再試。遊戲不計時，也不會因答錯而結束。\n題目按順序由淺到深，不可隨機跳題。先是兩件貨的加法，再是多件貨的加法，然後是找續減法，再是每盒若干的乘法，再是平均分進幾個袋的除法，最後一張單要按順序用上兩種運算。\n不少於 24 題，以小四至小六的加法、減法、乘法和除法為主。完成全部題目後，先顯示該局購物單、要計的數和正確算式，再可下載 Word 檔。",
         limit: "- 繁體中文，適合小四至小六\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 收銀前不可自動顯示總價、總數或算式\n- 每張購物單只有一個正確結果；最後一題要按順序完成兩步\n- 動畫要流暢：拖拉貨物、彈回貨架、按數字鍵、印收據"
@@ -369,14 +369,14 @@ const MAKE_EXAMPLES_PRI = [
 const MAKE_EXAMPLES_SEC = [
     {
         id: "foodchain",
-        label: "深海食物鏈",
+        label: "科學科 深海食物鏈",
         role: "你是一位擅長製作科學教育遊戲的前端工程師。",
         task: "建立可直接遊玩的單頁遊戲《深海食物鏈》。淺色海水，生物要大。\n\n重要：\n畫面下方有一條食物鏈空格。上方同時浮着三隻生物，只會上下輕微浮動。玩家把正確的下一環拖進空格。\n\n# 學習內容\n以香港中一至中三的食物鏈、生產者、消費者和分解者為學習內容。\n能量由被捕食者流向捕食者。關係必須正確。\n\n遊戲開始時：\n第一格已經放了生產者，例如海藻。玩家從三隻生物中，拖出吃掉牠的下一環。\n答對後：\n• 生物落入空格，顯示角色和能量方向\n• 空格再加一格，三隻生物換成新的一組\n答錯後：\n• 生物彈回原位，並顯示一句提示\n• 可立刻再拖\n完成 4 條鏈、每條 3 個生物後，顯示這局的食物網。按首次答對率給予稱號：見習潛航員、海洋觀察員、食物鏈領航員。最後顯示：「深海食物鏈完成」，並可重看每條鏈。",
         limit: "- 繁體中文，適合中一至中三\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每一格只有一種正確生物\n- 動畫要流暢：生物浮動、拖進空格、彈回"
     },
     {
         id: "slope",
-        label: "斜率滑板",
+        label: "數學科 斜率滑板",
         role: "你是一位擅長製作數學教育遊戲的前端工程師。",
         task: "建立可直接遊玩的單頁遊戲《斜率滑板》。淺色滑板場，斜坡和數字要大。\n\n重要：\n斜坡只能卡在斜率 -2、-1、0、1、2。玩家拖動斜坡至其中一個，再按出發。少年這時才滑向閘門。\n\n# 學習內容\n以香港中一至中三的斜率和直線方程 y = mx + c 為學習內容。\n水平線斜率是 0。不要出垂直線，也不要出二次方程。\n\n遊戲開始時：\n閘門顯示題目，例如「斜率 2」或「由 (0,1) 到 (2,5)」。玩家先調斜坡，再按出發。\n答對後：\n• 少年滑過閘門，顯示斜率和直線方程\n• 下一題出現\n答錯後：\n• 少年翻車，並提示垂直距離和水平距離\n• 可再調斜坡，再按出發\n完成 6 題後，列出每題的斜率和方程。按首次答對率給予稱號：見習滑手、斜坡騎手、首席滑手。最後顯示：「斜率滑板完成」。",
         limit: "- 繁體中文，適合中一至中三\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個正確斜率\n- 動畫要流暢：斜坡卡位、滑過閘門、翻車"
