@@ -183,10 +183,12 @@
     }
     .modal-card .lede { margin-bottom: 14px; }
     .modal-card .btn-row { justify-content: center; }
-    .make-layout { display: flex; align-items: flex-start; gap: 18px; }
-    .make-main { flex: 2 1 0; min-width: 0; }
-    .make-side { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 10px; position: sticky; top: 12px; }
-    .make-side .pill-btn { width: 100%; }
+    .make-layout { display: block; }
+    .make-main { min-width: 0; }
+    .make-side { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 8px; }
+    .make-side .chip-row { width: 100%; flex-wrap: nowrap; justify-content: safe center; overflow-x: auto; }
+    .make-side .chip-row .pill-btn { flex: 0 0 auto; white-space: nowrap; }
+    .make-side .make-hint { text-align: center; margin: 0; }
     .make-block { margin: 0 0 16px; }
     .make-block h3 { margin: 0 0 6px; color: var(--goai-blue); font-size: 1.15rem; }
     .make-block textarea { min-height: 96px; resize: vertical; }
@@ -286,8 +288,7 @@
         .column { padding: 20px; }
         .seg-bar { flex-direction: column; }
         .band-card { max-width: none; min-height: 180px; }
-        .make-layout { flex-direction: column; }
-        .make-side { width: 100%; flex-basis: auto; position: static; }
+        .make-side { width: 100%; }
     }
     </style>
 </head>
@@ -1320,10 +1321,9 @@ function renderMake() {
         }).join("") + "</div>"
         : "";
     const examples = helped
-        ? '<p class="make-hint">如果想不到，可以選擇例子。</p>' +
-            makeExamples().map(function (item) {
-                return '<button type="button" class="pill-btn' + (state.makeExample === item.id ? " on" : "") + '" data-action="make-example" data-value="' + item.id + '">' + escapeHtml(item.label) + "</button>";
-            }).join("")
+        ? makeExamples().map(function (item) {
+            return '<button type="button" class="pill-btn' + (state.makeExample === item.id ? " on" : "") + '" data-action="make-example" data-value="' + item.id + '">' + escapeHtml(item.label) + "</button>";
+        }).join("")
         : "";
     const helpBtn = helped
         ? ""
@@ -1360,11 +1360,13 @@ function renderMake() {
         '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy-make">' + icon("copy") + "複製全部</button>" +
         (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div>" +
         "</div><div class=\"make-side\">" +
+        '<div class="chip-row">' +
         '<button type="button" class="pill-btn' + (state.makeTips ? " on" : "") + '" data-action="toggle-tips" aria-expanded="' + (state.makeTips ? "true" : "false") + '">小錦囊</button>' +
         blankBtn +
         guideBtn +
         helpBtn +
         examples +
+        "</div>" +
         tips +
         "</div></div>" + modal;
 }
