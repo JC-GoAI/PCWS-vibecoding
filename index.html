@@ -110,6 +110,7 @@
         text-align: center;
     }
     .seg-btn.on { background: var(--goai-blue); color: #fff; box-shadow: 0 8px 18px rgba(2, 33, 105, 0.18); }
+    .seg-btn:disabled { color: #94a3b8; cursor: not-allowed; }
     .chip-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 0 16px; }
     .src-line { margin: 16px 0 0; font-size: 0.78rem; line-height: 1.45; font-weight: 700; color: #64748b; text-align: center; }
     .field .chip-row { justify-content: flex-start; margin-bottom: 0; }
@@ -939,8 +940,12 @@ function chipRow(items) {
 
 function segBar(items) {
     return '<div class="seg-bar" role="tablist">' + items.map(function (item) {
-        return '<button type="button" class="seg-btn' + (item.on ? " on" : "") + '" data-action="' + item.action + '" data-value="' + item.value + '" aria-pressed="' + (item.on ? "true" : "false") + '">' + escapeHtml(item.label) + "</button>";
+        return '<button type="button" class="seg-btn' + (item.on ? " on" : "") + '" data-action="' + item.action + '" data-value="' + item.value + '" aria-pressed="' + (item.on ? "true" : "false") + '"' + (item.locked ? " disabled" : "") + ">" + escapeHtml(item.label) + "</button>";
     }).join("") + "</div>";
+}
+
+function helpOpen() {
+    try { return sessionStorage.getItem("pcws-lock-help") === "1"; } catch (e) { return false; }
 }
 
 function levelBlock(key, label, text, note, tone) {
@@ -1178,7 +1183,7 @@ function applyMakePrompt(parts, exampleId) {
 }
 
 function renderMake() {
-    const helped = !!gates.make_help;
+    const helped = helpOpen();
     const copied = state.copyMsg === "make-all";
     const tips = state.makeTips
         ? '<div class="tip-panel">' + makeTips().map(function (line, index) {
@@ -1194,6 +1199,18 @@ function renderMake() {
                 return '<button type="button" class="pill-btn' + (state.makeExample === item.id ? " on" : "") + '" data-action="make-example" data-value="' + item.id + '">' + escapeHtml(item.label) + "</button>";
             }).join("") + "</div></div>"
         : "";
+    const helpBtn = helped
+        ? ""
+        : '<button type="button" class="pill-btn" data-action="open-make-help">需要幫忙</button>';
+    const modal = helped
+        ? ""
+        : '<div class="modal-back" id="make-gate" data-action="close-make-help" hidden>' +
+            '<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="make-lock-title">' +
+            '<p class="lede" id="make-lock-title">請輸入密碼，以取得填空提示。</p>' +
+            '<input type="password" id="lock-pass" placeholder="密碼" autocomplete="off">' +
+            '<p class="error-text" hidden>密碼不正確</p>' +
+            '<div class="btn-row"><button type="button" class="primary-btn" data-action="unlock" data-value="help">確認</button>' +
+            '<button type="button" class="ghost-btn" data-action="close-make-help">關閉</button></div></div></div>';
     return '<div class="make-layout"><div class="make-main">' +
         '<div class="make-block"><h3># 角色</h3><p class="make-hint">你希望 AI 是甚麼身份？例如：擅長製作哪一科教育遊戲的前端工程師？</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
         '<div class="make-block"><h3># 背景與任務</h3><p class="make-hint">遊戲叫甚麼名字？畫面像甚麼？想要甚麼風格？遊戲機制可以寫四點：玩家是誰、要做甚麼動作？答對和答錯分別發生甚麼，遊戲幾時結束？連續答對有甚麼獎勵，難度怎樣提升？題目從哪裡來，玩完看到甚麼？</p><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea></div>" +
@@ -1207,8 +1224,8 @@ function renderMake() {
             ? '<button type="button" class="pill-btn' + (state.makeExample === "blank" ? " on" : "") + '" data-action="make-blank">空白版</button>' +
                 '<button type="button" class="pill-btn' + (state.makeExample === "base" ? " on" : "") + '" data-action="make-base">基礎版</button>'
             : "") +
-        tips +
-        "</div></div>";
+        helpBtn + tips +
+        "</div></div>" + modal;
 }
 
 function bandIcon(kind) {
@@ -1234,12 +1251,11 @@ function render() {
     if (!state.band) {
         html = '<section class="column">' + renderHome() + "</section>";
     } else {
-        const navItems = [
-            { action: "activity", value: "prompt", label: "Go Play：引導式提示詞", on: state.activity === "prompt" }
-        ];
-        if (gates.game) navItems.push({ action: "activity", value: "helper", label: "Go Play：互動學習遊戲", on: state.activity === "helper" });
-        if (gates.make) navItems.push({ action: "activity", value: "make", label: "Go Make：親子共創", on: state.activity === "make" });
-        const nav = segBar(navItems);
+        const nav = segBar([
+            { action: "activity", value: "prompt", label: "Go Play：引導式提示詞", on: state.activity === "prompt" },
+            { action: "activity", value: "helper", label: "Go Play：互動學習遊戲", on: state.activity === "helper", locked: !gates.game },
+            { action: "activity", value: "make", label: "Go Make：親子共創", on: state.activity === "make", locked: !gates.make }
+        ]);
         const back = '<div class="back-row"><button type="button" class="back-btn" data-action="home">返回選擇小學或中學</button></div>';
         let below = "";
         if (state.activity === "prompt") below = renderPrompting();
@@ -1355,6 +1371,34 @@ document.addEventListener("click", function (event) {
         state.playId = value;
     } else if (action === "make") {
         state.makeId = value;
+    } else if (action === "open-make-help") {
+        const gate = document.getElementById("make-gate");
+        if (gate) {
+            gate.hidden = false;
+            const err = gate.querySelector(".error-text");
+            if (err) err.hidden = true;
+            const input = document.getElementById("lock-pass");
+            if (input) {
+                input.value = "";
+                input.focus();
+            }
+        }
+        return;
+    } else if (action === "close-make-help") {
+        if (event.target !== btn) return;
+        const gate = document.getElementById("make-gate");
+        if (gate) gate.hidden = true;
+        return;
+    } else if (action === "unlock") {
+        const typed = (document.getElementById("lock-pass").value || "").trim();
+        if (typed === "goai") {
+            try { sessionStorage.setItem("pcws-lock-help", "1"); } catch (e) {}
+            applyMakePrompt(makeScaffold(), "base");
+        } else {
+            const err = document.querySelector("#make-gate .error-text");
+            if (err) err.hidden = false;
+            return;
+        }
     } else if (action === "toggle-tips") {
         state.makeTips = !state.makeTips;
     } else if (action === "make-blank") {
@@ -1425,6 +1469,19 @@ document.addEventListener("keydown", function (event) {
     const selected = sel && sel.anchorNode && insideLockedCopy(sel.anchorNode);
     if (insideLockedCopy(event.target) || selected) event.preventDefault();
 }, true);
+
+document.getElementById("app").addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        const gate = document.getElementById("make-gate");
+        if (gate && !gate.hidden) gate.hidden = true;
+        return;
+    }
+    if (event.key !== "Enter" || event.target.id !== "lock-pass") return;
+    event.preventDefault();
+    const openGate = event.target.closest(".modal-back");
+    const btn = openGate ? openGate.querySelector('[data-action="unlock"]') : null;
+    if (btn) btn.click();
+});
 
 window.addEventListener("resize", sizePromptAreas);
 startGates();
