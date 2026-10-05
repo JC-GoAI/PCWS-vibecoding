@@ -654,7 +654,7 @@ function rememberGates(row) {
     if (!changed) return;
     syncMakeFields();
     GATE_KEYS.forEach(function (key) { gates[key] = !!row[key]; });
-    if (state.activity === "helper" && !gates.game) state.activity = "prompt";
+    if (state.activity === "helper" && !gates.game && !gates.game_prompt) state.activity = "prompt";
     if (state.activity === "make" && !gates.make) state.activity = "prompt";
     render();
 }
@@ -1124,11 +1124,13 @@ function showSecChatPage(page) {
 function renderHelper() {
     if (state.band !== "pri" && state.band !== "sec") return "";
     const sec = state.band === "sec";
-    const frame = sec
-        ? '<iframe class="game-frame" title="尋找桃花源" src="games/peach-blossom.html"></iframe>'
-        : '<iframe class="game-frame" title="成語迴轉壽司店" src="games/idiom-sushi.html"></iframe>';
-    if (!gates.game_prompt) return frame;
-    return frame + (sec ? secVibeToolsMarkup() : vibeToolsMarkup());
+    const frame = gates.game
+        ? (sec
+            ? '<iframe class="game-frame" title="尋找桃花源" src="games/peach-blossom.html"></iframe>'
+            : '<iframe class="game-frame" title="成語迴轉壽司店" src="games/idiom-sushi.html"></iframe>')
+        : "";
+    const tools = gates.game_prompt ? (sec ? secVibeToolsMarkup() : vibeToolsMarkup()) : "";
+    return frame + tools;
 }
 
 function downloadGameCode() {
@@ -1242,7 +1244,7 @@ function renderHome() {
 }
 
 function render() {
-    if (state.activity === "helper" && !gates.game) state.activity = "prompt";
+    if (state.activity === "helper" && !gates.game && !gates.game_prompt) state.activity = "prompt";
     if (state.activity === "make" && !gates.make) state.activity = "prompt";
     const scrollY = window.scrollY;
     const viewKey = state.activity + "|" + state.helperBand + "|" + state.band + "|" + state.playId + "|" + state.makeId;
@@ -1253,7 +1255,7 @@ function render() {
     } else {
         const nav = segBar([
             { action: "activity", value: "prompt", label: "Go Play：引導式提示詞", on: state.activity === "prompt" },
-            { action: "activity", value: "helper", label: "Go Play：互動學習遊戲", on: state.activity === "helper", locked: !gates.game },
+            { action: "activity", value: "helper", label: "Go Play：互動學習遊戲", on: state.activity === "helper", locked: !gates.game && !gates.game_prompt },
             { action: "activity", value: "make", label: "Go Make：親子共創", on: state.activity === "make", locked: !gates.make }
         ]);
         const back = '<div class="back-row"><button type="button" class="back-btn" data-action="home">返回選擇小學或中學</button></div>';
@@ -1263,7 +1265,7 @@ function render() {
         if (state.activity === "make") below = renderMake();
         html = '<section class="column">' + back + nav + below + "</section>";
     }
-    document.body.classList.toggle("playing-game", (state.band === "pri" || state.band === "sec") && state.activity === "helper");
+    document.body.classList.toggle("playing-game", (state.band === "pri" || state.band === "sec") && state.activity === "helper" && gates.game);
     document.getElementById("app").innerHTML = html;
     saveState();
     state._viewKey = viewKey;
@@ -1349,7 +1351,7 @@ document.addEventListener("click", function (event) {
     if (action === "home") {
         state.band = "";
     } else if (action === "activity") {
-        if (value === "helper" && !gates.game) return;
+        if (value === "helper" && !gates.game && !gates.game_prompt) return;
         if (value === "make" && !gates.make) return;
         state.activity = value;
     } else if (action === "helper-band") {
