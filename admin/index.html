@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>活動控制</title>
-    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="icon" href="../favicon.png" type="image/png">
     <style>
     :root { --goai-blue: #022169; --goai-blue-hover: #12338f; --goai-yellow: #fecf13; --grey: #f4f6fa; }
     body {
@@ -140,9 +140,13 @@ async function save(patch) {
 }
 
 async function showApp(session) {
-    show("login-card", !session);
-    show("gate-card", !!session);
-    if (session) await loadGates();
+    if (session) {
+        const path = location.pathname.replace(/\/admin\/?$/, "/");
+        location.href = path + "index.html?host=1";
+        return;
+    }
+    show("login-card", true);
+    show("gate-card", false);
 }
 
 document.getElementById("login-form").addEventListener("submit", async function (event) {

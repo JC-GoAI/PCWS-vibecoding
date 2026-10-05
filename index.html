@@ -76,6 +76,25 @@
     }
     .admin-link:hover { filter: brightness(1.05); }
     .admin-link:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+    body.host-mode { padding-right: 280px; box-sizing: border-box; }
+    body.host-mode .admin-link { display: none; }
+    #host-rail {
+        position: fixed; top: 0; right: 0; bottom: 0; width: 280px; z-index: 30;
+        background: #fff; border-left: 1px solid #e2e8f0;
+        box-shadow: -8px 0 24px rgba(2, 33, 105, 0.06);
+        padding: 18px 16px 28px; box-sizing: border-box; overflow: auto;
+    }
+    #host-rail h2 { margin: 0 0 6px; color: var(--goai-blue); font-size: 1.2rem; }
+    #host-rail .rail-note { margin: 0 0 8px; color: #64748b; font-weight: 700; font-size: 0.85rem; line-height: 1.45; }
+    #host-rail .rail-row { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 12px 0; border-bottom: 1px solid #eef2f7; }
+    #host-rail .rail-row strong { color: var(--goai-blue); }
+    #host-rail .rail-row button { width: 100%; }
+    #host-rail .rail-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    #host-rail .is-open { background: #166534; color: #fff; border-color: #166534; }
+    @media (max-width: 800px) {
+        body.host-mode { padding-right: 0; }
+        #host-rail { position: sticky; top: 0; width: 100%; height: auto; max-height: 42vh; border-left: 0; border-bottom: 1px solid #e2e8f0; }
+    }
     #app { width: calc(100% - 48px); max-width: none; margin: 18px auto 0; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
     .column {
         background: var(--white); padding: 28px; border-radius: 24px;
@@ -273,7 +292,7 @@
 </head>
 <body>
 <header>
-    <a class="admin-link" href="admin.html">Admin 登入</a>
+    <a class="admin-link" href="admin">Admin 登入</a>
     <div class="cartoon-shape shape-monster1">Prompting</div>
     <div class="cartoon-shape shape-monster2">Vibe Coding</div>
     <button type="button" class="header-home" data-action="home" aria-label="返回開始版面">
@@ -292,7 +311,22 @@ const SUPABASE_URL = "https://ujpxuvwjsmdfzeesbuaq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_dhv0taIRqqrxArJ_76-ycw_7cSNW02B";
 const GATE_KEYS = ["level1", "level2", "level3", "game", "game_prompt", "make", "make_help"];
 let gates = { level1: false, level2: false, level3: false, game: false, game_prompt: false, make: false, make_help: false };
+let liveGates = { level1: false, level2: false, level3: false, game: false, game_prompt: false, make: false, make_help: false };
 let gateDb = null;
+const HOST = new URLSearchParams(location.search).get("host") === "1";
+function adminPath() {
+    const path = location.pathname.replace(/\/index\.html$/, "/");
+    return (path.endsWith("/") ? path : path + "/") + "admin";
+}
+const RAIL = [
+    ["level1", "Level 1"],
+    ["level2", "Level 2"],
+    ["level3", "Level 3"],
+    ["game", "互動學習遊戲"],
+    ["game_prompt", "遊戲 Prompt 及代碼"],
+    ["make", "Go Make"]
+];
+if (HOST) GATE_KEYS.forEach(function (key) { gates[key] = true; });
 function makeGrade() {
     return state.band === "sec" ? "中一至中三" : "小四至小六";
 }
@@ -650,6 +684,13 @@ function icon(name) {
 
 function rememberGates(row) {
     if (!row) return;
+    if (HOST) {
+        const changed = GATE_KEYS.some(function (key) { return !!liveGates[key] !== !!row[key]; });
+        GATE_KEYS.forEach(function (key) { liveGates[key] = !!row[key]; });
+        const list = document.getElementById("rail-list");
+        if (changed || (list && !list.innerHTML)) paintRail();
+        return;
+    }
     const changed = GATE_KEYS.some(function (key) { return !!gates[key] !== !!row[key]; });
     if (!changed) return;
     syncMakeFields();
@@ -657,6 +698,69 @@ function rememberGates(row) {
     if (state.activity === "helper" && !gates.game && !gates.game_prompt) state.activity = "prompt";
     if (state.activity === "make" && !gates.make) state.activity = "prompt";
     render();
+}
+
+function paintRail() {
+    const list = document.getElementById("rail-list");
+    if (!list) return;
+    list.innerHTML = RAIL.map(function (item) {
+        const open = !!liveGates[item[0]];
+        return '<div class="rail-row"><strong>' + item[1] + "</strong>" +
+            '<button type="button" class="' + (open ? "primary-btn is-open" : "ghost-btn") + '" data-key="' + item[0] + '" data-next="' + (open ? "0" : "1") + '">' +
+            (open ? "收回" : "開放") + "</button></div>";
+    }).join("");
+}
+
+function saveLive(patch) {
+    const err = document.getElementById("rail-error");
+    if (err) {
+        err.hidden = true;
+        err.textContent = "";
+    }
+    gateDb.from("workshop_gates").update(patch).eq("id", 1).select("*").maybeSingle().then(function (res) {
+        if (res.error || !res.data) {
+            if (err) {
+                err.hidden = false;
+                err.textContent = (res.error && res.error.message) || "未能更改開關。";
+            }
+            return;
+        }
+        rememberGates(res.data);
+    });
+}
+
+function mountRail() {
+    if (document.getElementById("host-rail")) return;
+    const rail = document.createElement("aside");
+    rail.id = "host-rail";
+    rail.innerHTML = '<h2>現場開關</h2><p class="rail-note">這一頁看得到全部內容。右邊的掣只控制參加者。</p><div id="rail-list"></div><p class="error-text" id="rail-error" hidden></p><div class="rail-actions"><button type="button" class="ghost-btn" id="rail-close-all">全部收回</button><button type="button" class="ghost-btn" id="rail-logout">登出</button></div>';
+    document.body.appendChild(rail);
+    rail.addEventListener("click", function (event) {
+        const btn = event.target.closest("[data-key]");
+        if (!btn) return;
+        const patch = {};
+        patch[btn.getAttribute("data-key")] = btn.getAttribute("data-next") === "1";
+        saveLive(patch);
+    });
+    document.getElementById("rail-close-all").addEventListener("click", function () {
+        const patch = {};
+        RAIL.forEach(function (item) { patch[item[0]] = false; });
+        saveLive(patch);
+    });
+    document.getElementById("rail-logout").addEventListener("click", function () {
+        gateDb.auth.signOut().then(function () { location.href = adminPath(); });
+    });
+    paintRail();
+}
+
+function bindGateFeed() {
+    pullGates();
+    gateDb.channel("workshop-gates")
+        .on("postgres_changes", { event: "*", schema: "public", table: "workshop_gates" }, function (payload) {
+            if (payload.new) rememberGates(payload.new);
+        })
+        .subscribe();
+    setInterval(pullGates, 3000);
 }
 
 function pullGates() {
@@ -667,16 +771,26 @@ function pullGates() {
 }
 
 function startGates() {
-    render();
-    if (!window.supabase || !window.supabase.createClient) return;
+    if (!window.supabase || !window.supabase.createClient) {
+        render();
+        return;
+    }
     gateDb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    pullGates();
-    gateDb.channel("workshop-gates")
-        .on("postgres_changes", { event: "*", schema: "public", table: "workshop_gates" }, function (payload) {
-            if (payload.new) rememberGates(payload.new);
-        })
-        .subscribe();
-    setInterval(pullGates, 3000);
+    if (HOST) {
+        document.body.classList.add("host-mode");
+        gateDb.auth.getSession().then(function (res) {
+            if (!res.data.session) {
+                location.href = adminPath();
+                return;
+            }
+            render();
+            mountRail();
+            bindGateFeed();
+        });
+        return;
+    }
+    render();
+    bindGateFeed();
 }
 
 function vibeToolsMarkup() {
@@ -945,6 +1059,7 @@ function segBar(items) {
 }
 
 function helpOpen() {
+    if (HOST) return true;
     try { return sessionStorage.getItem("pcws-lock-help") === "1"; } catch (e) { return false; }
 }
 
