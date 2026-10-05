@@ -192,6 +192,7 @@
     .make-block { margin: 0 0 16px; }
     .make-block h3 { margin: 0 0 6px; color: var(--goai-blue); font-size: 1.15rem; }
     .make-block textarea { min-height: 96px; resize: vertical; }
+    #make-prompt { display: block; resize: none; overflow: auto; }
     .make-hint { margin: 0 0 8px; color: #4a5568; font-weight: 700; line-height: 1.55; }
     .make-examples { margin-top: 8px; }
     .make-examples .lede { text-align: left; margin-bottom: 10px; }
@@ -1270,7 +1271,30 @@ function makeExamples() {
     return state.band === "sec" ? MAKE_EXAMPLES_SEC : MAKE_EXAMPLES_PRI;
 }
 
+function splitMakePrompt(text) {
+    const src = String(text || "").replace(/\r\n/g, "\n");
+    const taskMark = "\n# 背景與任務\n";
+    const limitMark = "\n# 指導與限制\n";
+    const taskAt = src.indexOf(taskMark);
+    const limitAt = src.indexOf(limitMark);
+    function body(chunk) { return chunk.replace(/\n+$/, ""); }
+    if (taskAt < 0 || limitAt < taskAt) return { role: body(src.replace(/^# 角色\n/, "")), task: "", limit: "" };
+    return {
+        role: body(src.slice(0, taskAt).replace(/^# 角色\n/, "")),
+        task: body(src.slice(taskAt + taskMark.length, limitAt)),
+        limit: body(src.slice(limitAt + limitMark.length))
+    };
+}
+
 function syncMakeFields() {
+    const whole = document.getElementById("make-prompt");
+    if (whole) {
+        const parts = splitMakePrompt(whole.value);
+        state.makeRole = parts.role;
+        state.makeTask = parts.task;
+        state.makeLimit = parts.limit;
+        return;
+    }
     const role = document.getElementById("make-role");
     const task = document.getElementById("make-task");
     const limit = document.getElementById("make-limit");
@@ -1317,18 +1341,11 @@ function renderMake() {
             '<div class="btn-row"><button type="button" class="primary-btn" data-action="unlock" data-value="help">確認</button>' +
             '<button type="button" class="ghost-btn" data-action="close-make-help">關閉</button></div></div></div>';
     const guided = state.makeExample === "base";
-    const roleHint = guided
-        ? "這是導師的身份，會連同下面兩段一併複製。"
-        : "你希望 AI 是甚麼身份？例如：擅長製作哪一科教育遊戲的前端工程師？";
-    const taskHint = guided
-        ? "這是導師的提問步驟。貼到 Gemini 後，每次只答一題。"
-        : "遊戲叫甚麼名字？畫面像甚麼？想要甚麼風格？遊戲機制可以寫四點：玩家是誰、要做甚麼動作？答對和答錯分別發生甚麼，遊戲幾時結束？連續答對有甚麼獎勵，難度怎樣提升？題目從哪裡來，玩完看到甚麼？";
-    const limitHint = guided
-        ? "這是導師的規則，同最後要生成的遊戲 Prompt 格式。"
-        : "用甚麼語言、給哪個年級？要支援滑鼠、觸控、手機和電腦嗎？程式要不要放在單一檔案？答案和動畫有甚麼規則？";
-    const guideNote = guided
-        ? '<p class="make-hint">請按「複製全部」，整份貼到 Gemini 對話，再按 AI 的問題一步步構思遊戲。</p>'
-        : "";
+    const fields = guided
+        ? '<p class="make-hint">請按「複製全部」，整份貼到 Gemini 對話，再按 AI 的問題一步步構思遊戲。</p><textarea id="make-prompt">' + escapeHtml(makePromptText()) + "</textarea>"
+        : '<div class="make-block"><h3># 角色</h3><p class="make-hint">你希望 AI 是甚麼身份？例如：擅長製作哪一科教育遊戲的前端工程師？</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
+            '<div class="make-block"><h3># 背景與任務</h3><p class="make-hint">遊戲叫甚麼名字？畫面像甚麼？想要甚麼風格？遊戲機制可以寫四點：玩家是誰、要做甚麼動作？答對和答錯分別發生甚麼，遊戲幾時結束？連續答對有甚麼獎勵，難度怎樣提升？題目從哪裡來，玩完看到甚麼？</p><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea></div>" +
+            '<div class="make-block"><h3># 指導與限制</h3><p class="make-hint">用甚麼語言、給哪個年級？要支援滑鼠、觸控、手機和電腦嗎？程式要不要放在單一檔案？答案和動畫有甚麼規則？</p><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea></div>";
     return '<div class="make-layout"><div class="make-side">' +
         '<div class="chip-row">' +
         blankBtn +
@@ -1337,10 +1354,7 @@ function renderMake() {
         examples +
         "</div>" +
         '</div><div class="make-main">' +
-        guideNote +
-        '<div class="make-block"><h3># 角色</h3><p class="make-hint">' + roleHint + '</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
-        '<div class="make-block"><h3># 背景與任務</h3><p class="make-hint">' + taskHint + '</p><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea></div>" +
-        '<div class="make-block"><h3># 指導與限制</h3><p class="make-hint">' + limitHint + '</p><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea></div>" +
+        fields +
         '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy-make">' + icon("copy") + "複製全部</button>" +
         (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div>" +
         "</div></div>" + modal;
@@ -1406,27 +1420,12 @@ function promptContentHeight(el) {
 function sizePromptAreas() {
     const level3 = document.getElementById("play-high");
     if (level3) level3.style.height = (promptContentHeight(level3) + 8) + "px";
-    if (state.makeExample === "base") {
-        ["make-role", "make-task", "make-limit"].forEach(function (id) {
-            const el = document.getElementById(id);
-            if (el) el.style.height = (promptContentHeight(el) + 8) + "px";
-        });
-    }
     const make = document.getElementById("make-prompt");
     if (make) {
-        const panel = make.closest(".panel");
-        const makeTop = make.getBoundingClientRect().top + window.scrollY;
-        const afterBox = panel
-            ? panel.getBoundingClientRect().bottom - make.getBoundingClientRect().bottom
-            : 140;
-        const available = window.innerHeight - makeTop - afterBox - 16;
-        const full = promptContentHeight(make);
-        make.style.height = Math.max(120, Math.min(full, Math.round(available))) + "px";
-        const overflow = document.documentElement.scrollHeight - window.innerHeight;
-        if (overflow > 0) {
-            const next = parseFloat(make.style.height) - overflow - 4;
-            make.style.height = Math.max(96, Math.round(next)) + "px";
-        }
+        const row = make.parentElement.querySelector(".btn-row");
+        const rowH = row ? row.offsetHeight : 48;
+        const available = window.innerHeight - make.getBoundingClientRect().top - rowH - 28;
+        make.style.height = Math.max(160, Math.round(available)) + "px";
     }
 }
 
