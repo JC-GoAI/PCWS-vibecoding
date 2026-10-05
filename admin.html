@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活動控制</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <style>
+    :root { --goai-blue: #022169; --goai-blue-hover: #12338f; --goai-yellow: #fecf13; --grey: #f4f6fa; }
+    body {
+        font-family: "PingFang HK", "Helvetica Neue", "Microsoft JhengHei", sans-serif;
+        margin: 0; background: var(--grey); color: #1a202c;
+    }
+    header { background: var(--goai-blue); color: #fff; padding: 22px 24px; }
+    header h1 { margin: 0; font-size: 1.5rem; }
+    header p { margin: 6px 0 0; color: #cbd5e1; }
+    main { width: min(720px, calc(100% - 32px)); margin: 24px auto 40px; }
+    .card {
+        background: #fff; border-radius: 24px; padding: 24px;
+        box-shadow: 0 10px 25px rgba(10, 34, 102, 0.05);
+    }
+    label { display: block; font-weight: 800; color: var(--goai-blue); margin: 14px 0 8px; }
+    input {
+        width: 100%; box-sizing: border-box; border: 2px solid #e2e8f0; border-radius: 12px;
+        padding: 12px; font: inherit;
+    }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid #eef2f7; }
+    .row strong { display: block; color: var(--goai-blue); }
+    .row span { color: #64748b; font-weight: 700; font-size: 0.92rem; }
+    button {
+        min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; cursor: pointer;
+        font: inherit; font-weight: 800;
+    }
+    .primary { background: var(--goai-blue); color: #fff; }
+    .primary:hover { background: var(--goai-blue-hover); }
+    .ghost { background: #fff; color: var(--goai-blue); border: 2px solid #cbd5e1; }
+    .on { background: #166534; color: #fff; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .error { color: #c53030; font-weight: 700; white-space: pre-wrap; }
+    .hint { background: #eef3ff; color: var(--goai-blue); border-radius: 12px; padding: 12px 14px; font-weight: 700; line-height: 1.55; }
+    code { display: block; margin-top: 10px; white-space: pre-wrap; font-size: 0.85rem; }
+    [hidden] { display: none !important; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>活動控制</h1>
+    <p>撳一下，全場活動頁會跟着開放或收回。</p>
+</header>
+<main>
+    <section class="card" id="login-card">
+        <p class="hint">用你在 Supabase 建立的控制頁電郵和密碼登入。</p>
+        <form id="login-form">
+            <label for="email">電郵</label>
+            <input id="email" type="email" autocomplete="username" required>
+            <label for="password">密碼</label>
+            <input id="password" type="password" autocomplete="current-password" required>
+            <div class="actions"><button class="primary" type="submit">登入</button></div>
+        </form>
+        <p class="error" id="login-error" hidden></p>
+    </section>
+    <section class="card" id="gate-card" hidden>
+        <div id="gate-list"></div>
+        <p class="error" id="gate-error" hidden></p>
+        <div class="actions">
+            <button class="ghost" type="button" id="close-all">全部收回</button>
+            <button class="ghost" type="button" id="logout">登出</button>
+        </div>
+    </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://ujpxuvwjsmdfzeesbuaq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_dhv0taIRqqrxArJ_76-ycw_7cSNW02B";
+const GATES = [
+    ["level1", "Go Play：Level 1"],
+    ["level2", "Go Play：Level 2"],
+    ["level3", "Go Play：Level 3"],
+    ["game", "Go Play：互動學習遊戲"],
+    ["game_prompt", "遊戲 Prompt 及代碼"],
+    ["make", "Go Make：親子共創"],
+    ["make_help", "Go Make 例子"]
+];
+const GRANT_SQL = "grant select on public.workshop_gates to anon, authenticated;\ngrant update on public.workshop_gates to authenticated;";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let row = null;
+
+function show(id, on) { document.getElementById(id).hidden = !on; }
+
+function showError(id, text) {
+    const el = document.getElementById(id);
+    el.hidden = !text;
+    el.textContent = text || "";
+}
+
+function renderGates() {
+    document.getElementById("gate-list").innerHTML = GATES.map(function (item) {
+        const open = !!(row && row[item[0]]);
+        return '<div class="row"><div><strong>' + item[1] + '</strong><span>' + (open ? "已開放" : "未開放") + '</span></div>' +
+            '<button type="button" class="' + (open ? "on" : "primary") + '" data-key="' + item[0] + '" data-next="' + (open ? "0" : "1") + '">' +
+            (open ? "收回" : "開放") + "</button></div>";
+    }).join("");
+}
+
+function explain(error) {
+    if (!error) return "";
+    if (error.code === "42501" || /permission denied/i.test(error.message || "")) {
+        return "後台未允許讀取或更改開關。請到 Supabase 的 SQL Editor 執行：\n" + GRANT_SQL;
+    }
+    return error.message || "未能連接後台。";
+}
+
+async function loadGates() {
+    const res = await db.from("workshop_gates").select("*").eq("id", 1).maybeSingle();
+    if (res.error) {
+        showError("gate-error", explain(res.error));
+        return;
+    }
+    if (!res.data) {
+        showError("gate-error", "找不到開關記錄。請確認 workshop_gates 有一行 id 為 1 的資料。");
+        return;
+    }
+    showError("gate-error", "");
+    row = res.data;
+    renderGates();
+}
+
+async function save(patch) {
+    showError("gate-error", "");
+    const res = await db.from("workshop_gates").update(patch).eq("id", 1).select("*").maybeSingle();
+    if (res.error) {
+        showError("gate-error", explain(res.error));
+        return;
+    }
+    if (!res.data) {
+        showError("gate-error", "已登入，但未能更改開關。請到 Supabase 的 SQL Editor 執行：\n" + GRANT_SQL);
+        return;
+    }
+    row = res.data;
+    renderGates();
+}
+
+async function showApp(session) {
+    show("login-card", !session);
+    show("gate-card", !!session);
+    if (session) await loadGates();
+}
+
+document.getElementById("login-form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+    showError("login-error", "");
+    const res = await db.auth.signInWithPassword({
+        email: document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value
+    });
+    if (res.error) {
+        showError("login-error", "登入失敗。請核對電郵和密碼。");
+        return;
+    }
+    await showApp(res.data.session);
+});
+
+document.getElementById("gate-list").addEventListener("click", function (event) {
+    const btn = event.target.closest("[data-key]");
+    if (!btn) return;
+    const patch = {};
+    patch[btn.getAttribute("data-key")] = btn.getAttribute("data-next") === "1";
+    save(patch);
+});
+
+document.getElementById("close-all").addEventListener("click", function () {
+    const patch = {};
+    GATES.forEach(function (item) { patch[item[0]] = false; });
+    save(patch);
+});
+
+document.getElementById("logout").addEventListener("click", async function () {
+    await db.auth.signOut();
+    row = null;
+    showApp(null);
+});
+
+db.auth.getSession().then(function (res) { showApp(res.data.session); });
+</script>
+</body>
+</html>
