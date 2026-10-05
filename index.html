@@ -79,21 +79,30 @@
     body.host-mode .admin-link { display: none; }
     #host-rail {
         width: calc(100% - 48px); margin: 18px auto 0; background: #fff; border-radius: 24px;
-        box-shadow: 0 10px 25px rgba(10, 34, 102, 0.03); padding: 20px 24px 8px; box-sizing: border-box;
+        box-shadow: 0 10px 25px rgba(10, 34, 102, 0.03); padding: 12px 20px; box-sizing: border-box;
     }
-    #host-rail .rail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-    #host-rail h2 { margin: 0; color: var(--goai-blue); font-size: 1.2rem; }
-    #host-rail .rail-note { margin: 6px 0 0; color: #64748b; font-weight: 700; font-size: 0.85rem; line-height: 1.45; }
+    #host-rail .rail-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 40px; }
+    #host-rail h2 { margin: 0; color: var(--goai-blue); font-size: 1.15rem; }
     #host-rail .rail-actions { display: flex; flex-wrap: wrap; gap: 8px; flex: 0 0 auto; }
-    #host-rail .rail-groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 14px; }
-    #host-rail .rail-group h3 { margin: 0 0 4px; color: var(--goai-blue); font-size: 1rem; }
-    #host-rail .rail-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; }
-    #host-rail .rail-row strong { color: var(--goai-blue); font-size: 0.95rem; }
-    #host-rail .rail-state {
-        flex: 0 0 auto; min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px;
-        background: #e2e8f0; color: #64748b; font: inherit; font-weight: 800; font-size: 0.92rem; cursor: pointer;
+    #host-rail .rail-actions .ghost-btn { min-height: 34px; padding: 0 14px; font-size: 0.9rem; }
+    #host-rail .rail-groups { margin-top: 4px; }
+    #host-rail .rail-group {
+        display: flex; align-items: center; gap: 16px; min-height: 42px; padding: 6px 0;
+        border-top: 1px solid #e6eaf1;
     }
-    #host-rail .rail-state.is-open { background: var(--goai-blue); color: #fff; }
+    #host-rail .rail-group h3 { margin: 0; flex: 0 0 230px; color: var(--goai-blue); font-size: 0.95rem; }
+    #host-rail .rail-items { display: flex; align-items: center; gap: 18px; min-width: 0; overflow-x: auto; }
+    #host-rail .rail-item { display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto; color: var(--goai-blue); font-weight: 800; font-size: 0.92rem; white-space: nowrap; }
+    #host-rail .rail-switch {
+        position: relative; width: 51px; height: 31px; padding: 0; border: 0; border-radius: 16px;
+        background: #e9e9ea; cursor: pointer; flex: 0 0 auto;
+    }
+    #host-rail .rail-switch::after {
+        content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%;
+        background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.22); transition: transform 0.2s ease;
+    }
+    #host-rail .rail-switch.is-open { background: #34c759; }
+    #host-rail .rail-switch.is-open::after { transform: translateX(20px); }
     #app { width: calc(100% - 48px); max-width: none; margin: 18px auto 0; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
     .column {
         background: var(--white); padding: 28px; border-radius: 24px;
@@ -276,9 +285,8 @@
         .header-logo { height: 64px; }
         .header-text { text-align: center; }
         .admin-link { top: 8px; right: 8px; min-height: 32px; padding: 0 10px; font-size: 0.78rem; }
-        #host-rail { width: calc(100% - 24px); padding: 16px 16px 8px; }
-        #host-rail .rail-head { flex-direction: column; }
-        #host-rail .rail-groups { grid-template-columns: 1fr; }
+        #host-rail { width: calc(100% - 24px); padding: 10px 14px; }
+        #host-rail .rail-group h3 { flex-basis: 148px; font-size: 0.82rem; }
         header h1 { font-size: 1.35rem; }
         .cartoon-shape {
             position: relative; display: inline-block; margin: 5px;
@@ -320,16 +328,16 @@ function adminPath() {
     return (path.endsWith("/") ? path : path + "/") + "admin";
 }
 const RAIL_GROUPS = [
-    ["Go Play 提示詞", [
+    ["Go Play：引導式提示詞", [
         ["level1", "Level 1"],
         ["level2", "Level 2"],
         ["level3", "Level 3"]
     ]],
-    ["Go Play 遊戲", [
+    ["Go Play：互動學習遊戲", [
         ["game", "互動學習遊戲"],
         ["game_prompt", "遊戲 Prompt"]
     ]],
-    ["Go Make", [
+    ["Go Make：親子共創", [
         ["make", "親子共創"],
         ["make_help", "AI指導"]
     ]]
@@ -708,13 +716,12 @@ function paintRail() {
     const list = document.getElementById("rail-list");
     if (!list) return;
     list.innerHTML = RAIL_GROUPS.map(function (group) {
-        return '<section class="rail-group"><h3>' + group[0] + "</h3>" +
+        return '<section class="rail-group"><h3>' + group[0] + '</h3><div class="rail-items">' +
             group[1].map(function (item) {
                 const open = !!liveGates[item[0]];
-                return '<div class="rail-row"><strong>' + item[1] + "</strong>" +
-                    '<button type="button" class="rail-state' + (open ? " is-open" : "") + '" data-key="' + item[0] + '" data-next="' + (open ? "0" : "1") + '">' +
-                    (open ? "已開放" : "未開放") + "</button></div>";
-            }).join("") + "</section>";
+                return '<div class="rail-item"><span>' + item[1] + "</span>" +
+                    '<button type="button" class="rail-switch' + (open ? " is-open" : "") + '" aria-pressed="' + (open ? "true" : "false") + '" aria-label="' + item[1] + '" data-key="' + item[0] + '" data-next="' + (open ? "0" : "1") + '"></button></div>';
+            }).join("") + "</div></section>";
     }).join("");
 }
 
@@ -740,7 +747,7 @@ function mountRail() {
     if (document.getElementById("host-rail")) return;
     const rail = document.createElement("aside");
     rail.id = "host-rail";
-    rail.innerHTML = '<div class="rail-head"><div><h2>現場開關</h2><p class="rail-note">這一列只控制參加者。這一頁仍然看得到全部內容。</p></div><div class="rail-actions"><button type="button" class="ghost-btn" id="rail-close-all">全部收回</button><button type="button" class="ghost-btn" id="rail-logout">登出</button></div></div><div class="rail-groups" id="rail-list"></div><p class="error-text" id="rail-error" hidden></p>';
+    rail.innerHTML = '<div class="rail-head"><h2>現場開關</h2><div class="rail-actions"><button type="button" class="ghost-btn" id="rail-close-all">全部收回</button><button type="button" class="ghost-btn" id="rail-logout">登出</button></div></div><div class="rail-groups" id="rail-list"></div><p class="error-text" id="rail-error" hidden></p>';
     const header = document.querySelector("header");
     if (header) header.insertAdjacentElement("afterend", rail);
     else document.body.insertBefore(rail, document.body.firstChild);
