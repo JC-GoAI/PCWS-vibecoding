@@ -78,7 +78,8 @@ const GATES = [
     ["level3", "Go Play：Level 3"],
     ["game", "Go Play：互動學習遊戲"],
     ["game_prompt", "遊戲 Prompt 及代碼"],
-    ["make", "Go Make：親子共創"]
+    ["make", "Go Make：親子共創"],
+    ["make_help", "Go Make：AI指導"]
 ];
 const GRANT_SQL = "grant select on public.workshop_gates to anon, authenticated;\ngrant update on public.workshop_gates to authenticated;";
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
