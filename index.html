@@ -332,10 +332,11 @@ function makeGrade() {
 }
 
 function makeScaffold() {
+    const grade = makeGrade();
     return {
-        role: "你是一位擅長製作______教育遊戲的前端工程師。",
-        task: "請建立可直接遊玩的單頁遊戲《______》：______。畫面要有遊戲感，不要像測驗卷或工作紙。\n遊戲機制：\n1. 玩家是______。畫面上有______。玩家要______。\n2. 答對就______。答錯就______。______就遊戲結束。\n3. 連續答對會______。難度會______。\n4. 題目包括______。結束後先顯示______。",
-        limit: "- 香港書面語繁體中文，適合" + makeGrade() + "\n- 支援滑鼠、觸控、手機及電腦\n- HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n- 每題只有一個正確答案\n- 動畫要流暢：物件移動、答對有反應、答錯有反應、得分特效"
+        role: "你是親切的「遊戲設計導師」，請用引導和問答方式，帶領" + grade + "學生與家長一起 Vibe Coding 構思遊戲。",
+        task: "一步步提問並引導使用者，最後幫他們生成一份可直接貼入 Gemini Canvas 的遊戲 Prompt Markdown。\n\n請分階段執行，**每次只問一個問題，並附上 3-5 個建議選項**供他們選擇，建議要跟住他們剛才的答案來想。每題最後都加上「或者你自己講」。他們已經講清楚的部分，就跳過。問題包括：\n1. **學習難題**：詢問最近在學習上（如中文成語、英文、數學分數等）有什麼覺得難記或想溫習的課題？你不肯定的內容，請他們提供例子，不要自己編。\n2. **主題場景**：根據課題，詢問想設定在什麼有趣故事或場景？\n3. **玩法機制**：玩家怎樣操作？答對會怎樣，答錯會怎樣，遊戲怎樣結束？連續答對有沒有獎勵，後面會不會難一點？\n4. **生成 Prompt**：收集完後，用三句話覆述課題、場景和玩法，然後問「可以生成Prompt嗎？」得到同意後，才輸出最終的 Prompt Markdown。",
+        limit: "- **語言**：香港書面語繁體中文，親切易懂，適合" + grade + "學生和家長一起看。\n- **節奏**：一問一答，絕不一次過問多個問題。未得到同意前，只可以對話，不要輸出 HTML、CSS 或 JavaScript。\n- 遊戲機制要寫滿四點；題目必須來自他們提供的課題和例子。\n- **最終輸出格式**：必須嚴格符合以下結構：\n\n  ```markdown\n  # 角色\n  你是一位擅長製作[學科/主題]教育遊戲的前端工程師。\n\n  # 背景與任務\n  請建立可直接遊玩的單頁遊戲《[遊戲名稱]》：[視覺風格與畫面要求]。畫面要有遊戲感，不要像工作紙。\n  遊戲機制：[詳細描述故事、操作、得分/Combo、勝負條件、難度遞增與題目來源]。\n\n  # 指導與限制\n  - 香港書面語繁體中文，適合" + grade + "\n  - 支援滑鼠、觸控、手機及電腦\n  - HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n  ```"
     };
 }
 
@@ -1328,10 +1329,24 @@ function renderMake() {
             '<p class="error-text" hidden>密碼不正確</p>' +
             '<div class="btn-row"><button type="button" class="primary-btn" data-action="unlock" data-value="help">確認</button>' +
             '<button type="button" class="ghost-btn" data-action="close-make-help">關閉</button></div></div></div>';
+    const guided = state.makeExample === "base";
+    const roleHint = guided
+        ? "這是導師的身份，會連同下面兩段一併複製。"
+        : "你希望 AI 是甚麼身份？例如：擅長製作哪一科教育遊戲的前端工程師？";
+    const taskHint = guided
+        ? "這是導師的提問步驟。貼到 Gemini 後，每次只答一題。"
+        : "遊戲叫甚麼名字？畫面像甚麼？想要甚麼風格？遊戲機制可以寫四點：玩家是誰、要做甚麼動作？答對和答錯分別發生甚麼，遊戲幾時結束？連續答對有甚麼獎勵，難度怎樣提升？題目從哪裡來，玩完看到甚麼？";
+    const limitHint = guided
+        ? "這是導師的規則，同最後要生成的遊戲 Prompt 格式。"
+        : "用甚麼語言、給哪個年級？要支援滑鼠、觸控、手機和電腦嗎？程式要不要放在單一檔案？答案和動畫有甚麼規則？";
+    const guideNote = guided
+        ? '<p class="make-hint">請按「複製全部」，整份貼到 Gemini 對話，再按 AI 的問題一步步構思遊戲。</p>'
+        : "";
     return '<div class="make-layout"><div class="make-main">' +
-        '<div class="make-block"><h3># 角色</h3><p class="make-hint">你希望 AI 是甚麼身份？例如：擅長製作哪一科教育遊戲的前端工程師？</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
-        '<div class="make-block"><h3># 背景與任務</h3><p class="make-hint">遊戲叫甚麼名字？畫面像甚麼？想要甚麼風格？遊戲機制可以寫四點：玩家是誰、要做甚麼動作？答對和答錯分別發生甚麼，遊戲幾時結束？連續答對有甚麼獎勵，難度怎樣提升？題目從哪裡來，玩完看到甚麼？</p><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea></div>" +
-        '<div class="make-block"><h3># 指導與限制</h3><p class="make-hint">用甚麼語言、給哪個年級？要支援滑鼠、觸控、手機和電腦嗎？程式要不要放在單一檔案？答案和動畫有甚麼規則？</p><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea></div>" +
+        guideNote +
+        '<div class="make-block"><h3># 角色</h3><p class="make-hint">' + roleHint + '</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
+        '<div class="make-block"><h3># 背景與任務</h3><p class="make-hint">' + taskHint + '</p><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea></div>" +
+        '<div class="make-block"><h3># 指導與限制</h3><p class="make-hint">' + limitHint + '</p><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea></div>" +
         '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy-make">' + icon("copy") + "複製全部</button>" +
         (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div>" +
         examples +
@@ -1399,6 +1414,12 @@ function promptContentHeight(el) {
 function sizePromptAreas() {
     const level3 = document.getElementById("play-high");
     if (level3) level3.style.height = (promptContentHeight(level3) + 8) + "px";
+    if (state.makeExample === "base") {
+        ["make-role", "make-task", "make-limit"].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.style.height = (promptContentHeight(el) + 8) + "px";
+        });
+    }
     const make = document.getElementById("make-prompt");
     if (make) {
         const panel = make.closest(".panel");
