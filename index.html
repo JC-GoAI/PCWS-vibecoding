@@ -1352,14 +1352,7 @@ function renderMake() {
     const guideNote = guided
         ? '<p class="make-hint">請按「複製全部」，整份貼到 Gemini 對話，再按 AI 的問題一步步構思遊戲。</p>'
         : "";
-    return '<div class="make-layout"><div class="make-main">' +
-        guideNote +
-        '<div class="make-block"><h3># 角色</h3><p class="make-hint">' + roleHint + '</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
-        '<div class="make-block"><h3># 背景與任務</h3><p class="make-hint">' + taskHint + '</p><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea></div>" +
-        '<div class="make-block"><h3># 指導與限制</h3><p class="make-hint">' + limitHint + '</p><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea></div>" +
-        '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy-make">' + icon("copy") + "複製全部</button>" +
-        (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div>" +
-        "</div><div class=\"make-side\">" +
+    return '<div class="make-layout"><div class="make-side">' +
         '<div class="chip-row">' +
         '<button type="button" class="pill-btn' + (state.makeTips ? " on" : "") + '" data-action="toggle-tips" aria-expanded="' + (state.makeTips ? "true" : "false") + '">小錦囊</button>' +
         blankBtn +
@@ -1368,6 +1361,13 @@ function renderMake() {
         examples +
         "</div>" +
         tips +
+        '</div><div class="make-main">' +
+        guideNote +
+        '<div class="make-block"><h3># 角色</h3><p class="make-hint">' + roleHint + '</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
+        '<div class="make-block"><h3># 背景與任務</h3><p class="make-hint">' + taskHint + '</p><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea></div>" +
+        '<div class="make-block"><h3># 指導與限制</h3><p class="make-hint">' + limitHint + '</p><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea></div>" +
+        '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy-make">' + icon("copy") + "複製全部</button>" +
+        (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div>" +
         "</div></div>" + modal;
 }
 
