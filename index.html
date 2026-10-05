@@ -76,25 +76,24 @@
     }
     .admin-link:hover { filter: brightness(1.05); }
     .admin-link:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
-    body.host-mode { padding-left: 280px; box-sizing: border-box; }
     body.host-mode .admin-link { display: none; }
     #host-rail {
-        position: fixed; top: 0; left: 0; bottom: 0; width: 280px; z-index: 30;
-        background: #fff; border-right: 1px solid #e2e8f0;
-        box-shadow: 8px 0 24px rgba(2, 33, 105, 0.06);
-        padding: 18px 16px 28px; box-sizing: border-box; overflow: auto;
+        width: calc(100% - 48px); margin: 18px auto 0; background: #fff; border-radius: 24px;
+        box-shadow: 0 10px 25px rgba(10, 34, 102, 0.03); padding: 20px 24px 8px; box-sizing: border-box;
     }
-    #host-rail h2 { margin: 0 0 6px; color: var(--goai-blue); font-size: 1.2rem; }
-    #host-rail .rail-note { margin: 0 0 8px; color: #64748b; font-weight: 700; font-size: 0.85rem; line-height: 1.45; }
-    #host-rail .rail-row { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 12px 0; border-bottom: 1px solid #eef2f7; }
-    #host-rail .rail-row strong { color: var(--goai-blue); }
-    #host-rail .rail-row button { width: 100%; }
-    #host-rail .rail-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
-    #host-rail .is-open { background: #166534; color: #fff; border-color: #166534; }
-    @media (max-width: 800px) {
-        body.host-mode { padding-left: 0; }
-        #host-rail { position: sticky; top: 0; left: auto; bottom: auto; width: 100%; height: auto; max-height: 42vh; border-right: 0; border-bottom: 1px solid #e2e8f0; box-shadow: none; }
+    #host-rail .rail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    #host-rail h2 { margin: 0; color: var(--goai-blue); font-size: 1.2rem; }
+    #host-rail .rail-note { margin: 6px 0 0; color: #64748b; font-weight: 700; font-size: 0.85rem; line-height: 1.45; }
+    #host-rail .rail-actions { display: flex; flex-wrap: wrap; gap: 8px; flex: 0 0 auto; }
+    #host-rail .rail-groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 14px; }
+    #host-rail .rail-group h3 { margin: 0 0 4px; color: var(--goai-blue); font-size: 1rem; }
+    #host-rail .rail-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; }
+    #host-rail .rail-row strong { color: var(--goai-blue); font-size: 0.95rem; }
+    #host-rail .rail-state {
+        flex: 0 0 auto; min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px;
+        background: #e2e8f0; color: #64748b; font: inherit; font-weight: 800; font-size: 0.92rem; cursor: pointer;
     }
+    #host-rail .rail-state.is-open { background: var(--goai-blue); color: #fff; }
     #app { width: calc(100% - 48px); max-width: none; margin: 18px auto 0; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; }
     .column {
         background: var(--white); padding: 28px; border-radius: 24px;
@@ -277,6 +276,9 @@
         .header-logo { height: 64px; }
         .header-text { text-align: center; }
         .admin-link { top: 8px; right: 8px; min-height: 32px; padding: 0 10px; font-size: 0.78rem; }
+        #host-rail { width: calc(100% - 24px); padding: 16px 16px 8px; }
+        #host-rail .rail-head { flex-direction: column; }
+        #host-rail .rail-groups { grid-template-columns: 1fr; }
         header h1 { font-size: 1.35rem; }
         .cartoon-shape {
             position: relative; display: inline-block; margin: 5px;
@@ -317,14 +319,20 @@ function adminPath() {
     const path = location.pathname.replace(/\/index\.html$/, "/");
     return (path.endsWith("/") ? path : path + "/") + "admin";
 }
-const RAIL = [
-    ["level1", "Level 1"],
-    ["level2", "Level 2"],
-    ["level3", "Level 3"],
-    ["game", "互動學習遊戲"],
-    ["game_prompt", "遊戲 Prompt 及代碼"],
-    ["make", "Go Make"],
-    ["make_help", "Go Make：AI指導"]
+const RAIL_GROUPS = [
+    ["Go Play 提示詞", [
+        ["level1", "Level 1"],
+        ["level2", "Level 2"],
+        ["level3", "Level 3"]
+    ]],
+    ["Go Play 遊戲", [
+        ["game", "互動學習遊戲"],
+        ["game_prompt", "遊戲 Prompt"]
+    ]],
+    ["Go Make", [
+        ["make", "親子共創"],
+        ["make_help", "AI指導"]
+    ]]
 ];
 if (HOST) GATE_KEYS.forEach(function (key) { gates[key] = true; });
 function makeGrade() {
@@ -699,11 +707,14 @@ function rememberGates(row) {
 function paintRail() {
     const list = document.getElementById("rail-list");
     if (!list) return;
-    list.innerHTML = RAIL.map(function (item) {
-        const open = !!liveGates[item[0]];
-        return '<div class="rail-row"><strong>' + item[1] + "</strong>" +
-            '<button type="button" class="' + (open ? "primary-btn is-open" : "ghost-btn") + '" data-key="' + item[0] + '" data-next="' + (open ? "0" : "1") + '">' +
-            (open ? "收回" : "開放") + "</button></div>";
+    list.innerHTML = RAIL_GROUPS.map(function (group) {
+        return '<section class="rail-group"><h3>' + group[0] + "</h3>" +
+            group[1].map(function (item) {
+                const open = !!liveGates[item[0]];
+                return '<div class="rail-row"><strong>' + item[1] + "</strong>" +
+                    '<button type="button" class="rail-state' + (open ? " is-open" : "") + '" data-key="' + item[0] + '" data-next="' + (open ? "0" : "1") + '">' +
+                    (open ? "已開放" : "未開放") + "</button></div>";
+            }).join("") + "</section>";
     }).join("");
 }
 
@@ -729,8 +740,10 @@ function mountRail() {
     if (document.getElementById("host-rail")) return;
     const rail = document.createElement("aside");
     rail.id = "host-rail";
-    rail.innerHTML = '<h2>現場開關</h2><p class="rail-note">這一頁看得到全部內容。左邊的掣只控制參加者。</p><div id="rail-list"></div><p class="error-text" id="rail-error" hidden></p><div class="rail-actions"><button type="button" class="ghost-btn" id="rail-close-all">全部收回</button><button type="button" class="ghost-btn" id="rail-logout">登出</button></div>';
-    document.body.insertBefore(rail, document.body.firstChild);
+    rail.innerHTML = '<div class="rail-head"><div><h2>現場開關</h2><p class="rail-note">這一列只控制參加者。這一頁仍然看得到全部內容。</p></div><div class="rail-actions"><button type="button" class="ghost-btn" id="rail-close-all">全部收回</button><button type="button" class="ghost-btn" id="rail-logout">登出</button></div></div><div class="rail-groups" id="rail-list"></div><p class="error-text" id="rail-error" hidden></p>';
+    const header = document.querySelector("header");
+    if (header) header.insertAdjacentElement("afterend", rail);
+    else document.body.insertBefore(rail, document.body.firstChild);
     rail.addEventListener("click", function (event) {
         const btn = event.target.closest("[data-key]");
         if (!btn) return;
@@ -739,8 +752,11 @@ function mountRail() {
         saveLive(patch);
     });
     document.getElementById("rail-close-all").addEventListener("click", function () {
+        if (!window.confirm("收回全部項目？")) return;
         const patch = {};
-        RAIL.forEach(function (item) { patch[item[0]] = false; });
+        RAIL_GROUPS.forEach(function (group) {
+            group[1].forEach(function (item) { patch[item[0]] = false; });
+        });
         saveLive(patch);
     });
     document.getElementById("rail-logout").addEventListener("click", function () {

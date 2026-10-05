@@ -10,10 +10,16 @@
     body {
         font-family: "PingFang HK", "Helvetica Neue", "Microsoft JhengHei", sans-serif;
         margin: 0; background: var(--grey); color: #1a202c;
+        -webkit-font-smoothing: antialiased;
     }
-    header { background: var(--goai-blue); color: #fff; padding: 22px 24px; }
-    header h1 { margin: 0; font-size: 1.5rem; }
-    header p { margin: 6px 0 0; color: #cbd5e1; }
+    header {
+        background: var(--goai-blue); color: #fff; padding: 16px 24px;
+        border-radius: 0 0 16px 16px; box-shadow: 0 4px 15px rgba(2, 33, 105, 0.1);
+    }
+    .header-home { display: flex; align-items: center; justify-content: center; gap: 16px; }
+    .header-logo { height: 72px; width: auto; display: block; object-fit: contain; }
+    header h1 { margin: 0; font-size: 1.7rem; font-weight: 900; letter-spacing: 0.5px; line-height: 1.3; }
+    header p { margin: 4px 0 0; color: #cbd5e1; font-weight: 600; }
     main { width: min(720px, calc(100% - 32px)); margin: 24px auto 40px; }
     .card {
         background: #fff; border-radius: 24px; padding: 24px;
@@ -44,8 +50,13 @@
 </head>
 <body>
 <header>
-    <h1>活動控制</h1>
-    <p>撳一下，全場活動頁會跟着開放或收回。</p>
+    <div class="header-home">
+        <img src="../logo.jpg?v=crop" alt="" class="header-logo">
+        <div>
+            <h1>活動控制</h1>
+            <p>撳一下，全場活動頁會跟着開放或收回。</p>
+        </div>
+    </div>
 </header>
 <main>
     <section class="card" id="login-card">
