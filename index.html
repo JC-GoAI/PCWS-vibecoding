@@ -140,7 +140,10 @@
     .seg-btn.on { background: var(--goai-blue); color: #fff; box-shadow: 0 8px 18px rgba(2, 33, 105, 0.18); }
     .seg-btn:disabled { color: #94a3b8; cursor: not-allowed; }
     .chip-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 0 16px; }
+    .topic-line { margin: 4px 0 0; font-size: 1rem; line-height: 1.55; font-weight: 800; color: var(--goai-blue); text-align: center; }
     .src-line { margin: 16px 0 0; font-size: 0.78rem; line-height: 1.45; font-weight: 700; color: #64748b; text-align: center; }
+    .src-line.under-download { margin: 8px 0 4px; }
+    .src-line.under-topic { margin: 6px 0 2px; }
     .field .chip-row { justify-content: flex-start; margin-bottom: 0; }
     .tab-bar {
         display: flex; align-items: center; gap: 4px; background: #eef1f6;
@@ -1100,15 +1103,23 @@ function thumbLink(href, label) {
     return '<a class="thumb-card" download href="' + href + '"><img src="' + href + '" alt="' + label + '"><span>' + label + "</span></a>";
 }
 
+function sourceLine(subject, place) {
+    if (!subject || !subject.source) return "";
+    const extra = place === "download" ? " under-download" : place === "topic" ? " under-topic" : "";
+    return '<p class="src-line' + extra + '">' + escapeHtml(subject.source) + "</p>";
+}
+
 function subjectDownloads(id) {
+    const subject = playById(id);
+    const source = sourceLine(subject, "download");
     if (id === "eng") {
         return '<div class="thumb-row">' +
             thumbLink("refs/english-passage.jpg", "下載英文篇章") +
             thumbLink("refs/english-questions.jpg", "下載英文題目") +
-            "</div>";
+            "</div>" + source;
     }
     if (id === "math") {
-        return '<div class="thumb-row">' + thumbLink("refs/math-diagram.jpg", "下載數學題目圖") + "</div>";
+        return '<div class="thumb-row">' + thumbLink("refs/math-diagram.jpg", "下載數學題目圖") + "</div>" + source;
     }
     return "";
 }
@@ -1121,16 +1132,16 @@ function renderPrompting() {
     let panel = "";
     if (subject) {
         const mathNote = subject.id === "math" ? subject.hint : "";
-        const source = subject.source
-            ? '<p class="src-line">' + escapeHtml(subject.source) + "</p>"
+        const chineseIntro = subject.id === "chi"
+            ? '<p class="topic-line">題目：有一天，你和家人在家中吃晚餐時突然停電。請寫一篇文章，記述那一次的經歷和感受。</p>' + sourceLine(subject, "topic")
             : "";
         const anyLevel = gates.level1 || gates.level2 || gates.level3;
         panel = '<div class="panel">' +
             (anyLevel ? subjectDownloads(subject.id) : "") +
+            (anyLevel ? chineseIntro : "") +
             levelSlot("basic", "Level 1", subject.basic, "", "lv1", gates.level1) +
             levelSlot("mid", "Level 2", subject.mid, mathNote, "lv2", gates.level2) +
             levelSlot("high", "Level 3", subject.high(state.band), "", "lv3", gates.level3) +
-            (anyLevel ? source : "") +
             "</div>";
     }
     return chips +
