@@ -22,11 +22,12 @@
       --jade: #366d58;
     }
     
+    html, body { height: 100%; }
     body {
       font-family: 'Noto Serif TC', serif;
       background-color: #f7f1e6;
       color: var(--ink);
-      touch-action: none;
+      touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
       overflow: hidden;
@@ -39,9 +40,11 @@
     /* Map Camera Stage with soft light gradient vignette */
     #viewport {
       position: relative;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
+      min-height: 100dvh;
       overflow: hidden;
+      touch-action: none;
       background: radial-gradient(circle at center, #fbf7ef 0%, #efe5d5 100%);
     }
 
@@ -136,6 +139,29 @@
       max-width: none;
       width: min(1680px, 220%);
     }
+    #modal-container, #modal-card, #start-modal {
+      touch-action: pan-y;
+      -webkit-overflow-scrolling: touch;
+    }
+    #start-modal { align-items: flex-start; }
+    #start-modal > div { margin-top: auto; margin-bottom: auto; }
+    #modal-card { max-height: min(92dvh, 92vh); }
+    #floating-guide-bar { bottom: max(1rem, env(safe-area-inset-bottom)); }
+    #free-explore-tools { bottom: max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem)); }
+    @media (max-width: 640px) {
+      .map-topbar { flex-wrap: wrap; align-items: flex-start; row-gap: 8px; padding: 8px 10px; }
+      .map-topbar .brand-badge { display: none; }
+      .map-controls { width: 100%; justify-content: flex-end; }
+      #floating-guide-bar {
+        left: 0.75rem;
+        right: 3.75rem;
+        width: auto;
+        transform: none;
+        justify-content: flex-start;
+      }
+      #btn-quick-next { max-width: 100%; white-space: normal; text-align: left; line-height: 1.35; }
+      .map-notice { top: 7.5rem; max-width: calc(100% - 1.5rem); white-space: normal; text-align: center; }
+    }
   </style>
 </head>
 <body class="w-full h-full">
@@ -183,7 +209,7 @@
     <canvas id="petals-canvas" class="absolute inset-0 z-20 pointer-events-none w-full h-full"></canvas>
 
     <!-- UI Overlay: Top Navigation Bar -->
-    <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between p-3 sm:p-4 pointer-events-none">
+    <header class="map-topbar fixed top-0 left-0 right-0 z-30 flex items-center justify-between p-3 sm:p-4 pointer-events-none">
       <div class="flex items-center space-x-3 pointer-events-auto">
         <div class="paper-panel px-4 py-2 rounded-2xl flex items-center space-x-3 shadow-md border-amber-800/30">
           <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-500 to-amber-700 text-white flex items-center justify-center font-calligraphy text-2xl shadow-inner">
@@ -192,7 +218,7 @@
           <div>
             <h1 class="text-base sm:text-lg font-bold tracking-wider text-amber-950 flex items-center gap-1.5">
               尋找桃花源
-              <span class="text-[11px] font-normal text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">教育局建議篇章</span>
+              <span class="brand-badge text-[11px] font-normal text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">教育局建議篇章</span>
             </h1>
             <p id="station-indicator" class="text-xs text-amber-800 font-medium">第 1 站：緣溪桃林</p>
           </div>
@@ -200,7 +226,7 @@
       </div>
 
       <!-- Control Buttons -->
-      <div class="flex items-center space-x-2 pointer-events-auto">
+      <div class="map-controls flex items-center space-x-2 pointer-events-auto">
         <button id="btn-codex" onclick="openCodexModal()" class="paper-panel px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-amber-950 hover:bg-amber-100/60 active:scale-95 transition flex items-center gap-1.5 shadow">
           <span>📜</span>
           <span class="hidden sm:inline">文言圖鑑</span>
@@ -241,8 +267,8 @@
   </div>
 
   <!-- Start Game Introduction Overlay -->
-  <div id="start-modal" class="fixed inset-0 z-50 bg-stone-900/45 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
-    <div class="paper-panel paper-border-gold w-full max-w-lg rounded-3xl p-6 sm:p-8 modal-enter text-amber-950 shadow-2xl relative text-center">
+  <div id="start-modal" class="fixed inset-0 z-50 bg-stone-900/45 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="paper-panel paper-border-gold w-full max-w-lg rounded-3xl p-6 sm:p-8 modal-enter text-amber-950 shadow-2xl relative text-center my-auto">
       
       <!-- Top Decorative Emblem -->
       <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-gradient-to-br from-rose-400 via-rose-500 to-amber-700 text-white flex items-center justify-center font-calligraphy text-4xl sm:text-5xl shadow-lg border-2 border-amber-200">
@@ -1940,7 +1966,7 @@
 
     function showFloatingNotice(msg) {
       const notice = document.createElement('div');
-      notice.className = 'fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-amber-950/90 text-amber-100 border border-amber-400/60 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-2xl transition-all duration-300 pointer-events-none opacity-0 translate-y-2';
+      notice.className = 'map-notice fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-amber-950/90 text-amber-100 border border-amber-400/60 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-2xl transition-all duration-300 pointer-events-none opacity-0 translate-y-2';
       notice.textContent = msg;
       document.body.appendChild(notice);
 

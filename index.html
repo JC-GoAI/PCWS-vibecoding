@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>親子共創 AI 學習助手</title>
+    <title>親子共創 AI 學習遊戲</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="favicon.png">
     <style>
@@ -67,8 +67,34 @@
     }
     .shape-monster1 { left: 3%; top: 18%; background: var(--card-green); color: white; transform: rotate(-8deg); }
     .shape-monster2 { right: 3%; bottom: 16%; background: var(--goai-orange); color: white; transform: rotate(10deg); }
+    .top-tools {
+        position: fixed; top: 12px; right: 16px; z-index: 30;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .lang-menu { position: relative; }
+    .lang-globe {
+        width: 36px; height: 36px; padding: 0; border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.9); background: transparent; color: #fff;
+        display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .lang-globe svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+    .lang-globe[aria-expanded="true"] { background: #fff; color: var(--goai-blue); }
+    .lang-globe:focus-visible { outline: 3px solid var(--goai-yellow); outline-offset: 2px; }
+    .lang-pop {
+        position: absolute; top: calc(100% + 8px); right: 0; z-index: 40;
+        min-width: 156px; margin: 0; padding: 6px; list-style: none;
+        background: #fff; border-radius: 14px; box-shadow: 0 12px 32px rgba(2, 33, 105, 0.2);
+    }
+    .lang-pop[hidden] { display: none; }
+    .lang-pop button {
+        display: block; width: 100%; border: 0; background: transparent; color: var(--goai-blue);
+        font: inherit; font-weight: 800; font-size: 0.92rem; text-align: left;
+        min-height: 40px; padding: 0 12px; border-radius: 10px; cursor: pointer;
+    }
+    .lang-pop button[aria-pressed="true"] { background: #eef3ff; }
+    .lang-pop button:hover { background: #f4f6fa; }
     .admin-link {
-        position: absolute; top: 12px; right: 16px; z-index: 3;
+        position: static; z-index: 3;
         display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px;
         border-radius: 999px; background: var(--goai-yellow); color: var(--goai-blue);
         font-size: 0.85rem; font-weight: 800; text-decoration: none;
@@ -287,7 +313,9 @@
         .header-home { flex-direction: column; text-align: center; gap: 8px; }
         .header-logo { height: 64px; }
         .header-text { text-align: center; }
-        .admin-link { top: 8px; right: 8px; min-height: 32px; padding: 0 10px; font-size: 0.78rem; }
+        .top-tools { top: 8px; right: 8px; gap: 6px; }
+        .lang-globe { width: 32px; height: 32px; }
+        .admin-link { min-height: 32px; padding: 0 10px; font-size: 0.78rem; }
         #host-rail { width: calc(100% - 24px); padding: 10px 14px; }
         #host-rail .rail-group h3 { flex-basis: 148px; font-size: 0.82rem; }
         header h1 { font-size: 1.35rem; }
@@ -299,23 +327,55 @@
         .seg-bar { flex-direction: column; }
         .band-card { max-width: none; min-height: 180px; }
         .make-side { width: 100%; }
+        body.playing-game header,
+        body.playing-game #host-rail { display: none; }
+        body.playing-game .admin-link { display: none; }
+        body.playing-game #app { width: 100%; margin: 0; gap: 0; }
+        body.playing-game .column { padding: 46px 10px 10px; border-radius: 0; box-shadow: none; }
+        body.playing-game .back-row { margin-bottom: 4px; }
+        body.playing-game .seg-bar { flex-direction: row; margin-bottom: 8px; overflow-x: auto; }
+        body.playing-game .seg-btn { min-height: 44px; padding: 6px 8px; font-size: 0.72rem; line-height: 1.25; }
+        body.playing-game .game-frame {
+            height: calc(100dvh - 120px);
+            min-height: 0;
+            border-radius: 12px;
+        }
     }
     </style>
 </head>
 <body>
-<header>
+<div class="top-tools">
     <a class="admin-link" href="admin">Admin 登入</a>
+    <div class="lang-menu">
+        <button type="button" class="lang-globe" aria-haspopup="menu" aria-expanded="false" aria-label="語言">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M3 12h18"></path>
+                <ellipse cx="12" cy="12" rx="4.2" ry="9"></ellipse>
+                <path d="M4.8 7.5h14.4"></path>
+                <path d="M4.8 16.5h14.4"></path>
+            </svg>
+        </button>
+        <div class="lang-pop" role="menu" hidden>
+            <button type="button" role="menuitemradio" data-lang="zh-HK" aria-pressed="true">繁體中文</button>
+            <button type="button" role="menuitemradio" data-lang="zh-CN" aria-pressed="false">简体中文</button>
+            <button type="button" role="menuitemradio" data-lang="en" aria-pressed="false">English</button>
+        </div>
+    </div>
+</div>
+<header>
     <div class="cartoon-shape shape-monster1">Prompting</div>
     <div class="cartoon-shape shape-monster2">Vibe Coding</div>
     <button type="button" class="header-home" data-action="home" aria-label="返回開始版面">
         <img src="logo.jpg?v=crop" alt="" class="header-logo">
         <div class="header-text">
-            <h1>親子共創 <span class="highlight-yellow">AI</span> 學習助手</h1>
+            <h1>親子共創 <span class="highlight-yellow">AI</span> 學習遊戲</h1>
             <p class="header-sub">從 Prompting 到 Vibe Coding</p>
         </div>
     </button>
 </header>
 <main id="app"></main>
+<script src="i18n.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const STORAGE_KEY = "pcws-coach-v1";
@@ -341,7 +401,7 @@ const RAIL_GROUPS = [
         ["game_prompt", "遊戲 Prompt"]
     ]],
     ["Go Make：親子共創", [
-        ["make", "親子共創"],
+        ["make", "共創"],
         ["make_help", "AI指導"]
     ]]
 ];
@@ -350,12 +410,21 @@ function makeGrade() {
     return state.band === "sec" ? "中一至中三" : "小四至小六";
 }
 
+function englishScaffold(grade) {
+    return {
+        role: "You are a friendly \"game design coach\". Use questions to guide " + grade + " students and their parents as they design a game together with Vibe Coding.",
+        task: "Ask one step at a time and, at the end, write a game prompt in Markdown that they can paste straight into Gemini Canvas.\n\nWork in stages. **Ask only one question at a time, with 3 to 5 suggested choices** that follow their last answer. End every question with \"or say it in your own words\". Skip anything they have already made clear. The questions are:\n1. **Learning problem**: What have they found hard to remember or want to revise lately, such as Chinese idioms, English, or fractions? If you are not sure of the content, ask them for examples. Do not invent any.\n2. **Setting**: Based on that topic, what story or place should the game use?\n3. **How it plays**: How does the player act? What happens for a right answer and a wrong answer, and when does the game end? Is there a reward for a streak, and does it get harder?\n4. **Write the prompt**: After you have enough, retell the topic, setting and rules in three sentences, then ask \"May I write the prompt now?\" Only after they agree, output the final prompt Markdown.",
+        limit: "- **Language**: clear English that " + grade + " students and their parents can read together.\n- **Pace**: one question at a time. Never ask several questions at once. Until they agree, only talk. Do not output HTML, CSS or JavaScript.\n- Write all four points of the game mechanics. Questions must come from the topic and examples they gave.\n- **Final format**: follow this structure exactly:\n\n  ```markdown\n  # Role\n  You are a front-end engineer who is good at making educational games about [subject/theme].\n\n  # Background and task\n  Build a single-page game that can be played immediately, *[game name]*: [look and style]. It should feel like a game, not a worksheet.\n  Game mechanics: [story, actions, scoring/Combo, how you win or lose, how difficulty rises, and where the questions come from].\n\n  # Instructions and limits\n  - Clear English, suitable for " + grade + "\n  - Support mouse, touch, phone and computer\n  - Put HTML, CSS and JavaScript in a single file that runs when opened\n  ```"
+    };
+}
+
 function makeScaffold() {
     const grade = makeGrade();
+    if (currentLang() === "en") return englishScaffold(tx(grade));
     return {
-        role: "你是親切的「遊戲設計導師」，請用引導和問答方式，帶領" + grade + "學生與家長一起 Vibe Coding 構思遊戲。",
-        task: "一步步提問並引導使用者，最後幫他們生成一份可直接貼入 Gemini Canvas 的遊戲 Prompt Markdown。\n\n請分階段執行，**每次只問一個問題，並附上 3-5 個建議選項**供他們選擇，建議要跟住他們剛才的答案來想。每題最後都加上「或者你自己講」。他們已經講清楚的部分，就跳過。問題包括：\n1. **學習難題**：詢問最近在學習上（如中文成語、英文、數學分數等）有什麼覺得難記或想溫習的課題？你不肯定的內容，請他們提供例子，不要自己編。\n2. **主題場景**：根據課題，詢問想設定在什麼有趣故事或場景？\n3. **玩法機制**：玩家怎樣操作？答對會怎樣，答錯會怎樣，遊戲怎樣結束？連續答對有沒有獎勵，後面會不會難一點？\n4. **生成 Prompt**：收集完後，用三句話覆述課題、場景和玩法，然後問「可以生成Prompt嗎？」得到同意後，才輸出最終的 Prompt Markdown。",
-        limit: "- **語言**：香港書面語繁體中文，親切易懂，適合" + grade + "學生和家長一起看。\n- **節奏**：一問一答，絕不一次過問多個問題。未得到同意前，只可以對話，不要輸出 HTML、CSS 或 JavaScript。\n- 遊戲機制要寫滿四點；題目必須來自他們提供的課題和例子。\n- **最終輸出格式**：必須嚴格符合以下結構：\n\n  ```markdown\n  # 角色\n  你是一位擅長製作[學科/主題]教育遊戲的前端工程師。\n\n  # 背景與任務\n  請建立可直接遊玩的單頁遊戲《[遊戲名稱]》：[視覺風格與畫面要求]。畫面要有遊戲感，不要像工作紙。\n  遊戲機制：[詳細描述故事、操作、得分/Combo、勝負條件、難度遞增與題目來源]。\n\n  # 指導與限制\n  - 香港書面語繁體中文，適合" + grade + "\n  - 支援滑鼠、觸控、手機及電腦\n  - HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n  ```"
+        role: tx("你是親切的「遊戲設計導師」，請用引導和問答方式，帶領" + grade + "學生與家長一起 Vibe Coding 構思遊戲。"),
+        task: tx("一步步提問並引導使用者，最後幫他們生成一份可直接貼入 Gemini Canvas 的遊戲 Prompt Markdown。\n\n請分階段執行，**每次只問一個問題，並附上 3-5 個建議選項**供他們選擇，建議要跟住他們剛才的答案來想。每題最後都加上「或者你自己講」。他們已經講清楚的部分，就跳過。問題包括：\n1. **學習難題**：詢問最近在學習上（如中文成語、英文、數學分數等）有什麼覺得難記或想溫習的課題？你不肯定的內容，請他們提供例子，不要自己編。\n2. **主題場景**：根據課題，詢問想設定在什麼有趣故事或場景？\n3. **玩法機制**：玩家怎樣操作？答對會怎樣，答錯會怎樣，遊戲怎樣結束？連續答對有沒有獎勵，後面會不會難一點？\n4. **生成 Prompt**：收集完後，用三句話覆述課題、場景和玩法，然後問「可以生成Prompt嗎？」得到同意後，才輸出最終的 Prompt Markdown。"),
+        limit: tx("- **語言**：香港書面語繁體中文，親切易懂，適合" + grade + "學生和家長一起看。\n- **節奏**：一問一答，絕不一次過問多個問題。未得到同意前，只可以對話，不要輸出 HTML、CSS 或 JavaScript。\n- 遊戲機制要寫滿四點；題目必須來自他們提供的課題和例子。\n- **最終輸出格式**：必須嚴格符合以下結構：\n\n  ```markdown\n  # 角色\n  你是一位擅長製作[學科/主題]教育遊戲的前端工程師。\n\n  # 背景與任務\n  請建立可直接遊玩的單頁遊戲《[遊戲名稱]》：[視覺風格與畫面要求]。畫面要有遊戲感，不要像工作紙。\n  遊戲機制：[詳細描述故事、操作、得分/Combo、勝負條件、難度遞增與題目來源]。\n\n  # 指導與限制\n  - 香港書面語繁體中文，適合" + grade + "\n  - 支援滑鼠、觸控、手機及電腦\n  - HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n  ```")
     };
 }
 
@@ -719,11 +788,12 @@ function paintRail() {
     const list = document.getElementById("rail-list");
     if (!list) return;
     list.innerHTML = RAIL_GROUPS.map(function (group) {
-        return '<section class="rail-group"><h3>' + group[0] + '</h3><div class="rail-items">' +
+        return '<section class="rail-group"><h3>' + escapeHtml(tx(group[0])) + '</h3><div class="rail-items">' +
             group[1].map(function (item) {
                 const open = !!liveGates[item[0]];
-                return '<div class="rail-item"><span>' + item[1] + "</span>" +
-                    '<button type="button" class="rail-switch' + (open ? " is-open" : "") + '" aria-pressed="' + (open ? "true" : "false") + '" aria-label="' + item[1] + '" data-key="' + item[0] + '" data-next="' + (open ? "0" : "1") + '"></button></div>';
+                const label = tx(item[1]);
+                return '<div class="rail-item"><span>' + escapeHtml(label) + "</span>" +
+                    '<button type="button" class="rail-switch' + (open ? " is-open" : "") + '" aria-pressed="' + (open ? "true" : "false") + '" aria-label="' + escapeHtml(label) + '" data-key="' + item[0] + '" data-next="' + (open ? "0" : "1") + '"></button></div>';
             }).join("") + "</div></section>";
     }).join("");
 }
@@ -738,7 +808,7 @@ function saveLive(patch) {
         if (res.error || !res.data) {
             if (err) {
                 err.hidden = false;
-                err.textContent = (res.error && res.error.message) || "未能更改開關。";
+                err.textContent = (res.error && res.error.message) || tx("未能更改開關。");
             }
             return;
         }
@@ -750,7 +820,7 @@ function mountRail() {
     if (document.getElementById("host-rail")) return;
     const rail = document.createElement("aside");
     rail.id = "host-rail";
-    rail.innerHTML = '<div class="rail-head"><h2>現場開關</h2><div class="rail-actions"><button type="button" class="ghost-btn" id="rail-close-all">全部收回</button><button type="button" class="ghost-btn" id="rail-logout">登出</button></div></div><div class="rail-groups" id="rail-list"></div><p class="error-text" id="rail-error" hidden></p>';
+    rail.innerHTML = '<div class="rail-head"><h2>' + escapeHtml(tx("現場開關")) + '</h2><div class="rail-actions"><button type="button" class="ghost-btn" id="rail-close-all">' + escapeHtml(tx("全部收回")) + '</button><button type="button" class="ghost-btn" id="rail-logout">' + escapeHtml(tx("登出")) + '</button></div></div><div class="rail-groups" id="rail-list"></div><p class="error-text" id="rail-error" hidden></p>';
     const header = document.querySelector("header");
     if (header) header.insertAdjacentElement("afterend", rail);
     else document.body.insertBefore(rail, document.body.firstChild);
@@ -762,7 +832,7 @@ function mountRail() {
         saveLive(patch);
     });
     document.getElementById("rail-close-all").addEventListener("click", function () {
-        if (!window.confirm("收回全部項目？")) return;
+        if (!window.confirm(tx("收回全部項目？"))) return;
         const patch = {};
         RAIL_GROUPS.forEach(function (group) {
             group[1].forEach(function (item) { patch[item[0]] = false; });
@@ -817,11 +887,11 @@ function startGates() {
 
 function vibeToolsMarkup() {
     return '<div class="game-tools">' +
-        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">展示prompt</button>' +
-        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-chat" aria-expanded="false">展示與AI的完整對話</button>' +
-        '<button type="button" class="ghost-btn" data-action="download-code">下載完整代碼</button>' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">' + escapeHtml(tx("展示prompt")) + '</button>' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-chat" aria-expanded="false">' + escapeHtml(tx("展示與AI的完整對話")) + '</button>' +
+        '<button type="button" class="ghost-btn" data-action="download-code">' + escapeHtml(tx("下載完整代碼")) + '</button>' +
         "</div>" +
-        '<div id="reveal-prompt" class="reveal-panel nocopy"><pre class="prompt-view">' + escapeHtml(GAME_PROMPT) + "</pre></div>" +
+        '<div id="reveal-prompt" class="reveal-panel nocopy"><pre class="prompt-view">' + escapeHtml(txBlock("gamePrompt", GAME_PROMPT)) + "</pre></div>" +
         '<div id="reveal-chat" class="reveal-panel nocopy"><div class="chat-row">' +
         '<div class="chat-shot"><img id="chat-img-1" src="games/ai-chat-1.png" alt="" draggable="false"><div class="chat-shield"></div></div>' +
         '<div class="chat-shot"><img id="chat-img-2" src="games/ai-chat-2.png" alt="" draggable="false"><div class="chat-shield"></div></div>' +
@@ -1090,12 +1160,12 @@ function levelBlock(key, label, text, note, tone) {
     return '<div class="level ' + tone + '"><h3>' + label + "</h3>" +
         (note ? '<p class="note">' + escapeHtml(note) + "</p>" : "") +
         '<textarea readonly id="play-' + key + '">' + escapeHtml(text) + "</textarea>" +
-        '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy" data-value="play-' + key + '">' + icon("copy") + "複製這段提示詞</button>" +
-        (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div></div>";
+        '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy" data-value="play-' + key + '">' + icon("copy") + escapeHtml(tx("複製這段提示詞")) + "</button>" +
+        (copied ? '<span class="copy-ok">' + escapeHtml(tx("已複製")) + "</span>" : "") + "</div></div>";
 }
 
 function levelSlot(key, label, text, note, tone, open) {
-    if (!open) return '<div class="level ' + tone + ' is-wait"><h3>' + label + '</h3><p class="wait-note">稍後開放</p></div>';
+    if (!open) return '<div class="level ' + tone + ' is-wait"><h3>' + label + '</h3><p class="wait-note">' + escapeHtml(tx("稍後開放")) + "</p></div>";
     return levelBlock(key, label, text, note, tone);
 }
 
@@ -1106,7 +1176,7 @@ function thumbLink(href, label) {
 function sourceLine(subject, place) {
     if (!subject || !subject.source) return "";
     const extra = place === "download" ? " under-download" : place === "topic" ? " under-topic" : "";
-    return '<p class="src-line' + extra + '">' + escapeHtml(subject.source) + "</p>";
+    return '<p class="src-line' + extra + '">' + escapeHtml(tx(subject.source)) + "</p>";
 }
 
 function subjectDownloads(id) {
@@ -1114,38 +1184,47 @@ function subjectDownloads(id) {
     const source = sourceLine(subject, "download");
     if (id === "eng") {
         return '<div class="thumb-row">' +
-            thumbLink("refs/english-passage.jpg", "下載英文篇章") +
-            thumbLink("refs/english-questions.jpg", "下載英文題目") +
+            thumbLink("refs/english-passage.jpg", tx("下載英文篇章")) +
+            thumbLink("refs/english-questions.jpg", tx("下載英文題目")) +
             "</div>" + source;
     }
     if (id === "math") {
-        return '<div class="thumb-row">' + thumbLink("refs/math-diagram.jpg", "下載數學題目圖") + "</div>" + source;
+        return '<div class="thumb-row">' + thumbLink("refs/math-diagram.jpg", tx("下載數學題目圖")) + "</div>" + source;
     }
     return "";
 }
 
+function playText(subject, key) {
+    const text = key === "high" ? subject.high(state.band) : (subject[key] || "");
+    if (currentLang() !== "en") return tx(text);
+    if (subject.id !== "math") return text;
+    if (key === "basic") return txBlock("mathBasic", text);
+    if (key === "mid") return txBlock("mathMid", text);
+    return txBlock(state.band === "sec" ? "mathHighSec" : "mathHighPri", text);
+}
+
 function renderPrompting() {
     const chips = chipRow(PLAY.map(function (s) {
-        return { action: "play", value: s.id, label: s.title, on: state.playId === s.id };
+        return { action: "play", value: s.id, label: tx(s.title), on: state.playId === s.id };
     }));
     const subject = playById(state.playId);
     let panel = "";
     if (subject) {
-        const mathNote = subject.id === "math" ? subject.hint : "";
+        const topic = "題目：有一天，你和家人在家中吃晚餐時突然停電。請寫一篇文章，記述那一次的經歷和感受。";
         const chineseIntro = subject.id === "chi"
-            ? '<p class="topic-line">題目：有一天，你和家人在家中吃晚餐時突然停電。請寫一篇文章，記述那一次的經歷和感受。</p>' + sourceLine(subject, "topic")
+            ? '<p class="topic-line">' + escapeHtml(currentLang() === "en" ? topic : tx(topic)) + "</p>" + sourceLine(subject, "topic")
             : "";
         const anyLevel = gates.level1 || gates.level2 || gates.level3;
         panel = '<div class="panel">' +
             (anyLevel ? subjectDownloads(subject.id) : "") +
             (anyLevel ? chineseIntro : "") +
-            levelSlot("basic", "Level 1", subject.basic, "", "lv1", gates.level1) +
-            levelSlot("mid", "Level 2", subject.mid, mathNote, "lv2", gates.level2) +
-            levelSlot("high", "Level 3", subject.high(state.band), "", "lv3", gates.level3) +
+            levelSlot("basic", "Level 1", playText(subject, "basic"), "", "lv1", gates.level1) +
+            levelSlot("mid", "Level 2", playText(subject, "mid"), "", "lv2", gates.level2) +
+            levelSlot("high", "Level 3", playText(subject, "high"), "", "lv3", gates.level3) +
             "</div>";
     }
     return chips +
-        '<p class="lede">請先選擇一個科目，每個科目分為三個程度。英文及數學部分須先下載參考圖片，上載至 Gemini，再按「複製」，將提示詞貼上。</p>' +
+        '<p class="lede">' + escapeHtml(tx("請先選擇一個科目，每個科目分為三個程度。英文及數學部分須先下載參考圖片，上載至 Gemini，再按「複製」，將提示詞貼上。")) + "</p>" +
         panel;
 }
 
@@ -1239,17 +1318,17 @@ function secChatShots(page) {
 function secVibeToolsMarkup() {
     const pages = secChatPageCount();
     return '<div class="game-tools">' +
-        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">展示prompt</button>' +
-        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-chat" aria-expanded="false">展示與AI的完整對話</button>' +
-        '<button type="button" class="ghost-btn" data-action="download-code">下載完整代碼</button>' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">' + escapeHtml(tx("展示prompt")) + '</button>' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-chat" aria-expanded="false">' + escapeHtml(tx("展示與AI的完整對話")) + '</button>' +
+        '<button type="button" class="ghost-btn" data-action="download-code">' + escapeHtml(tx("下載完整代碼")) + '</button>' +
         "</div>" +
-        '<div id="reveal-prompt" class="reveal-panel nocopy"><pre class="prompt-view">' + escapeHtml(SEC_GAME_PROMPT) + "</pre></div>" +
+        '<div id="reveal-prompt" class="reveal-panel nocopy"><pre class="prompt-view">' + escapeHtml(txBlock("secGamePrompt", SEC_GAME_PROMPT)) + "</pre></div>" +
         '<div id="reveal-chat" class="reveal-panel nocopy">' +
         '<div class="chat-row" id="sec-chat-row">' + secChatShots(0) + "</div>" +
         '<div class="chat-pager">' +
-        '<button type="button" class="ghost-btn" id="sec-chat-prev" data-action="chat-page" data-value="prev" disabled>上一頁</button>' +
+        '<button type="button" class="ghost-btn" id="sec-chat-prev" data-action="chat-page" data-value="prev" disabled>' + escapeHtml(tx("上一頁")) + '</button>' +
         '<span id="sec-chat-label">1 / ' + pages + "</span>" +
-        '<button type="button" class="ghost-btn" id="sec-chat-next" data-action="chat-page" data-value="next"' + (pages < 2 ? " disabled" : "") + ">下一頁</button>" +
+        '<button type="button" class="ghost-btn" id="sec-chat-next" data-action="chat-page" data-value="next"' + (pages < 2 ? " disabled" : "") + ">" + escapeHtml(tx("下一頁")) + "</button>" +
         "</div></div>";
 }
 
@@ -1271,8 +1350,8 @@ function renderHelper() {
     const sec = state.band === "sec";
     const frame = gates.game
         ? (sec
-            ? '<iframe class="game-frame" title="尋找桃花源" src="games/peach-blossom.html"></iframe>'
-            : '<iframe class="game-frame" title="成語迴轉壽司店" src="games/idiom-sushi.html"></iframe>')
+            ? '<iframe class="game-frame" title="' + escapeHtml(tx("尋找桃花源")) + '" src="games/peach-blossom.html"></iframe>'
+            : '<iframe class="game-frame" title="' + escapeHtml(tx("成語迴轉壽司店")) + '" src="games/idiom-sushi.html"></iframe>')
         : "";
     const tools = gates.game_prompt ? (sec ? secVibeToolsMarkup() : vibeToolsMarkup()) : "";
     return frame + tools;
@@ -1307,17 +1386,24 @@ function makeExamples() {
 
 function splitMakePrompt(text) {
     const src = String(text || "").replace(/\r\n/g, "\n");
-    const taskMark = "\n# 背景與任務\n";
-    const limitMark = "\n# 指導與限制\n";
-    const taskAt = src.indexOf(taskMark);
-    const limitAt = src.indexOf(limitMark);
+    const sets = [
+        ["\n# 背景與任務\n", "\n# 指導與限制\n", /^# 角色\n/],
+        ["\n# 背景与任务\n", "\n# 指导与限制\n", /^# 角色\n/],
+        ["\n# Background and task\n", "\n# Instructions and limits\n", /^# Role\n/]
+    ];
     function body(chunk) { return chunk.replace(/\n+$/, ""); }
-    if (taskAt < 0 || limitAt < taskAt) return { role: body(src.replace(/^# 角色\n/, "")), task: "", limit: "" };
-    return {
-        role: body(src.slice(0, taskAt).replace(/^# 角色\n/, "")),
-        task: body(src.slice(taskAt + taskMark.length, limitAt)),
-        limit: body(src.slice(limitAt + limitMark.length))
-    };
+    for (let i = 0; i < sets.length; i++) {
+        const taskAt = src.indexOf(sets[i][0]);
+        const limitAt = src.indexOf(sets[i][1]);
+        if (taskAt >= 0 && limitAt > taskAt) {
+            return {
+                role: body(src.slice(0, taskAt).replace(sets[i][2], "")),
+                task: body(src.slice(taskAt + sets[i][0].length, limitAt)),
+                limit: body(src.slice(limitAt + sets[i][1].length))
+            };
+        }
+    }
+    return { role: body(src.replace(/^# 角色\n/, "").replace(/^# Role\n/, "")), task: "", limit: "" };
 }
 
 function syncMakeFields() {
@@ -1338,10 +1424,10 @@ function syncMakeFields() {
 }
 
 function makePromptText() {
-    const english = state.makeExample === "greenhouse";
+    const english = currentLang() === "en" || state.makeExample === "greenhouse";
     const role = english ? "# Role" : "# 角色";
-    const task = english ? "# Background and task" : "# 背景與任務";
-    const limit = english ? "# Instructions and limits" : "# 指導與限制";
+    const task = english ? "# Background and task" : tx("# 背景與任務");
+    const limit = english ? "# Instructions and limits" : tx("# 指導與限制");
     return role + "\n" + (state.makeRole || "") + "\n\n" + task + "\n" + (state.makeTask || "") + "\n\n" + limit + "\n" + (state.makeLimit || "");
 }
 
@@ -1357,29 +1443,29 @@ function renderMake() {
     const copied = state.copyMsg === "make-all";
     const examples = helped
         ? makeExamples().map(function (item) {
-            return '<button type="button" class="pill-btn' + (state.makeExample === item.id ? " on" : "") + '" data-action="make-example" data-value="' + item.id + '">' + escapeHtml(item.label) + "</button>";
+            return '<button type="button" class="pill-btn' + (state.makeExample === item.id ? " on" : "") + '" data-action="make-example" data-value="' + item.id + '">' + escapeHtml(tx(item.label)) + "</button>";
         }).join("")
         : "";
     const helpBtn = helped
         ? ""
-        : '<button type="button" class="pill-btn" data-action="open-make-help">需要幫忙</button>';
-    const guideBtn = '<button type="button" class="pill-btn' + (gates.make_help && state.makeExample === "base" ? " on" : "") + '" data-action="make-base"' + (gates.make_help ? "" : " disabled") + '>AI指導</button>';
-    const blankBtn = '<button type="button" class="pill-btn' + (state.makeExample === "blank" ? " on" : "") + '" data-action="make-blank">空白版</button>';
+        : '<button type="button" class="pill-btn" data-action="open-make-help">' + escapeHtml(tx("需要幫忙")) + "</button>";
+    const guideBtn = '<button type="button" class="pill-btn' + (gates.make_help && state.makeExample === "base" ? " on" : "") + '" data-action="make-base"' + (gates.make_help ? "" : " disabled") + ">" + escapeHtml(tx("AI指導")) + "</button>";
+    const blankBtn = '<button type="button" class="pill-btn' + (state.makeExample === "blank" ? " on" : "") + '" data-action="make-blank">' + escapeHtml(tx("空白版")) + "</button>";
     const modal = helped
         ? ""
         : '<div class="modal-back" id="make-gate" data-action="close-make-help" hidden>' +
             '<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="make-lock-title">' +
-            '<p class="lede" id="make-lock-title">請輸入密碼，以取得填空提示。</p>' +
-            '<input type="password" id="lock-pass" placeholder="密碼" autocomplete="off">' +
-            '<p class="error-text" hidden>密碼不正確</p>' +
-            '<div class="btn-row"><button type="button" class="primary-btn" data-action="unlock" data-value="help">確認</button>' +
-            '<button type="button" class="ghost-btn" data-action="close-make-help">關閉</button></div></div></div>';
+            '<p class="lede" id="make-lock-title">' + escapeHtml(tx("請輸入密碼，以取得填空提示。")) + "</p>" +
+            '<input type="password" id="lock-pass" placeholder="' + escapeHtml(tx("密碼")) + '" autocomplete="off">' +
+            '<p class="error-text" hidden>' + escapeHtml(tx("密碼不正確")) + "</p>" +
+            '<div class="btn-row"><button type="button" class="primary-btn" data-action="unlock" data-value="help">' + escapeHtml(tx("確認")) + "</button>" +
+            '<button type="button" class="ghost-btn" data-action="close-make-help">' + escapeHtml(tx("關閉")) + "</button></div></div></div>";
     const guided = state.makeExample === "base";
     const fields = guided
-        ? '<p class="make-hint">請按「複製全部」，整份貼到 Gemini 對話，再按 AI 的問題一步步構思遊戲。</p><textarea id="make-prompt">' + escapeHtml(makePromptText()) + "</textarea>"
-        : '<div class="make-block"><h3># 角色</h3><p class="make-hint">你希望 AI 是甚麼身份？例如：擅長製作哪一科教育遊戲的前端工程師？</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
-            '<div class="make-block"><h3># 背景與任務</h3><p class="make-hint">遊戲叫甚麼名字？畫面像甚麼？想要甚麼風格？遊戲機制可以寫四點：玩家是誰、要做甚麼動作？答對和答錯分別發生甚麼，遊戲幾時結束？連續答對有甚麼獎勵，難度怎樣提升？題目從哪裡來，玩完看到甚麼？</p><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea></div>" +
-            '<div class="make-block"><h3># 指導與限制</h3><p class="make-hint">用甚麼語言、給哪個年級？要支援滑鼠、觸控、手機和電腦嗎？程式要不要放在單一檔案？答案和動畫有甚麼規則？</p><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea></div>";
+        ? '<p class="make-hint">' + escapeHtml(tx("請按「複製全部」，整份貼到 Gemini 對話，再按 AI 的問題一步步構思遊戲。")) + '</p><textarea id="make-prompt">' + escapeHtml(makePromptText()) + "</textarea>"
+        : '<div class="make-block"><h3>' + escapeHtml(tx("# 角色")) + '</h3><p class="make-hint">' + escapeHtml(tx("你希望 AI 是甚麼身份？例如：擅長製作哪一科教育遊戲的前端工程師？")) + '</p><textarea id="make-role">' + escapeHtml(state.makeRole) + "</textarea></div>" +
+            '<div class="make-block"><h3>' + escapeHtml(tx("# 背景與任務")) + '</h3><p class="make-hint">' + escapeHtml(tx("遊戲叫甚麼名字？畫面像甚麼？想要甚麼風格？遊戲機制可以寫四點：玩家是誰、要做甚麼動作？答對和答錯分別發生甚麼，遊戲幾時結束？連續答對有甚麼獎勵，難度怎樣提升？題目從哪裡來，玩完看到甚麼？")) + '</p><textarea id="make-task">' + escapeHtml(state.makeTask) + "</textarea></div>" +
+            '<div class="make-block"><h3>' + escapeHtml(tx("# 指導與限制")) + '</h3><p class="make-hint">' + escapeHtml(tx("用甚麼語言、給哪個年級？要支援滑鼠、觸控、手機和電腦嗎？程式要不要放在單一檔案？答案和動畫有甚麼規則？")) + '</p><textarea id="make-limit">' + escapeHtml(state.makeLimit) + "</textarea></div>";
     return '<div class="make-layout"><div class="make-side">' +
         '<div class="chip-row">' +
         blankBtn +
@@ -1389,8 +1475,8 @@ function renderMake() {
         "</div>" +
         '</div><div class="make-main">' +
         fields +
-        '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy-make">' + icon("copy") + "複製全部</button>" +
-        (copied ? '<span class="copy-ok">已複製</span>' : "") + "</div>" +
+        '<div class="btn-row"><button type="button" class="primary-btn" data-action="copy-make">' + icon("copy") + escapeHtml(tx("複製全部")) + "</button>" +
+        (copied ? '<span class="copy-ok">' + escapeHtml(tx("已複製")) + "</span>" : "") + "</div>" +
         "</div></div>" + modal;
 }
 
@@ -1401,9 +1487,9 @@ function bandIcon(kind) {
 }
 
 function renderHome() {
-    return '<p class="lede">請先選擇小學或中學。</p><div class="band-row">' +
-        '<button type="button" class="band-card" data-action="band" data-value="pri">' + bandIcon("pri") + "<strong>小學</strong><em>小四至小六</em></button>" +
-        '<button type="button" class="band-card" data-action="band" data-value="sec">' + bandIcon("sec") + "<strong>中學</strong><em>中一至中三</em></button>" +
+    return '<p class="lede">' + escapeHtml(tx("請先選擇小學或中學。")) + '</p><div class="band-row">' +
+        '<button type="button" class="band-card" data-action="band" data-value="pri">' + bandIcon("pri") + "<strong>" + escapeHtml(tx("小學")) + "</strong><em>" + escapeHtml(tx("小四至小六")) + "</em></button>" +
+        '<button type="button" class="band-card" data-action="band" data-value="sec">' + bandIcon("sec") + "<strong>" + escapeHtml(tx("中學")) + "</strong><em>" + escapeHtml(tx("中一至中三")) + "</em></button>" +
         "</div>";
 }
 
@@ -1424,11 +1510,11 @@ function render() {
         html = '<section class="column">' + renderHome() + "</section>";
     } else {
         const nav = segBar([
-            { action: "activity", value: "prompt", label: "Go Play：引導式提示詞", on: state.activity === "prompt" },
-            { action: "activity", value: "helper", label: "Go Play：互動學習遊戲", on: state.activity === "helper", locked: !gates.game && !gates.game_prompt },
-            { action: "activity", value: "make", label: "Go Make：親子共創", on: state.activity === "make", locked: !gates.make }
+            { action: "activity", value: "prompt", label: tx("Go Play：引導式提示詞"), on: state.activity === "prompt" },
+            { action: "activity", value: "helper", label: tx("Go Play：互動學習遊戲"), on: state.activity === "helper", locked: !gates.game && !gates.game_prompt },
+            { action: "activity", value: "make", label: tx("Go Make：親子共創"), on: state.activity === "make", locked: !gates.make }
         ]);
-        const back = '<div class="back-row"><button type="button" class="back-btn" data-action="home">返回選擇小學或中學</button></div>';
+        const back = '<div class="back-row"><button type="button" class="back-btn" data-action="home">' + escapeHtml(tx("返回選擇小學或中學")) + "</button></div>";
         let below = "";
         if (state.activity === "prompt") below = renderPrompting();
         if (state.activity === "helper") below = renderHelper();
@@ -1571,7 +1657,11 @@ document.addEventListener("click", function (event) {
         applyMakePrompt(makeScaffold(), "base");
     } else if (action === "make-example") {
         const example = makeExamples().filter(function (item) { return item.id === value; })[0];
-        if (example) applyMakePrompt(example, example.id);
+        if (example) applyMakePrompt({
+            role: txBlock(example.id + ":role", example.role),
+            task: txBlock(example.id + ":task", example.task),
+            limit: txBlock(example.id + ":limit", example.limit)
+        }, example.id);
     } else if (action === "copy-make") {
         copyText(makePromptText(), "make-all");
         return;
@@ -1641,6 +1731,52 @@ document.getElementById("app").addEventListener("keydown", function (event) {
 });
 
 window.addEventListener("resize", sizePromptAreas);
+
+function applyChrome() {
+    document.title = tx("親子共創 AI 學習遊戲");
+    const h1 = document.querySelector("header h1");
+    if (h1) h1.innerHTML = escapeHtml(tx("親子共創")) + ' <span class="highlight-yellow">AI</span> ' + escapeHtml(tx("學習遊戲"));
+    const sub = document.querySelector(".header-sub");
+    if (sub) sub.textContent = tx("從 Prompting 到 Vibe Coding");
+    const home = document.querySelector(".header-home");
+    if (home) home.setAttribute("aria-label", tx("返回開始版面"));
+    const admin = document.querySelector(".admin-link");
+    if (admin) admin.textContent = tx("Admin 登入");
+    const globe = document.querySelector(".lang-globe");
+    if (globe) globe.setAttribute("aria-label", tx("語言"));
+}
+
+function refreshMakeForLang() {
+    if (state.makeExample === "base") {
+        applyMakePrompt(makeScaffold(), "base");
+        return;
+    }
+    if (!state.makeExample || state.makeExample === "blank") return;
+    const example = makeExamples().filter(function (item) { return item.id === state.makeExample; })[0];
+    if (!example) return;
+    applyMakePrompt({
+        role: txBlock(example.id + ":role", example.role),
+        task: txBlock(example.id + ":task", example.task),
+        limit: txBlock(example.id + ":limit", example.limit)
+    }, example.id);
+}
+
+window.onLangChange = function () {
+    applyChrome();
+    refreshMakeForLang();
+    render();
+    const rail = document.getElementById("host-rail");
+    if (!rail) return;
+    const h2 = rail.querySelector("h2");
+    if (h2) h2.textContent = tx("現場開關");
+    const closeAll = document.getElementById("rail-close-all");
+    if (closeAll) closeAll.textContent = tx("全部收回");
+    const logout = document.getElementById("rail-logout");
+    if (logout) logout.textContent = tx("登出");
+    paintRail();
+};
+
+applyChrome();
 startGates();
 </script>
 </body>

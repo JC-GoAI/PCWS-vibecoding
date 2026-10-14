@@ -98,12 +98,29 @@
       background: #E2BC8C;
       padding: 8px;
     }
+    #startModal, #gameOverModal {
+      align-items: flex-start;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+    #startModal > div, #gameOverModal > div { margin-top: auto; margin-bottom: auto; }
+    @media (max-width: 640px) {
+      .game-topbar { flex-wrap: wrap; align-items: flex-start; gap: 8px; padding: 8px 10px; }
+      .game-topbar h1 { font-size: 1.05rem; line-height: 1.25; flex-wrap: wrap; }
+      .hud-row { width: 100%; justify-content: space-between; gap: 4px; }
+      .hud-row > button { flex: 0 0 auto; }
+      .hud-chip { min-width: 0; flex: 1 1 0; padding-left: 6px; padding-right: 6px; }
+      .hud-chip .hud-label { letter-spacing: 0; white-space: normal; text-align: center; line-height: 1.15; }
+      .order-head { flex-wrap: wrap; align-items: flex-start; gap: 6px; }
+      .prop-bar { flex-wrap: wrap; align-items: center; gap: 8px; }
+      .prop-actions { flex-wrap: wrap; justify-content: flex-end; }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-[#FFFBF0] text-[#3D312A] selection:bg-pink-200">
 
   <!-- Top Bar: Game Stats & Audio Control -->
-  <header class="w-full bg-[#FFEED9] border-b-4 border-[#ECC8A0] px-4 py-2 flex items-center justify-between shadow-sm sticky top-0 z-40">
+  <header class="game-topbar w-full bg-[#FFEED9] border-b-4 border-[#ECC8A0] px-4 py-2 flex items-center justify-between shadow-sm sticky top-0 z-40">
     <div class="flex items-center space-x-2">
       <span class="text-2xl sm:text-3xl">🍣</span>
       <div>
@@ -118,10 +135,10 @@
     </div>
 
     <!-- HUD Indicators -->
-    <div class="flex items-center gap-3 sm:gap-6">
+    <div class="hud-row flex items-center gap-3 sm:gap-6">
       <!-- Combo Meter -->
-      <div class="flex flex-col items-center bg-white/80 border-2 border-orange-200 px-3 py-0.5 rounded-2xl shadow-inner min-w-[75px]">
-        <span class="text-[10px] text-orange-600 font-bold uppercase tracking-wider">連擊 COMBO</span>
+      <div class="hud-chip flex flex-col items-center bg-white/80 border-2 border-orange-200 px-3 py-0.5 rounded-2xl shadow-inner min-w-[75px]">
+        <span class="hud-label text-[10px] text-orange-600 font-bold uppercase tracking-wider">連擊 COMBO</span>
         <div class="flex items-baseline gap-1">
           <span id="comboText" class="text-xl sm:text-2xl font-black text-orange-500 leading-none">0</span>
           <span id="multiplierBadge" class="text-[11px] font-bold text-pink-600 hidden">x1.5</span>
@@ -129,13 +146,13 @@
       </div>
 
       <!-- Score Display -->
-      <div class="flex flex-col items-center bg-white/80 border-2 border-amber-200 px-3 py-0.5 rounded-2xl shadow-inner min-w-[85px]">
-        <span class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">營業額 (分)</span>
+      <div class="hud-chip flex flex-col items-center bg-white/80 border-2 border-amber-200 px-3 py-0.5 rounded-2xl shadow-inner min-w-[85px]">
+        <span class="hud-label text-[10px] text-amber-700 font-bold uppercase tracking-wider">營業額 (分)</span>
         <span id="scoreText" class="text-xl sm:text-2xl font-black text-amber-600 leading-none">0</span>
       </div>
 
       <!-- Time Clock -->
-      <div class="flex items-center bg-white border-2 border-red-300 px-3 py-1 rounded-2xl shadow-sm">
+      <div class="hud-chip flex items-center bg-white border-2 border-red-300 px-3 py-1 rounded-2xl shadow-sm">
         <span class="text-lg mr-1">⏳</span>
         <span id="timerText" class="text-xl sm:text-2xl font-black text-rose-500 min-w-[36px] text-center">60</span>
         <span class="text-xs font-bold text-rose-400 ml-0.5">秒</span>
@@ -200,7 +217,7 @@
         <div class="hidden md:block absolute -left-3 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-r-[12px] border-r-white/95"></div>
 
         <!-- Order Category Badge & Prompt -->
-        <div class="flex items-center justify-between mb-2">
+        <div class="order-head flex items-center justify-between mb-2">
           <div class="flex items-center gap-2">
             <span class="bg-rose-100 text-rose-600 text-xs font-black px-2.5 py-0.5 rounded-full border border-rose-200 flex items-center gap-1">
               <span>🥢</span> 點單句子
@@ -251,14 +268,14 @@
     <div class="w-full bg-[#5C4033] rounded-3xl p-3 sm:p-4 shadow-2xl border-4 border-[#3D281D] relative flex flex-col justify-end">
       
       <!-- Counter Bar Shelf Edge & Right-Top Power-up Props Toolbar -->
-      <div class="w-full flex items-center justify-between mb-1.5 px-1">
+      <div class="prop-bar w-full flex items-center justify-between mb-1.5 px-1">
         <div class="flex items-center gap-1.5 text-xs font-black text-amber-200/90">
           <span class="text-base">🍣</span>
           <span>迴轉盛盤</span>
         </div>
         
         <!-- Three Power-up Props (傳送帶右上方三個小道具) -->
-        <div class="flex items-center gap-2">
+        <div class="prop-actions flex items-center gap-2">
           <!-- Prop 1: Green Tea (Restore Patience) -->
           <button id="propTeaBtn" class="flex items-center gap-1.5 bg-[#442E23] hover:bg-[#53392C] border-2 border-emerald-400 active:scale-95 text-white px-2.5 py-1 rounded-xl shadow transition" title="使用熱茶：恢復35%顧客耐心值">
             <span class="text-base sm:text-lg">🍵</span>
@@ -309,8 +326,8 @@
   </main>
 
   <!-- Welcome / Start Overlay Modal -->
-  <div id="startModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#FFFDF7] border-4 border-[#ECC8A0] rounded-3xl max-w-md w-full p-6 text-center shadow-2xl relative">
+  <div id="startModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-[#FFFDF7] border-4 border-[#ECC8A0] rounded-3xl max-w-md w-full p-5 sm:p-6 text-center shadow-2xl relative my-auto">
       <div class="text-6xl mb-3 animate-bob">🍣</div>
       <h2 class="text-2xl sm:text-3xl font-black text-[#8D4B38] mb-2">成語迴轉壽司店</h2>
       <p class="text-sm sm:text-base font-bold text-amber-800 mb-4 leading-relaxed">

@@ -13,9 +13,33 @@
         -webkit-font-smoothing: antialiased;
     }
     header {
+        position: relative;
         background: var(--goai-blue); color: #fff; padding: 16px 24px;
         border-radius: 0 0 16px 16px; box-shadow: 0 4px 15px rgba(2, 33, 105, 0.1);
     }
+    .top-tools {
+        position: absolute; top: 12px; right: 16px; z-index: 3;
+        display: flex; align-items: center;
+    }
+    .lang-menu { position: relative; }
+    .lang-globe {
+        width: 36px; height: 36px; min-height: 36px; padding: 0; border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.9); background: transparent; color: #fff;
+        display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .lang-globe svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+    .lang-globe[aria-expanded="true"] { background: #fff; color: var(--goai-blue); }
+    .lang-pop {
+        position: absolute; top: calc(100% + 8px); right: 0; z-index: 40;
+        min-width: 156px; padding: 6px; background: #fff; border-radius: 14px;
+        box-shadow: 0 12px 32px rgba(2, 33, 105, 0.2);
+    }
+    .lang-pop button {
+        display: block; width: 100%; border: 0; background: transparent; color: var(--goai-blue);
+        font: inherit; font-weight: 800; font-size: 0.92rem; text-align: left;
+        min-height: 40px; padding: 0 12px; border-radius: 10px; cursor: pointer;
+    }
+    .lang-pop button[aria-pressed="true"] { background: #eef3ff; }
     .header-home { display: flex; align-items: center; justify-content: center; gap: 16px; }
     .header-logo { height: 72px; width: auto; display: block; object-fit: contain; }
     header h1 { margin: 0; font-size: 1.7rem; font-weight: 900; letter-spacing: 0.5px; line-height: 1.3; }
@@ -50,6 +74,24 @@
 </head>
 <body>
 <header>
+    <div class="top-tools">
+        <div class="lang-menu">
+            <button type="button" class="lang-globe" aria-haspopup="menu" aria-expanded="false" aria-label="語言">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M3 12h18"></path>
+                    <ellipse cx="12" cy="12" rx="4.2" ry="9"></ellipse>
+                    <path d="M4.8 7.5h14.4"></path>
+                    <path d="M4.8 16.5h14.4"></path>
+                </svg>
+            </button>
+            <div class="lang-pop" role="menu" hidden>
+                <button type="button" role="menuitemradio" data-lang="zh-HK" aria-pressed="true">繁體中文</button>
+                <button type="button" role="menuitemradio" data-lang="zh-CN" aria-pressed="false">简体中文</button>
+                <button type="button" role="menuitemradio" data-lang="en" aria-pressed="false">English</button>
+            </div>
+        </div>
+    </div>
     <div class="header-home">
         <img src="../logo.jpg?v=crop" alt="" class="header-logo">
         <div>
@@ -79,6 +121,7 @@
         </div>
     </section>
 </main>
+<script src="../i18n.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://ujpxuvwjsmdfzeesbuaq.supabase.co";
@@ -107,18 +150,18 @@ function showError(id, text) {
 function renderGates() {
     document.getElementById("gate-list").innerHTML = GATES.map(function (item) {
         const open = !!(row && row[item[0]]);
-        return '<div class="row"><div><strong>' + item[1] + '</strong><span>' + (open ? "已開放" : "未開放") + '</span></div>' +
+        return '<div class="row"><div><strong>' + tx(item[1]) + '</strong><span>' + tx(open ? "已開放" : "未開放") + '</span></div>' +
             '<button type="button" class="' + (open ? "on" : "primary") + '" data-key="' + item[0] + '" data-next="' + (open ? "0" : "1") + '">' +
-            (open ? "收回" : "開放") + "</button></div>";
+            tx(open ? "收回" : "開放") + "</button></div>";
     }).join("");
 }
 
 function explain(error) {
     if (!error) return "";
     if (error.code === "42501" || /permission denied/i.test(error.message || "")) {
-        return "後台未允許讀取或更改開關。請到 Supabase 的 SQL Editor 執行：\n" + GRANT_SQL;
+        return tx("後台未允許讀取或更改開關。請到 Supabase 的 SQL Editor 執行：") + "\n" + GRANT_SQL;
     }
-    return error.message || "未能連接後台。";
+    return error.message || tx("未能連接後台。");
 }
 
 async function loadGates() {
@@ -128,7 +171,7 @@ async function loadGates() {
         return;
     }
     if (!res.data) {
-        showError("gate-error", "找不到開關記錄。請確認 workshop_gates 有一行 id 為 1 的資料。");
+        showError("gate-error", tx("找不到開關記錄。請確認 workshop_gates 有一行 id 為 1 的資料。"));
         return;
     }
     showError("gate-error", "");
@@ -144,7 +187,7 @@ async function save(patch) {
         return;
     }
     if (!res.data) {
-        showError("gate-error", "已登入，但未能更改開關。請到 Supabase 的 SQL Editor 執行：\n" + GRANT_SQL);
+        showError("gate-error", tx("已登入，但未能更改開關。請到 Supabase 的 SQL Editor 執行：") + "\n" + GRANT_SQL);
         return;
     }
     row = res.data;
@@ -169,7 +212,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
         password: document.getElementById("password").value
     });
     if (res.error) {
-        showError("login-error", "登入失敗。請核對電郵和密碼。");
+        showError("login-error", tx("登入失敗。請核對電郵和密碼。"));
         return;
     }
     await showApp(res.data.session);
@@ -196,6 +239,23 @@ document.getElementById("logout").addEventListener("click", async function () {
 });
 
 db.auth.getSession().then(function (res) { showApp(res.data.session); });
+
+function paintAdmin() {
+    document.title = tx("活動控制");
+    document.querySelector("header h1").textContent = tx("活動控制");
+    const globe = document.querySelector(".lang-globe");
+    if (globe) globe.setAttribute("aria-label", tx("語言"));
+    document.querySelector("header p").textContent = tx("撳一下，全場活動頁會跟着開放或收回。");
+    document.querySelector("#login-card .hint").textContent = tx("用你在 Supabase 建立的控制頁電郵和密碼登入。");
+    document.querySelector('label[for="email"]').textContent = tx("電郵");
+    document.querySelector('label[for="password"]').textContent = tx("密碼");
+    document.querySelector("#login-form button").textContent = tx("登入");
+    document.getElementById("close-all").textContent = tx("全部收回");
+    document.getElementById("logout").textContent = tx("登出");
+    renderGates();
+}
+window.onLangChange = paintAdmin;
+paintAdmin();
 </script>
 </body>
 </html>
