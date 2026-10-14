@@ -327,16 +327,24 @@
         .seg-bar { flex-direction: column; }
         .band-card { max-width: none; min-height: 180px; }
         .make-side { width: 100%; }
-        body.playing-game header,
         body.playing-game #host-rail { display: none; }
-        body.playing-game .admin-link { display: none; }
+        body.playing-game header { padding: 8px 12px; }
+        body.playing-game .cartoon-shape { display: none; }
+        body.playing-game .header-home {
+            flex-direction: row; justify-content: flex-start; text-align: left;
+            gap: 8px; padding: 0 132px 0 0;
+        }
+        body.playing-game .header-logo { height: 40px; }
+        body.playing-game .header-text { text-align: left; min-width: 0; }
+        body.playing-game .header-sub { display: none; }
+        body.playing-game header h1 { font-size: 0.92rem; white-space: nowrap; line-height: 1.2; }
         body.playing-game #app { width: 100%; margin: 0; gap: 0; }
-        body.playing-game .column { padding: 46px 10px 10px; border-radius: 0; box-shadow: none; }
+        body.playing-game .column { padding: 10px; border-radius: 0; box-shadow: none; }
         body.playing-game .back-row { margin-bottom: 4px; }
         body.playing-game .seg-bar { flex-direction: row; margin-bottom: 8px; overflow-x: auto; }
         body.playing-game .seg-btn { min-height: 44px; padding: 6px 8px; font-size: 0.72rem; line-height: 1.25; }
         body.playing-game .game-frame {
-            height: calc(100dvh - 120px);
+            height: calc(100dvh - 210px);
             min-height: 0;
             border-radius: 12px;
         }
