@@ -328,16 +328,24 @@
         .band-card { max-width: none; min-height: 180px; }
         .make-side { width: 100%; }
         body.playing-game #host-rail { display: none; }
-        body.playing-game header { padding: 8px 12px; }
-        body.playing-game .cartoon-shape { display: none; }
-        body.playing-game .header-home {
+        body.band-open header { padding: 8px 12px; }
+        body.band-open .cartoon-shape { display: none; }
+        body.band-open .header-home {
             flex-direction: row; justify-content: flex-start; text-align: left;
-            gap: 8px; padding: 0 132px 0 0;
+            gap: 8px; padding: 0 118px 0 0;
         }
-        body.playing-game .header-logo { height: 40px; }
-        body.playing-game .header-text { text-align: left; min-width: 0; }
-        body.playing-game .header-sub { display: none; }
-        body.playing-game header h1 { font-size: 0.92rem; white-space: nowrap; line-height: 1.2; }
+        body.band-open .header-logo { height: 40px; flex: 0 0 auto; }
+        body.band-open .header-text { text-align: left; min-width: 0; flex: 1 1 auto; }
+        body.band-open .header-sub { display: none; }
+        body.band-open header h1 { font-size: 0.92rem; white-space: nowrap; line-height: 1.2; letter-spacing: 0; }
+        html[lang="en"] .admin-link { font-size: 0; }
+        html[lang="en"] .admin-link::after { content: "Admin"; font-size: 0.78rem; line-height: 1; }
+        html[lang="en"] body.band-open .header-home { padding-right: 96px; align-items: center; }
+        html[lang="en"] body.band-open header h1 {
+            font-size: 0.78rem;
+            white-space: normal;
+            line-height: 1.15;
+        }
         body.playing-game #app { width: 100%; margin: 0; gap: 0; }
         body.playing-game .column { padding: 10px; border-radius: 0; box-shadow: none; }
         body.playing-game .back-row { margin-bottom: 4px; }
@@ -1569,6 +1577,7 @@ function render() {
         if (state.activity === "make") below = renderMake();
         html = '<section class="column">' + back + nav + below + "</section>";
     }
+    document.body.classList.toggle("band-open", state.band === "pri" || state.band === "sec");
     document.body.classList.toggle("playing-game", (state.band === "pri" || state.band === "sec") && state.activity === "helper" && gates.game);
     document.getElementById("app").innerHTML = html;
     saveState();
@@ -1789,7 +1798,10 @@ function applyChrome() {
     const home = document.querySelector(".header-home");
     if (home) home.setAttribute("aria-label", tx("返回開始版面"));
     const admin = document.querySelector(".admin-link");
-    if (admin) admin.textContent = tx("Admin 登入");
+    if (admin) {
+        admin.textContent = tx("Admin 登入");
+        admin.setAttribute("aria-label", tx("Admin 登入"));
+    }
     const globe = document.querySelector(".lang-globe");
     if (globe) globe.setAttribute("aria-label", tx("語言"));
 }
