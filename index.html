@@ -156,6 +156,8 @@
         min-height: 52px; padding: 10px 12px; border-radius: 14px; cursor: pointer;
         text-align: center;
     }
+    .seg-kicker::after { content: "："; }
+    html[lang="en"] .seg-kicker::after { content: ": "; }
     .seg-btn.on { background: var(--goai-blue); color: #fff; box-shadow: 0 8px 18px rgba(2, 33, 105, 0.18); }
     .seg-btn:disabled { color: #94a3b8; cursor: not-allowed; }
     .chip-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 0 16px; }
@@ -274,7 +276,17 @@
             left: auto !important; right: auto !important; top: auto !important; bottom: auto !important; transform: none !important;
         }
         .column { padding: 20px; }
-        .seg-bar { flex-direction: column; }
+        body.band-open .seg-bar { flex-direction: row; margin-bottom: 8px; overflow-x: auto; }
+        body.band-open .seg-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 44px; padding: 6px 4px; font-size: 0.72rem; line-height: 1.2; gap: 1px;
+        }
+        body.band-open .seg-kicker,
+        body.band-open .seg-rest { display: block; font-size: 0.72rem; line-height: 1.2; font-weight: 800; }
+        body.band-open .seg-kicker::after { content: none; }
+        html[lang="en"] body.band-open .seg-btn { font-size: 0.62rem; padding: 6px 2px; }
+        html[lang="en"] body.band-open .seg-kicker,
+        html[lang="en"] body.band-open .seg-rest { font-size: 0.62rem; white-space: nowrap; }
         .band-card { max-width: none; min-height: 180px; }
         .make-side { width: 100%; }
         body.playing-game #host-rail { display: none; }
@@ -299,8 +311,6 @@
         body.playing-game #app { width: 100%; margin: 0; gap: 0; }
         body.playing-game .column { padding: 10px; border-radius: 0; box-shadow: none; }
         body.playing-game .back-row { margin-bottom: 4px; }
-        body.playing-game .seg-bar { flex-direction: row; margin-bottom: 8px; overflow-x: auto; }
-        body.playing-game .seg-btn { min-height: 44px; padding: 6px 8px; font-size: 0.72rem; line-height: 1.25; }
         body.playing-game .game-frame {
             height: calc(100dvh - 210px);
             min-height: 0;
@@ -716,9 +726,21 @@ function chipRow(items) {
     }).join("") + "</div>";
 }
 
+function splitSegLabel(label) {
+    const src = String(label || "");
+    const zh = src.indexOf("：");
+    if (zh >= 0) return { kicker: src.slice(0, zh), rest: src.slice(zh + 1) };
+    const en = src.indexOf(": ");
+    if (en >= 0) return { kicker: src.slice(0, en), rest: src.slice(en + 2) };
+    return { kicker: src, rest: "" };
+}
+
 function segBar(items) {
     return '<div class="seg-bar" role="tablist">' + items.map(function (item) {
-        return '<button type="button" class="seg-btn' + (item.on ? " on" : "") + '" data-action="' + item.action + '" data-value="' + item.value + '" aria-pressed="' + (item.on ? "true" : "false") + '"' + (item.locked ? " disabled" : "") + ">" + escapeHtml(item.label) + "</button>";
+        const parts = splitSegLabel(item.label);
+        const inner = '<span class="seg-kicker">' + escapeHtml(parts.kicker) + "</span>" +
+            (parts.rest ? '<span class="seg-rest">' + escapeHtml(parts.rest) + "</span>" : "");
+        return '<button type="button" class="seg-btn' + (item.on ? " on" : "") + '" data-action="' + item.action + '" data-value="' + item.value + '" aria-pressed="' + (item.on ? "true" : "false") + '" aria-label="' + escapeHtml(item.label) + '"' + (item.locked ? " disabled" : "") + ">" + inner + "</button>";
     }).join("") + "</div>";
 }
 
