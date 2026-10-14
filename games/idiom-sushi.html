@@ -35,8 +35,9 @@
       flex-direction: column;
       gap: 8px;
     }
-    .order-panel { flex: 1 1 auto; min-height: 0; overflow: auto; }
-    .explain-card, .belt-panel { flex: 0 0 auto; }
+    .order-panel { flex: 0 0 auto; overflow: visible; }
+    .belt-panel { flex: 0 0 auto; }
+    .explain-card { flex: 1 1 auto; min-height: 0; overflow: auto; }
     /* Cute Candy Palette Variables */
     :root {
       --bg-cream: #FFFDF7;
@@ -118,18 +119,21 @@
     @media (max-width: 640px) {
       .game-topbar { flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px 8px; }
       .game-topbar h1 { font-size: 1rem; line-height: 1.2; white-space: nowrap; }
-      .brand-lock { flex: 1 1 100%; min-width: 0; }
+      .brand-lock { flex: 1 1 100%; }
       .game-topbar .top-sub { display: none; }
       .hud-row { width: 100%; justify-content: flex-end; gap: 4px; }
       .hud-row > button { flex: 0 0 auto; }
       .hud-chip { min-width: 0; flex: 0 0 auto; padding-left: 6px; padding-right: 6px; }
       .hud-chip .hud-label { display: none; }
-      .order-panel { flex-direction: row; align-items: flex-start; gap: 8px; padding: 8px; }
-      .customer-block { gap: 2px; }
-      #customerSVG { width: 58px; height: 58px; }
-      #customerSVG svg { width: 48px; height: 48px; }
-      .speech-bubble { min-height: 0; padding: 8px 10px; }
-      #conveyorTrackArea { height: 148px; }
+      .order-panel { flex-direction: column !important; align-items: stretch; gap: 6px; padding: 8px; overflow: visible; }
+      .customer-block { flex-direction: row !important; width: 100%; align-items: center; }
+      .customer-block #customerAvatarContainer { display: none; }
+      .customer-block > div:first-child { width: 100%; margin: 0; }
+      #explanationBox { display: none; }
+      .speech-bubble { min-height: 0; padding: 8px 10px; overflow: visible; }
+      #sentenceContainer { overflow: visible; }
+      #conveyorTrackArea { height: 132px; }
+      .belt-foot { display: none !important; }
       .game-main { padding: 8px; gap: 6px; }
       .order-head { flex-wrap: wrap; align-items: flex-start; gap: 6px; }
       .prop-bar { flex-wrap: wrap; align-items: center; gap: 8px; }
@@ -265,25 +269,6 @@
 
     </div>
 
-    <!-- Central Idiom Explanation Showcase (畫面中間位置成語解釋看板) -->
-    <div id="centerExplanationCard" class="explain-card w-full bg-gradient-to-r from-[#FFF9EE] via-[#FFF3D6] to-[#FFF9EE] border-2 border-amber-300 rounded-2xl px-3 sm:px-4 py-2 shadow-sm transition-all duration-300 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2.5 flex-1 min-w-0">
-        <div id="centerIconBadge" class="w-9 h-9 rounded-xl bg-amber-400 text-white flex items-center justify-center font-black text-lg shrink-0 shadow-sm transition-transform">
-          💡
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-0.5">
-            <span class="text-[11px] font-black text-amber-800 uppercase tracking-wider">成語釋義看板</span>
-            <span id="centerIdiomTag" class="text-xs font-black text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-200 hidden"></span>
-          </div>
-          <p id="centerExplanationText" class="text-sm font-bold text-[#4A3828] leading-snug">
-            🎯 點擊傳送帶上的正確成語壽司，這裡將為你即時解鎖精闢解釋！
-          </p>
-        </div>
-      </div>
-      <div id="streakFeedback" class="text-pink-600 font-extrabold text-xs sm:text-sm shrink-0 animate-pulse"></div>
-    </div>
-
     <!-- Conveyor Belt Section -->
     <div class="belt-panel w-full bg-[#5C4033] rounded-3xl p-3 sm:p-4 shadow-2xl border-4 border-[#3D281D] relative flex flex-col justify-end">
       
@@ -338,10 +323,28 @@
       </div>
 
       <!-- Conveyor Base Trim -->
-      <div class="mt-2 flex justify-between items-center px-4 text-[11px] text-amber-200/80 font-bold">
+      <div class="belt-foot mt-2 flex justify-between items-center px-4 text-[11px] text-amber-200/80 font-bold">
         <span>◀ 壽司向左迴轉中</span>
         <span>漏單將會扣減客人耐心哦！</span>
       </div>
+    </div>
+
+    <div id="centerExplanationCard" class="explain-card w-full bg-gradient-to-r from-[#FFF9EE] via-[#FFF3D6] to-[#FFF9EE] border-2 border-amber-300 rounded-2xl px-3 sm:px-4 py-2 shadow-sm transition-all duration-300 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 flex-1 min-w-0">
+        <div id="centerIconBadge" class="w-9 h-9 rounded-xl bg-amber-400 text-white flex items-center justify-center font-black text-lg shrink-0 shadow-sm transition-transform">
+          💡
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-0.5">
+            <span class="text-[11px] font-black text-amber-800 uppercase tracking-wider">成語釋義看板</span>
+            <span id="centerIdiomTag" class="text-xs font-black text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-200 hidden"></span>
+          </div>
+          <p id="centerExplanationText" class="text-sm font-bold text-[#4A3828] leading-snug">
+            🎯 點擊傳送帶上的正確成語壽司，這裡將為你即時解鎖精闢解釋！
+          </p>
+        </div>
+      </div>
+      <div id="streakFeedback" class="text-pink-600 font-extrabold text-xs sm:text-sm shrink-0 animate-pulse"></div>
     </div>
   </main>
 

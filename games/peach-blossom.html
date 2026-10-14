@@ -80,14 +80,7 @@
       border: 1.5px solid #c8a364;
       position: relative;
     }
-    .paper-border-gold::after {
-      content: '';
-      position: absolute;
-      inset: 3px;
-      border: 1px dashed rgba(200, 163, 100, 0.45);
-      pointer-events: none;
-      border-radius: inherit;
-    }
+    .paper-border-gold::after { display: none; }
 
     /* Node Ping Animation */
     .node-pulse {
@@ -124,7 +117,14 @@
       border-width: 2px;
     }
     .drag-item:active { cursor: grabbing; }
-    .drag-word-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .match-board {
+      display: grid;
+      grid-template-columns: 5.6rem minmax(0, 1fr);
+      gap: 8px;
+      align-items: start;
+    }
+    .drag-col { position: sticky; top: 0; }
+    .drag-word-row { display: flex; flex-direction: column; gap: 8px; }
     .drop-list { display: flex; flex-direction: column; gap: 8px; }
     .drop-zone {
       display: grid;
@@ -197,8 +197,6 @@
     #floating-guide-bar { bottom: max(1rem, env(safe-area-inset-bottom)); }
     #free-explore-tools { bottom: max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem)); }
     @media (max-width: 640px) {
-      .drop-zone { grid-template-columns: 1fr; }
-      .drop-zone .slot-content { justify-content: flex-start; min-height: 28px; }
       .map-topbar { flex-wrap: wrap; align-items: flex-start; row-gap: 8px; padding: 8px 10px; }
       .map-topbar .brand-badge { display: none; }
       .map-controls { width: 100%; justify-content: flex-end; }
@@ -1062,23 +1060,27 @@
       const shuffledMeanings = [...station.items].sort(() => Math.random() - 0.5);
 
       return `
-        <div class="space-y-3">
-          <div class="text-xs font-bold text-stone-600">文言字詞（拖到注釋，或先點字詞再點注釋）</div>
-          <div class="drag-word-row">
-            ${station.items.map(item => `
-              <div id="drag-${item.word}" data-word="${item.word}" class="drag-item px-3 bg-white hover:bg-rose-50/70 border-amber-300 rounded-xl shadow-sm font-bold text-amber-950 text-base flex items-center justify-center">
-                <span class="font-calligraphy text-xl text-amber-900">${item.word}</span>
-              </div>
-            `).join('')}
+        <div class="match-board">
+          <div class="drag-col">
+            <div class="text-xs font-bold text-stone-600 mb-2">文言字詞</div>
+            <div class="drag-word-row">
+              ${station.items.map(item => `
+                <div id="drag-${item.word}" data-word="${item.word}" class="drag-item px-2 bg-white hover:bg-rose-50/70 border-amber-300 rounded-xl shadow-sm font-bold text-amber-950 text-base flex items-center justify-center">
+                  <span>${item.word}</span>
+                </div>
+              `).join('')}
+            </div>
           </div>
-          <div class="text-xs font-bold text-stone-600">教育局課文指定注釋</div>
-          <div class="drop-list">
-            ${shuffledMeanings.map(item => `
-              <div class="drop-zone p-2.5 bg-amber-50/70 border-dashed border-amber-300/80 rounded-xl transition" data-target-word="${item.word}" data-filled="">
-                <div class="text-xs sm:text-sm text-amber-950 font-semibold leading-relaxed">${item.meaning}</div>
-                <div class="slot-content text-xs text-stone-400 italic">尚未放置</div>
-              </div>
-            `).join('')}
+          <div>
+            <div class="text-xs font-bold text-stone-600 mb-2">拖到注釋，或先點字詞再點注釋</div>
+            <div class="drop-list">
+              ${shuffledMeanings.map(item => `
+                <div class="drop-zone p-2.5 bg-amber-50/70 border-dashed border-amber-300/80 rounded-xl transition" data-target-word="${item.word}" data-filled="">
+                  <div class="text-xs sm:text-sm text-amber-950 font-semibold leading-relaxed">${item.meaning}</div>
+                  <div class="slot-content text-xs text-stone-400 italic">尚未放置</div>
+                </div>
+              `).join('')}
+            </div>
           </div>
         </div>
       `;
@@ -1292,8 +1294,8 @@
         const allDefs = [clue.targetDef, ...clue.distractors].sort(() => Math.random() - 0.5);
         html += `
           <div class="p-3.5 bg-amber-50/70 rounded-xl border border-amber-200">
-            <div class="text-sm font-bold text-amber-950 mb-1 flex items-center gap-1.5">
-              <span>🔍</span> 為文言關鍵詞「<span class="text-rose-800 font-calligraphy text-xl font-bold">${clue.term}</span>」選取課文注釋之解釋：
+            <div class="text-sm font-bold text-amber-950 mb-1 leading-relaxed">
+              <span>🔍</span> 為文言關鍵詞「<span class="text-rose-800 font-bold">${clue.term}</span>」選取課文注釋之解釋：
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
               ${allDefs.map((def, optIdx) => `
