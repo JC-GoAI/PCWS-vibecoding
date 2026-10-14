@@ -439,7 +439,7 @@ function makeScaffold() {
     if (currentLang() === "en") return englishScaffold(tx(grade));
     return {
         role: tx("你是親切的「遊戲設計導師」，請用引導和問答方式，帶領" + grade + "學生與家長一起 Vibe Coding 構思遊戲。"),
-        task: tx("一步步提問並引導使用者，最後幫他們生成一份可直接貼入 Gemini Canvas 的遊戲 Prompt Markdown。\n\n請分階段執行，**每次只問一個問題，並附上 3-5 個建議選項**供他們選擇，建議要跟住他們剛才的答案來想。每題最後都加上「或者你自己講」。他們已經講清楚的部分，就跳過。問題包括：\n1. **學習難題**：詢問最近在學習上（如中文成語、英文、數學分數等）有什麼覺得難記或想溫習的課題？你不肯定的內容，請他們提供例子，不要自己編。\n2. **主題場景**：根據課題，詢問想設定在什麼有趣故事或場景？\n3. **玩法機制**：玩家怎樣操作？答對會怎樣，答錯會怎樣，遊戲怎樣結束？連續答對有沒有獎勵，後面會不會難一點？\n4. **生成 Prompt**：收集完後，用三句話覆述課題、場景和玩法，然後問「可以生成Prompt嗎？」得到同意後，才輸出最終的 Prompt Markdown。"),
+        task: tx("一步步提問並引導使用者，最後幫他們生成一份可直接貼入 Gemini Canvas 的遊戲 Prompt Markdown。\n\n請分階段執行，**每次只問一個問題，並附上 3-5 個建議選項**供他們選擇，建議要跟住他們剛才的答案來想。每題最後都加上「或者你自己講」。他們已經講清楚的部分，就跳過。問題包括：\n1. **學習難題**：詢問最近在學習上（如中文成語、英文、數學分數等）有甚麼覺得難記或想溫習的課題？你不肯定的內容，請他們提供例子，不要自己編。\n2. **主題場景**：根據課題，詢問想設定在甚麼有趣故事或場景？\n3. **玩法機制**：玩家怎樣操作？答對會怎樣，答錯會怎樣，遊戲怎樣結束？連續答對有沒有獎勵，後面會不會難一點？\n4. **生成 Prompt**：收集完後，用三句話覆述課題、場景和玩法，然後問「可以生成 Prompt 嗎？」得到同意後，才輸出最終的 Prompt Markdown。"),
         limit: tx("- **語言**：香港書面語繁體中文，親切易懂，適合" + grade + "學生和家長一起看。\n- **節奏**：一問一答，絕不一次過問多個問題。未得到同意前，只可以對話，不要輸出 HTML、CSS 或 JavaScript。\n- 遊戲機制要寫滿四點；題目必須來自他們提供的課題和例子。\n- **最終輸出格式**：必須嚴格符合以下結構：\n\n  ```markdown\n  # 角色\n  你是一位擅長製作[學科/主題]教育遊戲的前端工程師。\n\n  # 背景與任務\n  請建立可直接遊玩的單頁遊戲《[遊戲名稱]》：[視覺風格與畫面要求]。畫面要有遊戲感，不要像工作紙。\n  遊戲機制：[詳細描述故事、操作、得分/Combo、勝負條件、難度遞增與題目來源]。\n\n  # 指導與限制\n  - 香港書面語繁體中文，適合" + grade + "\n  - 支援滑鼠、觸控、手機及電腦\n  - HTML、CSS、JavaScript 全部放在單一檔案，開啟即可執行\n  ```")
     };
 }
@@ -504,11 +504,11 @@ const PLAY = [
         id: "math",
         title: "數學",
         source: "資料來源：Pre S1 HKAT - 數學科選擇題",
-        basic: "Attached the diagram (jpg or pdf)\n上圖是由P和Q兩個梯形所組成，Q的面積是30 cm^2，h的值是多少？",
-        mid: "Attached the diagram (jpg or pdf)\n你是我的數學老師。請指導我做這題，不要直接給答案。\n上圖是由P和Q兩個梯形所組成，Q的面積是30 cm^2，h的值是多少？",
+        basic: "已附上題目圖片\n上圖是由P和Q兩個梯形所組成，Q的面積是30 cm^2，h的值是多少？",
+        mid: "已附上題目圖片\n你是我的數學老師。請指導我做這題，不要直接給答案。\n上圖是由P和Q兩個梯形所組成，Q的面積是30 cm^2，h的值是多少？",
         high: function (band) {
             const role = band === "sec" ? "你是香港中一至中三數學老師。" : "你是香港小六數學老師。";
-            return "Attached the diagram (jpg or pdf)\n# 角色\n" + role + "\n# 任務\n圖中是由 P 和 Q 兩個梯形所組成，Q 的面積是 30 cm^2，h 的值是多少？\n# 指導方向\n1. 你不需要告訴我答案，也不用把計算步驟寫出來。\n2. 你需要把問題分拆成數條小問題，符合解難過程。\n3. 你要把問題中需要使用的數學技巧明列。";
+            return "已附上題目圖片\n# 角色\n" + role + "\n# 任務\n圖中是由 P 和 Q 兩個梯形所組成，Q 的面積是 30 cm^2，h 的值是多少？\n# 指導方向\n1. 你不需要告訴我答案，也不用把計算步驟寫出來。\n2. 你需要把問題分拆成數條小問題，符合解難過程。\n3. 你要把問題中需要使用的數學技巧明列。";
         }
     }
 ];
@@ -705,8 +705,8 @@ function startGates() {
 
 function vibeToolsMarkup() {
     return '<div class="game-tools">' +
-        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">' + escapeHtml(tx("展示prompt")) + '</button>' +
-        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-chat" aria-expanded="false">' + escapeHtml(tx("展示與AI的完整對話")) + '</button>' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">' + escapeHtml(tx("展示 Prompt")) + '</button>' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-chat" aria-expanded="false">' + escapeHtml(tx("展示與 AI 的完整對話")) + '</button>' +
         '<button type="button" class="ghost-btn" data-action="download-code">' + escapeHtml(tx("下載完整代碼")) + '</button>' +
         "</div>" +
         '<div id="reveal-prompt" class="reveal-panel nocopy"><pre class="prompt-view">' + escapeHtml(txBlock("gamePrompt", GAME_PROMPT)) + "</pre></div>" +
@@ -782,7 +782,7 @@ function subjectDownloads(id) {
             "</div>" + source;
     }
     if (id === "math") {
-        return '<div class="thumb-row">' + thumbLink("refs/math-diagram.jpg", tx("下載數學題目圖")) + "</div>" + source;
+        return '<div class="thumb-row">' + thumbLink("refs/math-diagram.jpg", tx("下載數學題目圖片")) + "</div>" + source;
     }
     return "";
 }
@@ -843,10 +843,10 @@ const GAME_PROMPT = [
 ].join("\n");
 
 const SEC_GAME_PROMPT = [
-    "#角色",
+    "# 角色",
     "你是一位擅長製作中文教育遊戲的前端工程師。",
     "",
-    "#背景與任務",
+    "# 背景與任務",
     "建立可直接遊玩的單頁遊戲《尋找桃花源》。",
     "重要：",
     "使用這張桃花源圖片作為唯一遊戲地圖背景：https://i.imgur.com/gIqahgj.jpeg",
@@ -876,7 +876,7 @@ const SEC_GAME_PROMPT = [
     "• 可再次嘗試",
     "完成所有探索後：鏡頭逐步拉遠並升高，由局部場景縮放至完整桃花源地圖，展示所有已點亮的探索站點。根據玩家的答題表現、首次答對率及圖鑑收集進度進入不同結局。不同結局須顯示不同稱號、結算畫面及結語，提升重玩價值。最後顯示：「尋找桃花源完成」，並開放自由點擊各站點、自由放大縮小背景圖片，重溫詞語解釋與收藏圖鑑。",
     "",
-    "#指導與限制",
+    "# 指導與限制",
     "- 以我提供的圖片探索與發現為核心體驗。圖片最小固定在視窗大小，不可移動，但可以放大，放大時可移動。",
     "- 鏡頭移動、聚焦與縮放須流暢自然，具有動畫感。",
     "- 畫面具古風繪本感和探秘感，背景/整體顏色以淺色為主。",
@@ -911,8 +911,8 @@ function secChatShots(page) {
 function secVibeToolsMarkup() {
     const pages = secChatPageCount();
     return '<div class="game-tools">' +
-        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">' + escapeHtml(tx("展示prompt")) + '</button>' +
-        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-chat" aria-expanded="false">' + escapeHtml(tx("展示與AI的完整對話")) + '</button>' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-prompt" aria-expanded="false">' + escapeHtml(tx("展示 Prompt")) + '</button>' +
+        '<button type="button" class="ghost-btn" data-action="reveal" data-value="reveal-chat" aria-expanded="false">' + escapeHtml(tx("展示與 AI 的完整對話")) + '</button>' +
         '<button type="button" class="ghost-btn" data-action="download-code">' + escapeHtml(tx("下載完整代碼")) + '</button>' +
         "</div>" +
         '<div id="reveal-prompt" class="reveal-panel nocopy"><pre class="prompt-view">' + escapeHtml(txBlock("secGamePrompt", SEC_GAME_PROMPT)) + "</pre></div>" +

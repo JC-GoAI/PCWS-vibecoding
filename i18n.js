@@ -1,6 +1,6 @@
 (function () {
-    var SIMP_FROM = "並來係個們價優兒內兩別則剛創動務勝勵區協參員問啟單嗎嘗嚮嚴國圍圖執報場塊壽夠學宮實寫寶將專尋對導師帶幫幾張彈彙後從應戰戲換撳撿擇擊據擾敗敘數斷於時暢書會條構標樣機檔檢欄歷歸氣沒淺減測溫滿漁潑潔潛為煙營爭牠狀獎獲現環產畫當發確碼種稱積穩節範簡約紙級細終組結絕給經維綱網線編緩練縮總繪繼續義習腦與舉處號補裡製複見規視親覺觀觸計訓記設許訴評詞詢試話該詳認語說誰課請論講證識議讀變讓負貨費貼資購車較載輕輸轉迴這連進遊運過達遞遠適選還邊郵釋銀錄錯鍵鎖鏈鏡鑑長門閉開間閱關階隨險隻雙難電頁項順須預領頭題顏類顯風飛餘驗驟體鳥麼點";
-    var SIMP_TO = "并来系个们价优儿内两别则刚创动务胜励区协参员问启单吗尝向严国围图执报场块寿够学宫实写宝将专寻对导师带帮几张弹汇后从应战戏换揿捡择击据扰败叙数断于时畅书会条构标样机档检栏历归气没浅减测温满渔泼洁潜为烟营争它状奖获现环产画当发确码种称积稳节范简约纸级细终组结绝给经维纲网线编缓练缩总绘继续义习脑与举处号补里制复见规视亲觉观触计训记设许诉评词询试话该详认语说谁课请论讲证识议读变让负货费贴资购车较载轻输转回这连进游运过达递远适选还边邮释银录错键锁链镜鉴长门闭开间阅关阶随险只双难电页项顺须预领头题颜类显风飞余验骤体鸟么点";
+    var SIMP_FROM = "並來係個們價優兒內兩別則剛創動務勝勵區協參員問啟單嗎嘗嚮嚴國圍圖執報場塊壽夠學宮實寫寶將專尋對導師帶幫幾張彈彙後從應戰戲換撳撿擇擊據擾敗敘數斷於時暢書會條構標樣機檔檢欄歷歸氣沒淺減測溫滿漁潑潔潛為煙營爭牠狀獎獲現環產畫當發確碼種稱積穩節範簡約紙級細終組結絕給經維綱網線編緩練縮總繪繼續義習腦與舉處號補裡製複見規視親覺觀觸計訓記設許訴評詞詢試話該詳認語說誰課請論講證識議讀變讓負貨費貼資購車較載輕輸轉迴這連進遊運過達遞遠適選還邊郵釋銀錄錯鍵鎖鏈鏡鑑長門閉開間閱關階隨險隻雙難電頁項順須預領頭題顏類顯風飛餘驗驟體鳥麼點著覆樂歡";
+    var SIMP_TO = "并来系个们价优儿内两别则刚创动务胜励区协参员问启单吗尝向严国围图执报场块寿够学宫实写宝将专寻对导师带帮几张弹汇后从应战戏换揿捡择击据扰败叙数断于时畅书会条构标样机档检栏历归气没浅减测温满渔泼洁潜为烟营争它状奖获现环产画当发确码种称积稳节范简约纸级细终组结绝给经维纲网线编缓练缩总绘继续义习脑与举处号补里制复见规视亲觉观触计训记设许诉评词询试话该详认语说谁课请论讲证识议读变让负货费贴资购车较载轻输转回这连进游运过达递远适选还边邮释银录错键锁链镜鉴长门闭开间阅关阶随险只双难电页项顺须预领头题颜类显风飞余验骤体鸟么点着复乐欢";
     var EN = {
         "親子共創 AI 學習遊戲": "Parent-Child AI Learning Games",
         "親子共創": "Parent-Child",
@@ -17,25 +17,25 @@
         "Go Play：引導式提示詞": "Go Play: Guided prompts",
         "Go Play：互動學習遊戲": "Go Play: Interactive games",
         "Go Make：親子共創": "Go Make: Create together",
-        "互動學習遊戲": "Interactive game",
+        "互動學習遊戲": "Interactive games",
         "遊戲 Prompt": "Game prompt",
         "共創": "Create together",
         "AI指導": "AI guide",
         "中文": "Chinese",
         "英文": "English",
         "數學": "Mathematics",
-        "請先選擇一個科目，每個科目分為三個程度。英文及數學部分須先下載參考圖片，上載至 Gemini，再按「複製」，將提示詞貼上。": "Choose a subject first. Each subject has three levels. For English and Mathematics, download the reference images, upload them to Gemini, then tap Copy and paste the prompt.",
+        "請先選擇一個科目，每個科目分為三個程度。英文及數學部分須先下載參考圖片，上載至 Gemini，再按「複製」，將提示詞貼上。": "Choose a subject first. Each subject has three levels. For English and Mathematics, download the reference images, upload them to Gemini, then tap Copy this prompt and paste it.",
         "資料來源：TSA P6 - 中國語文寫作評估": "Source: TSA P6 – Chinese Language writing assessment",
         "資料來源：Pre S1 HKAT - 英國語文閱讀評估": "Source: Pre-S1 HKAT – English reading assessment",
         "資料來源：Pre S1 HKAT - 數學科選擇題": "Source: Pre-S1 HKAT – Mathematics multiple choice",
         "下載英文篇章": "Download the English passage",
         "下載英文題目": "Download the English questions",
-        "下載數學題目圖": "Download the maths diagram",
+        "下載數學題目圖片": "Download the maths question image",
         "複製這段提示詞": "Copy this prompt",
         "已複製": "Copied",
         "稍後開放": "Opens later",
-        "展示prompt": "Show prompt",
-        "展示與AI的完整對話": "Show the full chat with AI",
+        "展示 Prompt": "Show prompt",
+        "展示與 AI 的完整對話": "Show the full chat with AI",
         "下載完整代碼": "Download the full code",
         "上一頁": "Previous",
         "下一頁": "Next",
@@ -160,10 +160,10 @@
         "algebra:role": "You are a front-end engineer who is good at making mathematics learning games.",
         "algebra:task": "Build a single-page game that can be played immediately, Algebra Maze. Light-coloured passages, with a large character and large blocks.\n\nImportant:\nThe player moves along the path and picks up algebra blocks. Each door shows only one target, with no options listed. The player drags blocks onto the door and combines them. The door opens only when the combination is correct. This is a flat passage, not a 3D maze.\nYou write the questions, 6 doors, from easy to hard, with no repeats. Use the example below only as a reference. Do not use the same expression for all six.\n\nExample:\nThe target is x² − 9. On the ground are (x + 3), (x − 3), and other blocks that are not needed. The player pairs those two blocks and the door opens.\n\n# Learning content\nThe content is index laws and factorisation for Hong Kong Secondary 1 to 3.\nWhen multiplying powers with the same base, add the indices; when dividing, subtract them; an index outside brackets is multiplied in. Factorisation includes taking out a common factor and the difference of squares.\nThe first 3 doors use index laws. The last 3 use factorisation. The last door must take out a common factor first, then factorise.\n\nWhen the game starts:\nThe character walks to door 1. The correct blocks are nearby, along with blocks that are not needed.\nAfter a correct answer:\n• The blocks lock onto the door, the door opens, and the character walks through\n• Show the combined step\nAfter a wrong answer:\n• The blocks snap back to the ground, with a hint about indices or factors\n• They can be dragged again\nAfter 6 doors, list each target and combination. Titles by first-try success: trainee explorer, algebra guide, maze master. Finally show: \"Algebra Maze complete\".",
         "algebra:limit": "- Traditional Chinese, suitable for Secondary 1 to 3\n- Support mouse, touch, phone and computer\n- Put HTML, CSS and JavaScript in a single file that runs when opened\n- Each door has only one correct combination\n- Keep the animation smooth: walking, picking up blocks, combining, snapping back, opening the door",
-        "mathBasic": "Attached the diagram (jpg or pdf)\nThe figure above is made of two trapeziums, P and Q. The area of Q is 30 cm^2. What is the value of h?",
-        "mathMid": "Attached the diagram (jpg or pdf)\nYou are my mathematics teacher. Guide me through this question. Do not give me the answer directly.\nThe figure above is made of two trapeziums, P and Q. The area of Q is 30 cm^2. What is the value of h?",
-        "mathHighPri": "Attached the diagram (jpg or pdf)\n# Role\nYou are a Hong Kong Primary 6 mathematics teacher.\n# Task\nThe figure is made of two trapeziums, P and Q. The area of Q is 30 cm^2. What is the value of h?\n# Guidance\n1. Do not tell me the answer, and do not write out the calculation steps.\n2. Break the problem into several smaller questions that follow a problem-solving process.\n3. List the mathematics skills needed in the problem.",
-        "mathHighSec": "Attached the diagram (jpg or pdf)\n# Role\nYou are a Hong Kong Secondary 1 to 3 mathematics teacher.\n# Task\nThe figure is made of two trapeziums, P and Q. The area of Q is 30 cm^2. What is the value of h?\n# Guidance\n1. Do not tell me the answer, and do not write out the calculation steps.\n2. Break the problem into several smaller questions that follow a problem-solving process.\n3. List the mathematics skills needed in the problem."
+        "mathBasic": "Attached the question image\nThe figure above is made of two trapeziums, P and Q. The area of Q is 30 cm^2. What is the value of h?",
+        "mathMid": "Attached the question image\nYou are my mathematics teacher. Guide me through this question. Do not give me the answer directly.\nThe figure above is made of two trapeziums, P and Q. The area of Q is 30 cm^2. What is the value of h?",
+        "mathHighPri": "Attached the question image\n# Role\nYou are a Hong Kong Primary 6 mathematics teacher.\n# Task\nThe figure is made of two trapeziums, P and Q. The area of Q is 30 cm^2. What is the value of h?\n# Guidance\n1. Do not tell me the answer, and do not write out the calculation steps.\n2. Break the problem into several smaller questions that follow a problem-solving process.\n3. List the mathematics skills needed in the problem.",
+        "mathHighSec": "Attached the question image\n# Role\nYou are a Hong Kong Secondary 1 to 3 mathematics teacher.\n# Task\nThe figure is made of two trapeziums, P and Q. The area of Q is 30 cm^2. What is the value of h?\n# Guidance\n1. Do not tell me the answer, and do not write out the calculation steps.\n2. Break the problem into several smaller questions that follow a problem-solving process.\n3. List the mathematics skills needed in the problem."
     };
 
     function storedLang() {
