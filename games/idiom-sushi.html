@@ -6,10 +6,9 @@
   <title>成語迴轉壽司店 - 中文學習遊戲</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Zen Maru Gothic & Noto Sans TC for cute, clear Japanese-style typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700;900&display=swap" rel="stylesheet">
   <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -20,12 +19,24 @@
       -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
+    html, body { height: 100%; }
     body {
-      font-family: 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
+      font-family: "Noto Sans HK", "PingFang HK", "PingFang TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif;
       background-color: #FFFDF9;
       color: #4A3E3D;
-      overflow-x: hidden;
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow: hidden;
     }
+    .game-main {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .order-panel { flex: 1 1 auto; min-height: 0; overflow: auto; }
+    .explain-card, .belt-panel { flex: 0 0 auto; }
     /* Cute Candy Palette Variables */
     :root {
       --bg-cream: #FFFDF7;
@@ -105,23 +116,32 @@
     }
     #startModal > div, #gameOverModal > div { margin-top: auto; margin-bottom: auto; }
     @media (max-width: 640px) {
-      .game-topbar { flex-wrap: wrap; align-items: flex-start; gap: 8px; padding: 8px 10px; }
-      .game-topbar h1 { font-size: 1.05rem; line-height: 1.25; flex-wrap: wrap; }
-      .hud-row { width: 100%; justify-content: space-between; gap: 4px; }
+      .game-topbar { flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px 8px; }
+      .game-topbar h1 { font-size: 1rem; line-height: 1.2; white-space: nowrap; }
+      .brand-lock { flex: 1 1 100%; min-width: 0; }
+      .game-topbar .top-sub { display: none; }
+      .hud-row { width: 100%; justify-content: flex-end; gap: 4px; }
       .hud-row > button { flex: 0 0 auto; }
-      .hud-chip { min-width: 0; flex: 1 1 0; padding-left: 6px; padding-right: 6px; }
-      .hud-chip .hud-label { letter-spacing: 0; white-space: normal; text-align: center; line-height: 1.15; }
+      .hud-chip { min-width: 0; flex: 0 0 auto; padding-left: 6px; padding-right: 6px; }
+      .hud-chip .hud-label { display: none; }
+      .order-panel { flex-direction: row; align-items: flex-start; gap: 8px; padding: 8px; }
+      .customer-block { gap: 2px; }
+      #customerSVG { width: 58px; height: 58px; }
+      #customerSVG svg { width: 48px; height: 48px; }
+      .speech-bubble { min-height: 0; padding: 8px 10px; }
+      #conveyorTrackArea { height: 148px; }
+      .game-main { padding: 8px; gap: 6px; }
       .order-head { flex-wrap: wrap; align-items: flex-start; gap: 6px; }
       .prop-bar { flex-wrap: wrap; align-items: center; gap: 8px; }
       .prop-actions { flex-wrap: wrap; justify-content: flex-end; }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between bg-[#FFFBF0] text-[#3D312A] selection:bg-pink-200">
+<body class="h-dvh flex flex-col bg-[#FFFBF0] text-[#3D312A] selection:bg-pink-200">
 
   <!-- Top Bar: Game Stats & Audio Control -->
   <header class="game-topbar w-full bg-[#FFEED9] border-b-4 border-[#ECC8A0] px-4 py-2 flex items-center justify-between shadow-sm sticky top-0 z-40">
-    <div class="flex items-center space-x-2">
+      <div class="brand-lock flex items-center space-x-2 min-w-0">
       <span class="text-2xl sm:text-3xl">🍣</span>
       <div>
         <h1 class="font-black text-lg sm:text-2xl text-[#8D4B38] tracking-wider flex items-center gap-1.5">
@@ -130,7 +150,7 @@
             熟客光臨 (雙倍分!)
           </span>
         </h1>
-        <p class="text-xs text-[#A87B65] font-bold">學徒出師大挑戰</p>
+        <p class="top-sub text-xs text-[#A87B65] font-bold">學徒出師大挑戰</p>
       </div>
     </div>
 
@@ -166,13 +186,13 @@
   </header>
 
   <!-- Upper Counter Area: Seated Customers, Patience Bar, Speech Bubble with sentence -->
-  <main class="flex-1 w-full max-w-5xl mx-auto p-3 sm:p-4 flex flex-col justify-between relative overflow-hidden">
+  <main class="game-main w-full max-w-5xl mx-auto p-3 sm:p-4">
     
     <!-- Restaurant Background Decorations -->
-    <div class="w-full bg-[#FFF5E4] border-4 border-[#ECC8A0] rounded-3xl p-3 sm:p-5 shadow-lg relative flex flex-col md:flex-row items-center gap-4 sm:gap-6 tatami-banner">
+    <div class="order-panel w-full bg-[#FFF5E4] border-4 border-[#ECC8A0] rounded-3xl p-3 sm:p-5 shadow-lg relative flex flex-row items-center gap-3 sm:gap-6 tatami-banner">
       
       <!-- Customer Avatar & Patience Bar -->
-      <div class="flex flex-col items-center shrink-0">
+      <div class="customer-block flex flex-col items-center shrink-0">
         <!-- Customer Patience Bar Container -->
         <div class="w-32 sm:w-36 bg-gray-200 rounded-full h-4 sm:h-5 border-2 border-white shadow-inner overflow-hidden mb-2 relative">
           <div id="patienceBar" class="h-full bg-gradient-to-r from-emerald-400 via-yellow-400 to-rose-500 rounded-full transition-all duration-300 ease-out" style="width: 100%;"></div>
@@ -185,7 +205,7 @@
             🍵
           </div>
           <!-- SVG Cartoon Animals (Swappable) -->
-          <div id="customerSVG" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-orange-100 border-4 border-amber-300 shadow-md flex items-center justify-center relative overflow-hidden animate-bob">
+          <div id="customerSVG" class="w-16 h-16 sm:w-28 sm:h-28 rounded-full bg-orange-100 border-4 border-amber-300 shadow-md flex items-center justify-center relative overflow-hidden animate-bob">
             <!-- Drawn with inline cute SVG -->
             <svg id="customerFace" viewBox="0 0 100 100" class="w-20 h-20">
               <!-- Default: Shiba Inu Guest -->
@@ -212,7 +232,7 @@
       </div>
 
       <!-- Speech Bubble with Question & Missing Blank(s) -->
-      <div class="flex-1 w-full bg-white/95 border-3 border-amber-200 rounded-3xl p-4 sm:p-5 shadow-md relative min-h-[140px] flex flex-col justify-center">
+      <div class="speech-bubble flex-1 w-full min-w-0 bg-white/95 border-3 border-amber-200 rounded-3xl p-3 sm:p-5 shadow-md relative sm:min-h-[140px] flex flex-col justify-center">
         <!-- Speech Bubble pointer triangle -->
         <div class="hidden md:block absolute -left-3 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-r-[12px] border-r-white/95"></div>
 
@@ -246,7 +266,7 @@
     </div>
 
     <!-- Central Idiom Explanation Showcase (畫面中間位置成語解釋看板) -->
-    <div id="centerExplanationCard" class="w-full my-2 bg-gradient-to-r from-[#FFF9EE] via-[#FFF3D6] to-[#FFF9EE] border-2 border-amber-300 rounded-2xl px-3 sm:px-4 py-2 shadow-sm transition-all duration-300 flex items-center justify-between gap-3">
+    <div id="centerExplanationCard" class="explain-card w-full bg-gradient-to-r from-[#FFF9EE] via-[#FFF3D6] to-[#FFF9EE] border-2 border-amber-300 rounded-2xl px-3 sm:px-4 py-2 shadow-sm transition-all duration-300 flex items-center justify-between gap-3">
       <div class="flex items-center gap-2.5 flex-1 min-w-0">
         <div id="centerIconBadge" class="w-9 h-9 rounded-xl bg-amber-400 text-white flex items-center justify-center font-black text-lg shrink-0 shadow-sm transition-transform">
           💡
@@ -256,7 +276,7 @@
             <span class="text-[11px] font-black text-amber-800 uppercase tracking-wider">成語釋義看板</span>
             <span id="centerIdiomTag" class="text-xs font-black text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-200 hidden"></span>
           </div>
-          <p id="centerExplanationText" class="text-xs sm:text-sm font-bold text-[#4A3828] leading-tight line-clamp-2 sm:line-clamp-1">
+          <p id="centerExplanationText" class="text-sm font-bold text-[#4A3828] leading-snug">
             🎯 點擊傳送帶上的正確成語壽司，這裡將為你即時解鎖精闢解釋！
           </p>
         </div>
@@ -265,7 +285,7 @@
     </div>
 
     <!-- Conveyor Belt Section -->
-    <div class="w-full bg-[#5C4033] rounded-3xl p-3 sm:p-4 shadow-2xl border-4 border-[#3D281D] relative flex flex-col justify-end">
+    <div class="belt-panel w-full bg-[#5C4033] rounded-3xl p-3 sm:p-4 shadow-2xl border-4 border-[#3D281D] relative flex flex-col justify-end">
       
       <!-- Counter Bar Shelf Edge & Right-Top Power-up Props Toolbar -->
       <div class="prop-bar w-full flex items-center justify-between mb-1.5 px-1">
@@ -1329,6 +1349,7 @@
       timerId: null,
       animFrameId: null,
       isPlaying: false,
+      showingExplanation: false,
       conveyorSpeed: 2.2, // pixels per frame
       baseSpeed: 2.2,
       isSlowed: false,
@@ -1481,7 +1502,7 @@
       // Reset central board prompt for incoming question
       elCenterIdiomTag.classList.add("hidden");
       elCenterExplanationText.textContent = "🎯 點擊傳送帶上的正確成語壽司，這裡將為你即時解鎖精闢解釋！";
-      elCenterCard.className = "w-full my-2 bg-gradient-to-r from-[#FFF9EE] via-[#FFF3D6] to-[#FFF9EE] border-2 border-amber-300 rounded-2xl px-3 sm:px-4 py-2 shadow-sm transition-all duration-300 flex items-center justify-between gap-3";
+      elCenterCard.className = "explain-card w-full my-2 bg-gradient-to-r from-[#FFF9EE] via-[#FFF3D6] to-[#FFF9EE] border-2 border-amber-300 rounded-2xl px-3 sm:px-4 py-2 shadow-sm transition-all duration-300 flex items-center justify-between gap-3";
       elCenterIcon.textContent = "💡";
       elCenterIcon.className = "w-9 h-9 rounded-xl bg-amber-400 text-white flex items-center justify-center font-black text-lg shrink-0 shadow-sm transition-transform";
 
@@ -1597,7 +1618,7 @@
     }
 
     function onPlateClicked(plateEl) {
-      if (!GameState.isPlaying) return;
+      if (!GameState.isPlaying || GameState.showingExplanation) return;
       if (plateEl.dataset.clicked === "true") return;
 
       sounds.playPlateClick();
@@ -1718,7 +1739,7 @@
       elCenterExplanationText.textContent = q.explanation;
       elCenterIcon.textContent = "✨";
       elCenterIcon.className = "w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-black text-lg shrink-0 shadow-md scale-110 transition-transform";
-      elCenterCard.className = "w-full my-2 bg-gradient-to-r from-emerald-50 via-amber-50 to-emerald-50 border-2 border-emerald-400 rounded-2xl px-3 sm:px-4 py-2 shadow-md transition-all duration-300 flex items-center justify-between gap-3 transform scale-[1.01]";
+      elCenterCard.className = "explain-card w-full my-2 bg-gradient-to-r from-emerald-50 via-amber-50 to-emerald-50 border-2 border-emerald-400 rounded-2xl px-3 sm:px-4 py-2 shadow-md transition-all duration-300 flex items-center justify-between gap-3";
 
       // Save into session idioms log for End Game Compendium
       const record = {
@@ -1734,12 +1755,14 @@
 
       updateHUD();
 
-      // Proceed to next customer order after a sweet 1.1s delay
+      GameState.showingExplanation = true;
+      GameState.conveyorSpeed = 0;
       setTimeout(() => {
+        GameState.showingExplanation = false;
         if (GameState.isPlaying) {
           pickNextQuestion();
         }
-      }, 1100);
+      }, 3200);
     }
 
     function handleWrongHit(plateEl, hintMsg) {
@@ -1951,7 +1974,7 @@
       clearTimeout(GameState.slowTimerId);
       GameState.slowTimerId = setTimeout(() => {
         GameState.isSlowed = false;
-        GameState.conveyorSpeed = GameState.baseSpeed;
+        if (!GameState.showingExplanation) GameState.conveyorSpeed = GameState.baseSpeed;
         if (GameState.isPlaying) {
           showScoreFloatingPopup("傳送帶恢復原速", false);
           updateHUD();
@@ -2109,8 +2132,9 @@
         <head>
           <meta charset="utf-8">
           <title>成語迴轉壽司店 - 課後學習單</title>
+          <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;700&display=swap" rel="stylesheet">
           <style>
-            body { font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; padding: 20px; color: #333; }
+            body { font-family: "Noto Sans HK", "PingFang HK", "PingFang TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif; padding: 20px; color: #333; }
             h1 { color: #c2410c; text-align: center; margin-bottom: 5px; }
             .subtitle { text-align: center; color: #78350f; font-size: 14px; margin-bottom: 25px; }
             .info-box { border: 1px solid #fed7aa; background-color: #fff7ed; padding: 12px; margin-bottom: 20px; border-radius: 6px; }

@@ -10,7 +10,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -24,7 +24,7 @@
     
     html, body { height: 100%; }
     body {
-      font-family: 'Noto Serif TC', serif;
+      font-family: "Noto Sans HK", "PingFang HK", "PingFang TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif;
       background-color: #f7f1e6;
       color: var(--ink);
       touch-action: manipulation;
@@ -34,7 +34,7 @@
     }
 
     .font-calligraphy {
-      font-family: 'Ma Shan Zheng', cursive, 'Noto Serif TC', serif;
+      font-family: "Noto Sans HK", "PingFang HK", "PingFang TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif;
     }
 
     /* Map Camera Stage with soft light gradient vignette */
@@ -120,13 +120,61 @@
     .drag-item {
       cursor: grab;
       touch-action: none;
+      min-height: 48px;
+      border-width: 2px;
     }
-    .drag-item:active {
-      cursor: grabbing;
+    .drag-item:active { cursor: grabbing; }
+    .drag-word-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .drop-list { display: flex; flex-direction: column; gap: 8px; }
+    .drop-zone {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 5.5rem;
+      gap: 8px;
+      align-items: center;
+      min-height: 64px;
+      border-width: 2px;
     }
+    .drop-zone .slot-content { min-height: 32px; display: flex; align-items: center; justify-content: center; text-align: center; }
     .drop-zone.hovered {
       background-color: rgba(254, 237, 230, 0.8) !important;
       border-color: #d67a6d !important;
+    }
+    .drag-ghost {
+      position: fixed;
+      z-index: 80;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      background: #fff;
+      color: #78350f;
+      border: 2px solid #b45309;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(68, 40, 12, 0.18);
+    }
+    #modal-card.modal-split {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0;
+    }
+    #modal-card.modal-split::after { display: none; }
+    #modal-card.modal-split:not(:has(.modal-body)) {
+      display: block;
+      overflow-y: auto;
+      padding: 1.25rem;
+    }
+    #modal-card.modal-split .modal-body {
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+      padding: 1.25rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    #modal-card.modal-split .modal-foot {
+      padding: 0.75rem 1.25rem 1.25rem;
+      border-top: 1px solid rgba(120, 80, 20, 0.12);
+      background: rgba(255, 253, 248, 0.96);
     }
 
     #modal-card.chapter-wide {
@@ -149,6 +197,8 @@
     #floating-guide-bar { bottom: max(1rem, env(safe-area-inset-bottom)); }
     #free-explore-tools { bottom: max(5rem, calc(env(safe-area-inset-bottom) + 4.5rem)); }
     @media (max-width: 640px) {
+      .drop-zone { grid-template-columns: 1fr; }
+      .drop-zone .slot-content { justify-content: flex-start; min-height: 28px; }
       .map-topbar { flex-wrap: wrap; align-items: flex-start; row-gap: 8px; padding: 8px 10px; }
       .map-topbar .brand-badge { display: none; }
       .map-controls { width: 100%; justify-content: flex-end; }
@@ -990,7 +1040,11 @@
         </div>
       `;
 
-      card.innerHTML = content;
+      card.classList.add('modal-split');
+      const submit = station.type === 'drag_match'
+        ? '<div class="modal-foot"><button onclick="verifyDragMatch(' + station.id + ')" class="w-full py-2.5 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition">提交字詞配對</button></div>'
+        : '';
+      card.innerHTML = '<div class="modal-body">' + content + '</div>' + submit;
       modal.classList.remove('hidden');
 
       if (station.type === 'drag_match') {
@@ -1009,30 +1063,23 @@
 
       return `
         <div class="space-y-3">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div class="space-y-2">
-              <div class="text-xs font-bold text-stone-600">文言字詞（點選或拖曳）</div>
-              ${station.items.map(item => `
-                <div id="drag-${item.word}" data-word="${item.word}" draggable="true" class="drag-item p-3 bg-white hover:bg-rose-50/70 border border-amber-300 rounded-xl shadow-sm text-center font-bold text-amber-950 text-base active:scale-95 transition flex items-center justify-between">
-                  <span class="font-calligraphy text-xl text-amber-900">${item.word}</span>
-                  <span class="text-xs font-normal text-rose-800 bg-rose-50 px-2 py-0.5 rounded">配對字解</span>
-                </div>
-              `).join('')}
-            </div>
-
-            <div class="space-y-2">
-              <div class="text-xs font-bold text-stone-600">教育局課文指定注釋</div>
-              ${shuffledMeanings.map(item => `
-                <div class="drop-zone p-2.5 bg-amber-50/70 border-2 border-dashed border-amber-300/80 rounded-xl min-h-[58px] flex flex-col justify-center transition" data-target-word="${item.word}" data-filled="">
-                  <div class="text-xs text-amber-950 font-semibold mb-1">${item.meaning}</div>
-                  <div class="slot-content text-xs text-stone-400 italic">尚未放置詞語</div>
-                </div>
-              `).join('')}
-            </div>
+          <div class="text-xs font-bold text-stone-600">文言字詞（拖到注釋，或先點字詞再點注釋）</div>
+          <div class="drag-word-row">
+            ${station.items.map(item => `
+              <div id="drag-${item.word}" data-word="${item.word}" class="drag-item px-3 bg-white hover:bg-rose-50/70 border-amber-300 rounded-xl shadow-sm font-bold text-amber-950 text-base flex items-center justify-center">
+                <span class="font-calligraphy text-xl text-amber-900">${item.word}</span>
+              </div>
+            `).join('')}
           </div>
-          <button onclick="verifyDragMatch(${station.id})" class="w-full mt-3 py-2.5 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-700 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition">
-            提交字詞配對
-          </button>
+          <div class="text-xs font-bold text-stone-600">教育局課文指定注釋</div>
+          <div class="drop-list">
+            ${shuffledMeanings.map(item => `
+              <div class="drop-zone p-2.5 bg-amber-50/70 border-dashed border-amber-300/80 rounded-xl transition" data-target-word="${item.word}" data-filled="">
+                <div class="text-xs sm:text-sm text-amber-950 font-semibold leading-relaxed">${item.meaning}</div>
+                <div class="slot-content text-xs text-stone-400 italic">尚未放置</div>
+              </div>
+            `).join('')}
+          </div>
         </div>
       `;
     }
@@ -1041,39 +1088,83 @@
     function setupDragDropEvents() {
       const draggables = document.querySelectorAll('.drag-item');
       const dropZones = document.querySelectorAll('.drop-zone');
+      let dragWord = null;
+      let pointerId = null;
+      let startX = 0;
+      let startY = 0;
+      let moved = false;
+      let ghost = null;
+
+      function clearSelection() {
+        draggables.forEach(d => d.classList.remove('ring-2', 'ring-rose-500'));
+      }
+      function clearHover() {
+        dropZones.forEach(zone => zone.classList.remove('hovered'));
+      }
+      function zoneAt(x, y) {
+        const under = document.elementFromPoint(x, y);
+        return under ? under.closest('.drop-zone') : null;
+      }
 
       draggables.forEach(elem => {
-        elem.addEventListener('dragstart', (e) => {
-          e.dataTransfer.setData('text/plain', elem.getAttribute('data-word'));
+        elem.addEventListener('pointerdown', (e) => {
+          if (e.button !== undefined && e.button !== 0) return;
+          dragWord = elem.getAttribute('data-word');
+          pointerId = e.pointerId;
+          startX = e.clientX;
+          startY = e.clientY;
+          moved = false;
+          elem.setPointerCapture(e.pointerId);
         });
-        elem.addEventListener('click', () => {
-          draggables.forEach(d => d.classList.remove('ring-2', 'ring-rose-500'));
-          selectedWordItem = elem.getAttribute('data-word');
-          elem.classList.add('ring-2', 'ring-rose-500');
+        elem.addEventListener('pointermove', (e) => {
+          if (e.pointerId !== pointerId || !dragWord) return;
+          if (!moved && Math.hypot(e.clientX - startX, e.clientY - startY) < 8) return;
+          moved = true;
+          if (!ghost) {
+            ghost = document.createElement('div');
+            ghost.className = 'drag-ghost';
+            ghost.textContent = dragWord;
+            document.body.appendChild(ghost);
+          }
+          ghost.style.left = e.clientX + 'px';
+          ghost.style.top = e.clientY + 'px';
+          clearHover();
+          const zone = zoneAt(e.clientX, e.clientY);
+          if (zone) zone.classList.add('hovered');
+        });
+        elem.addEventListener('pointerup', (e) => {
+          if (e.pointerId !== pointerId) return;
+          const zone = zoneAt(e.clientX, e.clientY);
+          if (moved && zone && dragWord) {
+            placeWordInZone(zone, dragWord);
+            selectedWordItem = null;
+            clearSelection();
+          } else if (!moved) {
+            clearSelection();
+            selectedWordItem = dragWord;
+            elem.classList.add('ring-2', 'ring-rose-500');
+          }
+          if (ghost) ghost.remove();
+          ghost = null;
+          dragWord = null;
+          pointerId = null;
+          clearHover();
+        });
+        elem.addEventListener('pointercancel', () => {
+          if (ghost) ghost.remove();
+          ghost = null;
+          dragWord = null;
+          pointerId = null;
+          clearHover();
         });
       });
 
       dropZones.forEach(zone => {
-        zone.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          zone.classList.add('hovered');
-        });
-        zone.addEventListener('dragleave', () => {
-          zone.classList.remove('hovered');
-        });
-        zone.addEventListener('drop', (e) => {
-          e.preventDefault();
-          zone.classList.remove('hovered');
-          const word = e.dataTransfer.getData('text/plain');
-          placeWordInZone(zone, word);
-        });
-
         zone.addEventListener('click', () => {
-          if (selectedWordItem) {
-            placeWordInZone(zone, selectedWordItem);
-            selectedWordItem = null;
-            draggables.forEach(d => d.classList.remove('ring-2', 'ring-rose-500'));
-          }
+          if (!selectedWordItem) return;
+          placeWordInZone(zone, selectedWordItem);
+          selectedWordItem = null;
+          clearSelection();
         });
       });
     }
@@ -1604,6 +1695,11 @@
     }
 
     // 生成香港教育局《桃花源記》課本高解析度雙頁圖像畫布
+    function ensureUiFont() {
+      if (!document.fonts || !document.fonts.load) return Promise.resolve();
+      return document.fonts.load('700 38px "Noto Sans HK"').catch(function () {});
+    }
+
     function createEdbTextbookCanvas() {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -1630,14 +1726,14 @@
       ctx.fill();
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 50px "Noto Serif TC", serif';
+      ctx.font = 'bold 50px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
       ctx.textAlign = 'center';
       const titleChars = ['桃', '花', '源', '記'];
       titleChars.forEach((c, idx) => {
         ctx.fillText(c, 55, 160 + idx * 75);
       });
 
-      ctx.font = '30px "Noto Serif TC", serif';
+      ctx.font = '30px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
       ctx.fillStyle = '#fceada';
       ctx.fillText('陶', 55, 530);
       ctx.fillText('潛', 55, 575);
@@ -1645,7 +1741,7 @@
       // 3. 左頁 (Page 30) 原文正文
       ctx.fillStyle = '#2b231d';
       ctx.textAlign = 'left';
-      ctx.font = '38px/1.8 "Noto Serif TC", serif';
+      ctx.font = '38px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
 
       const leftParagraphs = [
         "晉太元中，武陵人捕魚為業。緣溪行，",
@@ -1710,14 +1806,14 @@
       ctx.arc(60, 1495, 26, 0, Math.PI * 2);
       ctx.stroke();
       ctx.fillStyle = '#5c4530';
-      ctx.font = 'bold 24px "Noto Serif TC", serif';
+      ctx.font = 'bold 24px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('30', 60, 1503);
 
       // 5. 右頁 (Page 31) 原文後半段
       ctx.textAlign = 'left';
       ctx.fillStyle = '#2b231d';
-      ctx.font = '38px/1.8 "Noto Serif TC", serif';
+      ctx.font = '38px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
 
       const rightParagraphs = [
         "既出，得其船，便扶向路，處處誌之。",
@@ -1740,7 +1836,7 @@
       });
 
       // 6. 右頁雙欄注釋 (① ~ ㉑) 課本正統排版
-      ctx.font = '24px/1.7 "Noto Serif TC", serif';
+      ctx.font = '24px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
       const col1Notes = [
         "① 太元：東晉孝武帝司馬曜年號。",
         "② 落英：落花。繽紛：繁雜。此處",
@@ -1813,7 +1909,7 @@
 
       // 7. 頁腳與右下角標註
       ctx.fillStyle = '#5c4530';
-      ctx.font = '24px "Noto Serif TC", serif';
+      ctx.font = '24px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText('桃花源記 | 陶潛    31', 2320, 1515);
 
@@ -1821,9 +1917,10 @@
     }
 
     // 觸發生成並下載教育局建議篇章標準雙頁 PDF 檔案
-    function downloadEdbChapterPDF() {
+    async function downloadEdbChapterPDF() {
       try {
         showFloatingNotice('正在生成教育局《桃花源記》課本 PDF...');
+        await ensureUiFont();
         const canvas = createEdbTextbookCanvas();
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
@@ -1871,9 +1968,10 @@
     }
 
     // 觸發下載教育局課本篇章高清圖片
-    function downloadEdbChapterImage() {
+    async function downloadEdbChapterImage() {
       try {
         showFloatingNotice('正在生成教育局《桃花源記》課本高清圖檔...');
+        await ensureUiFont();
         const canvas = createEdbTextbookCanvas();
         const dataUrl = canvas.toDataURL('image/png');
 
@@ -1893,10 +1991,11 @@
     }
 
     // 線上高清預覽課本篇章模態窗
-    function previewEdbChapterModal() {
+    async function previewEdbChapterModal() {
       const modal = document.getElementById('modal-container');
       const card = document.getElementById('modal-card');
 
+      await ensureUiFont();
       const canvas = createEdbTextbookCanvas();
       const dataUrl = canvas.toDataURL('image/png');
       card.classList.add('chapter-wide');
@@ -1960,7 +2059,10 @@
 
     function closeModal() {
       const card = document.getElementById('modal-card');
-      if (card) card.classList.remove('chapter-wide');
+      if (card) {
+        card.classList.remove('chapter-wide');
+        card.classList.remove('modal-split');
+      }
       document.getElementById('modal-container').classList.add('hidden');
     }
 
@@ -2175,6 +2277,7 @@
     });
 
     window.onload = function() {
+      ensureUiFont();
       initMap();
       PetalSystem.init();
       // 初始時保持全景，等待玩家於說明版面點擊啟程
