@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>尋找桃花源 - 香港教育局《桃花源記》篇章互動探索</title>
+  <title>尋找桃花源 - 《桃花源記》篇章互動探索</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- jsPDF for direct PDF compilation -->
@@ -266,7 +266,7 @@
           <div>
             <h1 class="text-base sm:text-lg font-bold tracking-wider text-amber-950 flex items-center gap-1.5">
               尋找桃花源
-              <span class="brand-badge text-[11px] font-normal text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">教育局建議篇章</span>
+              <span class="brand-badge text-[11px] font-normal text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">建議篇章</span>
             </h1>
             <p id="station-indicator" class="text-xs text-amber-800 font-medium">第 1 站：緣溪桃林</p>
           </div>
@@ -325,7 +325,7 @@
 
       <div class="mt-3">
         <span class="text-xs uppercase tracking-wider text-rose-800 font-bold bg-rose-100/80 px-3 py-1 rounded-full border border-rose-200">
-          香港教育局建議篇章互動學習
+          建議篇章互動學習
         </span>
         <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-950 font-calligraphy tracking-wider mt-2">
           尋找桃花源
@@ -346,7 +346,7 @@
         <div class="flex items-start gap-2.5">
           <span class="text-base sm:text-lg">📜</span>
           <div class="text-xs sm:text-sm text-stone-800 leading-relaxed">
-            <strong>挑戰文言關卡：</strong>途經 7 個故事站點，完成拖放配對、辨析字義與寶箱挑戰，所有解釋依據<strong>教育局建議篇章注釋</strong>為標準。
+            <strong>挑戰文言關卡：</strong>途經 7 個故事站點，完成拖放配對、辨析字義與寶箱挑戰，所有解釋依據<strong>香港教育局建議篇章注釋</strong>為標準。
           </div>
         </div>
         <div class="flex items-start gap-2.5">
@@ -378,7 +378,8 @@
     </div>
   </div>
   <script>
-    // --- 學習內容數據庫（嚴格依據上載圖片教育局建議篇章課本注釋與原文）---
+    // --- 學習內容數據庫（嚴格依據建議篇章課本注釋與原文）---
+    const CHAPTER_SOURCE = "資料來源：香港教育局課程發展處中國語文教育組編著：《積學涵泳——中國語文課程文言經典建議篇章（初中）》，中華教育：2022年8月，香港。";
     const STATIONS_DATA = [
       {
         id: 1,
@@ -1029,9 +1030,6 @@
 
       content += `
         <div id="challenge-feedback" class="mt-4 hidden p-3 rounded-xl text-sm font-medium"></div>
-        <div class="mt-5 border-t border-amber-900/10 pt-3 text-right">
-          <span class="text-[11px] text-stone-500">依據教育局課本注釋字解為唯一標準</span>
-        </div>
       `;
 
       card.classList.add('modal-split');
@@ -1480,7 +1478,7 @@
         endingTitle = "桃花源博學者";
         endingBadge = "🏵️ 絕頂大師・通曉古今";
         endingColor = "from-amber-600 to-yellow-600 text-amber-950";
-        endingComment = "【桃花源博學者・文心徹悟】\n你對香港教育局《桃花源記》課文注釋洞若觀火，古今異義、通假借代絲絲入扣，首次答對率近乎完美！如同親歷晉宋風骨，陶公筆下「芳草鮮美，落英繽紛」之怡然世界，已盡入君懷！";
+        endingComment = "【桃花源博學者・文心徹悟】\n你對《桃花源記》課文注釋洞若觀火，古今異義、通假借代絲絲入扣，首次答對率近乎完美！如同親歷晉宋風骨，陶公筆下「芳草鮮美，落英繽紛」之怡然世界，已盡入君懷！";
       } else if (accuracyRate >= 75) {
         endingTitle = "桃花源通";
         endingBadge = "🌸 嫻熟行者・豁然開朗";
@@ -1536,10 +1534,13 @@
           <div class="p-3.5 mb-4 rounded-2xl bg-gradient-to-br from-amber-50 to-rose-50 border border-amber-300 shadow-sm text-left">
             <div class="flex items-center gap-2 mb-1.5">
               <span class="text-lg">📥</span>
-              <span class="font-bold text-amber-950 text-sm">課後典藏：教育局《桃花源記》課本篇章</span>
+              <span class="font-bold text-amber-950 text-sm">課後典藏：《桃花源記》課本篇章</span>
             </div>
+            <p class="text-xs text-stone-700 leading-relaxed mb-2">
+              以下圖片及 PDF 檔案的${CHAPTER_SOURCE}
+            </p>
             <p class="text-xs text-stone-700 leading-relaxed mb-3">
-              恭喜完成全篇探索！已為你備妥香港教育局《桃花源記》原文雙頁典藏，包含第 30-31 頁課文與 21 條標準注釋。你可以直接下載 PDF 檔案隨身溫習，亦可查閱官方手冊。
+              恭喜完成全篇探索！已為你備妥《桃花源記》原文雙頁典藏，包含第 30-31 頁課文與 21 條標準注釋。你可以直接下載 PDF 檔案隨身溫習。
             </p>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button onclick="downloadEdbChapterPDF()" class="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-rose-700 via-amber-800 to-amber-900 hover:from-rose-600 text-white font-bold text-xs sm:text-sm shadow flex items-center justify-center gap-1.5 active:scale-95 transition">
@@ -1558,7 +1559,7 @@
               </button>
               <a href="https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-white hover:bg-amber-100/70 border border-amber-300 text-amber-950 font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition">
                 <span>🔗</span>
-                <span>教育局官方篇章原檔 (PDF)</span>
+                <span>建議篇章原檔 (PDF)</span>
               </a>
             </div>
           </div>
@@ -1586,24 +1587,27 @@
             <span class="text-2xl">📜</span>
             <div>
               <h2 class="text-xl font-bold text-amber-950 font-calligraphy">桃花源記・文言字詞圖鑑</h2>
-              <p class="text-xs text-amber-800">香港教育局建議篇章標準注釋規範</p>
+              <p class="text-xs text-amber-800">建議篇章標準注釋</p>
             </div>
           </div>
           <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 flex items-center justify-center font-bold text-sm transition">✕</button>
         </div>
 
-        <div class="p-3 mb-3 bg-amber-50/80 rounded-xl border border-amber-200 flex flex-wrap items-center justify-between gap-2">
-          <div class="text-xs text-amber-900">
-            <strong>課本原件：</strong>香港教育局建議篇章課本雙頁版
+        <div class="p-3 mb-3 bg-amber-50/80 rounded-xl border border-amber-200">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="text-xs text-amber-900">
+              <strong>課本原件：</strong>建議篇章課本雙頁版
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="downloadEdbChapterPDF()" class="px-3 py-1.5 bg-rose-800 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1 active:scale-95 transition">
+                <span>📑</span> 下載 PDF
+              </button>
+              <button onclick="downloadEdbChapterImage()" class="px-3 py-1.5 bg-amber-800 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1 active:scale-95 transition">
+                <span>🖼️</span> 下載圖片
+              </button>
+            </div>
           </div>
-          <div class="flex items-center gap-1.5">
-            <button onclick="downloadEdbChapterPDF()" class="px-3 py-1.5 bg-rose-800 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1 active:scale-95 transition">
-              <span>📑</span> 下載 PDF
-            </button>
-            <button onclick="downloadEdbChapterImage()" class="px-3 py-1.5 bg-amber-800 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1 active:scale-95 transition">
-              <span>🖼️</span> 下載圖片
-            </button>
-          </div>
+          <p class="text-[11px] text-stone-600 leading-relaxed mt-2">${CHAPTER_SOURCE}</p>
         </div>
 
         <div class="space-y-3 max-h-[55vh] overflow-y-auto pr-1">
@@ -1689,7 +1693,7 @@
       modal.classList.remove('hidden');
     }
 
-    // 生成香港教育局《桃花源記》課本高解析度雙頁圖像畫布
+    // 生成《桃花源記》課本高解析度雙頁圖像畫布
     function ensureUiFont() {
       if (!document.fonts || !document.fonts.load) return Promise.resolve();
       return document.fonts.load('700 38px "Noto Sans HK"').catch(function () {});
@@ -1908,13 +1912,32 @@
       ctx.textAlign = 'right';
       ctx.fillText('桃花源記 | 陶潛    31', 2320, 1515);
 
+      ctx.fillStyle = '#6b5a48';
+      ctx.font = '16px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
+      ctx.textAlign = 'left';
+      const sourceMax = 2100;
+      let sourceLine = '';
+      let sourceY = 1552;
+      const sourceX = 180;
+      CHAPTER_SOURCE.split('').forEach(function (ch) {
+        const trial = sourceLine + ch;
+        if (ctx.measureText(trial).width > sourceMax && sourceLine) {
+          ctx.fillText(sourceLine, sourceX, sourceY);
+          sourceLine = ch;
+          sourceY += 22;
+        } else {
+          sourceLine = trial;
+        }
+      });
+      if (sourceLine) ctx.fillText(sourceLine, sourceX, sourceY);
+
       return canvas;
     }
 
-    // 觸發生成並下載教育局建議篇章標準雙頁 PDF 檔案
+    // 觸發生成並下載建議篇章標準雙頁 PDF 檔案
     async function downloadEdbChapterPDF() {
       try {
-        showFloatingNotice('正在生成教育局《桃花源記》課本 PDF...');
+        showFloatingNotice('正在生成《桃花源記》課本 PDF...');
         await ensureUiFont();
         const canvas = createEdbTextbookCanvas();
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
@@ -1951,27 +1974,27 @@
         }
 
         pdf.addImage(imgData, 'JPEG', posX, posY, renderW, renderH);
-        pdf.save('香港教育局建議篇章_桃花源記_課本原件典藏.pdf');
+        pdf.save('積學涵泳_桃花源記_建議篇章.pdf');
 
         playChime('correct');
         showFloatingNotice('《桃花源記》建議篇章 PDF 下載完成！');
       } catch (err) {
         console.error('PDF generation error:', err);
-        // 回退直接開啟官方教育局 PDF
+        // 回退直接開啟建議篇章原檔 PDF
         window.open('https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf', '_blank');
       }
     }
 
-    // 觸發下載教育局課本篇章高清圖片
+    // 觸發下載課本篇章高清圖片
     async function downloadEdbChapterImage() {
       try {
-        showFloatingNotice('正在生成教育局《桃花源記》課本高清圖檔...');
+        showFloatingNotice('正在生成《桃花源記》課本高清圖檔...');
         await ensureUiFont();
         const canvas = createEdbTextbookCanvas();
         const dataUrl = canvas.toDataURL('image/png');
 
         const link = document.createElement('a');
-        link.download = '香港教育局建議篇章_桃花源記_課本原件典藏.png';
+        link.download = '積學涵泳_桃花源記_建議篇章.png';
         link.href = dataUrl;
         document.body.appendChild(link);
         link.click();
@@ -1998,14 +2021,16 @@
       card.innerHTML = `
         <div class="flex items-center justify-between pb-3 border-b border-amber-900/15 mb-3">
           <div>
-            <span class="text-xs uppercase tracking-wider text-rose-800 font-bold bg-rose-100/70 px-2.5 py-0.5 rounded-md">教育局官方建議篇章</span>
+            <span class="text-xs uppercase tracking-wider text-rose-800 font-bold bg-rose-100/70 px-2.5 py-0.5 rounded-md">建議篇章</span>
             <h2 class="text-xl sm:text-2xl font-bold text-amber-950 mt-0.5 font-calligraphy">《桃花源記》課本全頁典藏圖</h2>
           </div>
           <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 flex items-center justify-center font-bold text-sm transition">✕</button>
         </div>
 
+        <p class="text-xs text-stone-700 leading-relaxed mb-3">${CHAPTER_SOURCE}</p>
+
         <div id="chapter-preview-frame" class="p-2 bg-stone-100/80 rounded-2xl border border-amber-200 shadow-inner max-h-[62vh] overflow-auto flex items-center justify-center">
-          <img id="chapter-preview-img" alt="香港教育局《桃花源記》建議篇章課本圖文" class="max-w-full h-auto rounded-lg shadow cursor-zoom-in" title="點擊放大圖片">
+          <img id="chapter-preview-img" alt="《桃花源記》建議篇章課本圖文" class="max-w-full h-auto rounded-lg shadow cursor-zoom-in" title="點擊放大圖片">
         </div>
 
         <p id="chapter-zoom-hint" class="text-xs text-stone-500 text-center mt-2">
@@ -2017,13 +2042,13 @@
             <span>📑</span>
             <span>下載建議篇章 PDF (A4 規格)</span>
           </button>
-          <a id="chapter-png-link" download="香港教育局建議篇章_桃花源記_課本原件典藏.png" class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
+          <a id="chapter-png-link" download="積學涵泳_桃花源記_建議篇章.png" class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
             <span>🖼️</span>
             <span>儲存 PNG 圖</span>
           </a>
           <a href="https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-amber-100 border border-amber-300 text-amber-950 font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-1.5 transition">
             <span>🏛️</span>
-            <span>教育局官網 PDF</span>
+            <span>建議篇章原檔 (PDF)</span>
           </a>
         </div>
       `;

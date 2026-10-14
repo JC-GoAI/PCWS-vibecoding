@@ -124,7 +124,7 @@
             "At the start, the camera zooms from the whole view to where the fisherman is, then follows the player to each place. After every place has been explored, the camera zooms back to the whole view and shows the complete peach-blossom spring.",
             "",
             "# Learning content",
-            "The only source is The Peach Blossom Spring from the Hong Kong Education Bureau's recommended passages.",
+            "The only source is The Peach Blossom Spring in Jixue Hanyong — Recommended Classical Chinese Passages for the Chinese Language Curriculum (Junior Secondary).",
             "Every word meaning, definition, question, answer and hint must follow the glossary in that recommended passage.",
             "Do not invent, guess, rewrite, or bring in meanings from another edition.",
             "",

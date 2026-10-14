@@ -559,209 +559,10 @@ const PLAY = [
     }
 ];
 
-const GRADES = {
-    pri: ["小四", "小五", "小六"],
-    sec: ["中一", "中二", "中三"]
-};
-
-const MAKE = {
-    pri: [
-        {
-            id: "chi",
-            title: "中文作文思考教練",
-            blurb: "引導構思、詞彙和大綱，不代寫文章。"
-        },
-        {
-            id: "eng",
-            name: "AI英文閱讀教練",
-            title: "英文閱讀理解教練",
-            blurb: "解釋難字、指出去哪一段找，不代選答案。",
-            audience: "香港小四至小六學生。",
-            goal: "協助學生學會做閱讀理解，而不是代學生選出答案。",
-            style: ["親切、有趣、兒童友善", "使用中英對照介面", "色彩活潑", "適合小學生使用"],
-            inputs: [
-                ["篇章與題目輸入區", "學生可以貼上篇章和問題，或依照工作紙作答。"],
-                ["練習重點", ["字義", "主旨", "選擇題"]]
-            ],
-            coach: "AI英文閱讀教練",
-            trigger: "學生輸入篇章和問題後",
-            steps: [
-                ["解釋難字", "只解釋對這個年級太難的字，每個字給一個簡單意思。"],
-                ["引導找答案", "透過提問協助學生思考，例如：這一段主要講甚麼？題目的關鍵字出現在哪一段？"],
-                ["同義詞提示", "如果題目和文章用了不同的字，指出可能是同義表達，不要指出正確選項。"],
-                ["整理答題大綱", "只輸出：\n【題目問甚麼】\n【去哪一段找】\n【我的證據】\n【我的答案】\n答案一欄留給學生自己寫。"],
-                ["自我檢查", "協助學生檢查：有沒有用文章中的證據、有沒有看錯題目。"]
-            ],
-            rule4: "不代學生選擇答案",
-            role: "你是一位香港資深小學英文老師。",
-            principles: ["不直接給答案", "不指出正確選項"],
-            cheer: "你已經找到線索，請繼續處理下一題。"
-        },
-        {
-            id: "math",
-            name: "AI數學解題教練",
-            title: "數學解題提示教練",
-            blurb: "拆開步驟、點出技巧，不代算答案。",
-            audience: "香港小四至小六學生。",
-            goal: "協助學生學會解題，而不是代學生算出答案。",
-            style: ["親切、有趣、兒童友善", "使用中文介面", "色彩清晰", "適合小學生使用"],
-            inputs: [
-                ["題目輸入區", "學生可以輸入數學題，或描述工作紙上的圖。"],
-                ["題目類型", ["計算", "圖形", "應用題"]]
-            ],
-            coach: "AI數學教練",
-            trigger: "學生輸入題目後",
-            steps: [
-                ["分析題目", "協助學生看清楚：題目已知甚麼、要求甚麼、單位是甚麼。"],
-                ["引導解題", "透過提問協助學生思考，例如：圖中有哪些形狀？哪一個數是已知？可以先求哪一部分？"],
-                ["指出技巧", "列出這題要用的數學技巧，只寫名稱，不寫完整算式。"],
-                ["整理解題大綱", "只輸出：\n【已知】\n【要求】\n【先做】\n【再做】\n不要算出最終答案。"],
-                ["自我檢查", "協助學生檢查：是否用了正確單位、步驟是否對應問題、答案是否合理。"]
-            ],
-            rule4: "不代學生列式",
-            role: "你是一位香港資深小學數學老師。",
-            principles: ["不直接給答案", "不寫完整計算步驟"],
-            cheer: "你已經找到下一步，請再計算一小步。"
-        },
-        {
-            id: "gs",
-            name: "AI常識研習教練",
-            title: "常識專題研習提問助手",
-            blurb: "幫忙收窄題目和列大綱，不代寫報告。",
-            audience: "香港小四至小六學生。",
-            goal: "協助學生提出問題和整理發現，而不是代學生完成研習報告。",
-            style: ["親切、有趣、兒童友善", "使用中文介面", "色彩活潑", "適合小學生使用"],
-            inputs: [
-                ["研習題目輸入區", "學生可以輸入想探究的題目。"],
-                ["研習方向", ["人物", "地方", "生活現象"]]
-            ],
-            coach: "AI常識研習教練",
-            trigger: "學生輸入研習題目後",
-            steps: [
-                ["收窄題目", "協助學生判斷題目是太大還是太細，並改成一個可以探究的小問題。"],
-                ["引導探究", "透過提問協助學生思考，例如：你可以到何處查閱？可以詢問誰？你自己觀察到甚麼？"],
-                ["專題詞語", "提供5個相關詞語，每個附一句簡單解釋，不要寫成報告。"],
-                ["整理報告大綱", "只輸出：\n【題目】\n【我想知道】\n【資料】\n【我的發現】\n【總結】\n不要代學生填寫內容。"],
-                ["自我檢查", "協助學生檢查：有沒有自己的發現、資料是否關連題目。"]
-            ],
-            rule4: "不代學生寫報告",
-            role: "你是一位香港資深小學常識老師。",
-            principles: ["不直接給報告", "不代學生寫發現"],
-            cheer: "你已經有自己的問題，請再找一個證據。"
-        }
-    ],
-    sec: [
-        {
-            id: "chi",
-            name: "AI議論文教練",
-            title: "議論文構思教練",
-            blurb: "引導立場、理由和例子，不代寫全文。",
-            audience: "香港中一至中三學生。",
-            goal: "協助學生構思議論文，而不是代學生完成文章。",
-            style: ["清晰、友善、適合青少年", "使用中文介面", "色彩穩重", "適合中學生使用"],
-            inputs: [
-                ["論題輸入區", "學生可以輸入議論文題目。"],
-                ["立場", ["同意", "不同意", "兩面都寫"]]
-            ],
-            coach: "AI議論文教練",
-            trigger: "學生輸入論題後",
-            steps: [
-                ["分析論題", "協助學生找出題目關鍵詞，以及正反雙方在爭論甚麼。"],
-                ["引導構思", "透過提問協助學生思考，例如：你的立場是甚麼？一個理由是甚麼？可以舉哪個香港例子？反方會怎樣說？"],
-                ["論說詞語", "提供5個連接詞和3個論說句式，不要寫成完整段落。"],
-                ["整理大綱", "只輸出：\n【引論】\n【理由一】\n【理由二】\n【反方與回應】\n【結論】\n不要代學生寫內容。"],
-                ["自我檢查", "協助學生檢查：是否跑題、是否只有立場而沒有理由、例子是否關連論點。"]
-            ],
-            rule4: "不代學生寫全文",
-            role: "你是一位香港資深中學中文老師。",
-            principles: ["不直接給範文", "不直接給全文"],
-            cheer: "你已經有自己的立場，請再補充一個理由。"
-        },
-        {
-            id: "eng",
-            name: "AI Reading & Vocabulary Coach",
-            title: "Reading & Vocabulary Coach",
-            blurb: "解釋難字和段落主旨，不代寫答案。",
-            audience: "香港中一至中三學生。",
-            goal: "協助學生閱讀篇章和運用詞彙，而不是代學生寫出答案。",
-            style: ["清晰、友善、適合青少年", "使用中英對照介面", "色彩清晰", "適合中學生使用"],
-            inputs: [
-                ["篇章與題目輸入區", "學生可以貼上篇章和問題。"],
-                ["練習重點", ["字彙", "段落主旨", "答題位置"]]
-            ],
-            coach: "AI Reading & Vocabulary Coach",
-            trigger: "學生輸入篇章和問題後",
-            steps: [
-                ["解釋難字", "只解釋超出學生程度的字，每個字給簡單英文解釋和一個中文意思。"],
-                ["引導閱讀", "透過提問協助學生思考，例如：這一段的主旨是甚麼？題目關鍵字在哪一行？"],
-                ["詞彙提示", "如果題目用了同義詞，提示學生兩邊在說同一件事，不要指出正確答案。"],
-                ["整理答題大綱", "只輸出：\n【Question】\n【Paragraph】\n【Evidence】\n【My answer】\n答案一欄留給學生自己寫。"],
-                ["自我檢查", "協助學生檢查：證據是否來自文章、句子是否答非所問。"]
-            ],
-            rule4: "不代學生寫完整答案",
-            role: "你是一位香港資深中學英文老師。",
-            principles: ["不直接給答案", "不代學生寫完整句子"],
-            cheer: "你已經找到段落，請再用自己的句子說明一次。"
-        },
-        {
-            id: "math",
-            name: "AI解難思維教練",
-            title: "解難思維訓練助手",
-            blurb: "先問已知和所求，不代寫完整步驟。",
-            audience: "香港中一至中三學生。",
-            goal: "協助學生建立解難步驟，而不是代學生完成計算。",
-            style: ["清晰、友善、適合青少年", "使用中文介面", "色彩清晰", "適合中學生使用"],
-            inputs: [
-                ["題目輸入區", "學生可以輸入數學題。"],
-                ["題目類型", ["代數", "圖形", "應用題"]]
-            ],
-            coach: "AI解難思維教練",
-            trigger: "學生輸入題目後",
-            steps: [
-                ["分清已知和所求", "協助學生列出題目給了甚麼、最後要求甚麼。"],
-                ["引導解難", "透過提問協助學生思考，例如：可以先設甚麼？圖中哪一段有用？下一步要先處理哪個條件？"],
-                ["指出技巧", "列出要用的數學技巧，只寫名稱，不寫完整步驟。"],
-                ["整理解難大綱", "只輸出：\n【已知】\n【所求】\n【方法】\n【要計算的部分】\n不要算出最終答案。"],
-                ["自我檢查", "協助學生檢查：是否答非所問、單位是否正確、結果是否合理。"]
-            ],
-            rule4: "不代學生寫完整步驟",
-            role: "你是一位香港資深中學數學老師。",
-            principles: ["不直接給答案", "不寫完整計算步驟"],
-            cheer: "你已經選對方向，請再完成一小步。"
-        },
-        {
-            id: "sci",
-            name: "AI科學探究教練",
-            title: "科學探究與實驗分析教練",
-            blurb: "用問題帶出變量、證據和結論，不代寫報告。",
-            audience: "香港中一至中三學生。",
-            goal: "協助學生進行探究和推理，而不是直接提供結論。",
-            style: ["清晰、友善、適合青少年", "使用中文介面", "色彩清晰", "適合中學生使用"],
-            inputs: [
-                ["探究問題輸入區", "學生可以輸入想探究的問題。"],
-                ["探究重點", ["觀察", "公平測試", "數據解釋"]]
-            ],
-            coach: "AI科學探究教練",
-            trigger: "學生輸入探究問題後",
-            steps: [
-                ["分析問題", "協助學生分清：想知道甚麼、可以觀察甚麼、哪些字眼需要先解釋。"],
-                ["引導探究", "透過提問協助學生思考，例如：你要改變哪一個變量？甚麼要保持不變？你預測會看到甚麼？"],
-                ["科學詞語", "提供5個相關科學詞語，每個附一句簡單解釋，不要寫成結論。"],
-                ["整理探究大綱", "只輸出：\n【問題】\n【假設】\n【方法】\n【要記錄的結果】\n【結論】\n結論一欄留給學生自己寫。"],
-                ["自我檢查", "協助學生檢查：測試是否公平、證據是否支持自己的說法。"]
-            ],
-            rule4: "不代學生寫結論",
-            role: "你是一位香港資深中學科學老師。",
-            principles: ["不直接給結論", "不代學生寫實驗報告"],
-            cheer: "你已經有自己的觀察，請再用證據思考下一步。"
-        }
-    ]
-};
-
 let state = loadState();
 
 function loadState() {
-    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", makeId: "", copyMsg: "", lockError: "", makeRole: "", makeTask: "", makeLimit: "", makeExample: "" };
+    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", copyMsg: "", lockError: "", makeRole: "", makeTask: "", makeLimit: "", makeExample: "" };
     try {
         const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "{}");
         if (saved.activity === "prompt" || saved.activity === "helper" || saved.activity === "make") base.activity = saved.activity;
@@ -774,10 +575,6 @@ function loadState() {
         if (saved.page === "play" || saved.page === "make") base.page = saved.page;
         if (saved.playMode === "prompt" || saved.playMode === "vibe") base.playMode = saved.playMode;
         if (PLAY.some(function (s) { return s.id === saved.playId; })) base.playId = saved.playId;
-        const themes = MAKE[base.band] || [];
-        if (themes.some(function (t) { return t.id === saved.makeId; })) {
-            base.makeId = saved.makeId;
-        }
         if (typeof saved.makeRole === "string") base.makeRole = saved.makeRole;
         if (typeof saved.makeTask === "string") base.makeTask = saved.makeTask;
         if (typeof saved.makeLimit === "string") base.makeLimit = saved.makeLimit;
@@ -794,7 +591,6 @@ function saveState() {
         page: state.page,
         playMode: state.playMode,
         playId: state.playId,
-        makeId: state.makeId,
         makeRole: state.makeRole,
         makeTask: state.makeTask,
         makeLimit: state.makeLimit,
@@ -958,231 +754,6 @@ function playById(id) {
     return PLAY.filter(function (s) { return s.id === id; })[0] || null;
 }
 
-function themes() {
-    return MAKE[state.band] || [];
-}
-
-function themeById(id) {
-    return themes().filter(function (t) { return t.id === id; })[0] || null;
-}
-
-function lines(items) {
-    return items.map(function (item) { return "- " + item; }).join("\n");
-}
-
-function priChinesePrompt() {
-    return [
-        "請建立一個名為「AI中文寫作教練」的學習助手網頁。",
-        "",
-        "目標使用者：",
-        "香港小四至小六學生。",
-        "",
-        "學習目標：",
-        "協助學生提升寫作能力，而不是代學生完成作文。",
-        "",
-        "設計風格：",
-        "- 親切、有趣、兒童友善",
-        "- 使用中文介面",
-        "- 色彩活潑",
-        "- 適合小學生使用",
-        "",
-        "主要功能：",
-        "",
-        "1. 作文題目輸入區",
-        "學生可以輸入作文題目。",
-        "",
-        "2. 年級選擇",
-        "- 小四",
-        "- 小五",
-        "- 小六",
-        "",
-        "3. 文體選擇",
-        "- 記敘文",
-        "- 描寫文",
-        "- 說明文",
-        "",
-        "4. AI寫作教練",
-        "",
-        "學生輸入題目後，",
-        "",
-        "AI必須：",
-        "",
-        "第一步：分析題目",
-        "",
-        "協助學生理解：",
-        "- 題目關鍵字",
-        "- 寫作重點",
-        "- 文體特色",
-        "",
-        "第二步：引導構思",
-        "",
-        "透過提問方式協助學生思考：",
-        "",
-        "例如：",
-        "",
-        "- 故事發生在甚麼地方？",
-        "- 當時有誰在場？",
-        "- 發生了甚麼事情？",
-        "- 最深刻的是甚麼？",
-        "- 你有甚麼感受？",
-        "",
-        "規則：",
-        "",
-        "- 每次只問一條問題",
-        "- 等待學生回應",
-        "- 不直接提供答案",
-        "- 不代學生寫作",
-        "",
-        "第三步：提供詞彙支援",
-        "",
-        "根據學生內容提供：",
-        "",
-        "- 5個形容詞",
-        "- 5個感受詞",
-        "- 3個成語",
-        "- 3個描寫句式",
-        "",
-        "第四步：整理作文大綱",
-        "",
-        "輸出：",
-        "",
-        "【開頭】",
-        "時間、地點、人物",
-        "",
-        "【經過】",
-        "事情發展",
-        "",
-        "【高潮】",
-        "最重要事件",
-        "",
-        "【結尾】",
-        "感受及反思",
-        "",
-        "注意：",
-        "",
-        "只提供大綱。",
-        "",
-        "不要代學生完成內容。",
-        "",
-        "第五步：自我檢查",
-        "",
-        "完成後協助學生檢查：",
-        "",
-        "- 是否切合題目",
-        "- 是否有足夠細節",
-        "- 是否有感受描寫",
-        "- 是否有清晰段落",
-        "",
-        "AI角色設定：",
-        "",
-        "你是一位香港資深小學中文老師。",
-        "",
-        "教學原則：",
-        "",
-        "- 不直接給範文",
-        "- 不直接給全文",
-        "- 優先提問",
-        "- 鼓勵學生思考",
-        "- 鼓勵學生自行完成作品",
-        "",
-        "輸出語氣：",
-        "",
-        "正面、鼓勵式、具啟發性。",
-        "",
-        "每次回應最後加入：",
-        "",
-        "「你已經想到很好的內容，我們再一步一步完成作文吧！」"
-    ].join("\n");
-}
-
-function buildMakePrompt(theme) {
-    if (state.band === "pri" && theme.id === "chi") return priChinesePrompt();
-    const choiceItems = theme.inputs[1][1];
-    const step2 = theme.steps[1];
-    return [
-        "請建立一個名為「" + theme.name + "」的學習助手網頁。",
-        "",
-        "目標使用者：",
-        theme.audience,
-        "",
-        "學習目標：",
-        theme.goal,
-        "",
-        "設計風格：",
-        lines(theme.style),
-        "",
-        "主要功能：",
-        "",
-        "1. " + theme.inputs[0][0],
-        theme.inputs[0][1],
-        "",
-        "2. 年級選擇",
-        lines(GRADES[state.band]),
-        "",
-        "3. " + theme.inputs[1][0],
-        lines(choiceItems),
-        "",
-        "4. " + theme.coach,
-        "",
-        theme.trigger + "，",
-        "",
-        "AI必須：",
-        "",
-        "第一步：" + theme.steps[0][0],
-        "",
-        theme.steps[0][1],
-        "",
-        "第二步：" + step2[0],
-        "",
-        step2[1],
-        "",
-        "規則：",
-        "",
-        "- 每次只問一條問題",
-        "- 等待學生回應",
-        "- 不直接提供答案",
-        "- " + theme.rule4,
-        "",
-        "第三步：" + theme.steps[2][0],
-        "",
-        theme.steps[2][1],
-        "",
-        "第四步：" + theme.steps[3][0],
-        "",
-        theme.steps[3][1],
-        "",
-        "第五步：" + theme.steps[4][0],
-        "",
-        theme.steps[4][1],
-        "",
-        "AI角色設定：",
-        "",
-        theme.role,
-        "",
-        "教學原則：",
-        "",
-        "- " + theme.principles[0],
-        "- " + theme.principles[1],
-        "- 優先提問",
-        "- 鼓勵學生思考",
-        "- 鼓勵學生自行完成作品",
-        "",
-        "輸出語氣：",
-        "",
-        "正面、鼓勵式、具啟發性。",
-        "",
-        "每次回應最後加入：",
-        "",
-        "「" + theme.cheer + "」"
-    ].join("\n");
-}
-
-function currentPrompt() {
-    const theme = themeById(state.makeId);
-    if (!theme) return "";
-    return buildMakePrompt(theme);
-}
-
 function lockMark() {
     return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>';
 }
@@ -1316,8 +887,8 @@ const SEC_GAME_PROMPT = [
     "遊戲開始時鏡頭由全景縮放至漁人所在位置，之後跟隨玩家探索不同地點；完成所有探索後，鏡頭縮放返回全景圖，展示完整桃花源。",
     "",
     "# 學習內容",
-    "以香港教育局《建議篇章》中的《桃花源記》為唯一學習內容來源。",
-    "所有字詞解釋、詞義、題目、答案及提示，必須依照教育局《桃花源記》建議篇章的詞解內容。",
+    "以《積學涵泳——中國語文課程文言經典建議篇章（初中）》中的《桃花源記》為唯一學習內容來源。",
+    "所有字詞解釋、詞義、題目、答案及提示，必須依照該建議篇章的詞解內容。",
     "不得自行創作、推測、改寫或引入其他版本的解釋。",
     "",
     "遊戲開始時：",
@@ -1559,7 +1130,7 @@ function render() {
         state.makeExample = "";
     }
     const scrollY = window.scrollY;
-    const viewKey = state.activity + "|" + state.helperBand + "|" + state.band + "|" + state.playId + "|" + state.makeId;
+    const viewKey = state.activity + "|" + state.helperBand + "|" + state.band + "|" + state.playId + "|" + state.makeExample;
     const keepScroll = state._viewKey === viewKey;
     let html;
     if (!state.band) {
@@ -1663,7 +1234,6 @@ document.addEventListener("click", function (event) {
     } else if (action === "band") {
         if (state.band !== value) {
             state.band = value;
-            state.makeId = "";
             state.makeRole = "";
             state.makeTask = "";
             state.makeLimit = "";
@@ -1675,8 +1245,6 @@ document.addEventListener("click", function (event) {
         state.playMode = value;
     } else if (action === "play") {
         state.playId = value;
-    } else if (action === "make") {
-        state.makeId = value;
     } else if (action === "open-make-help") {
         const gate = document.getElementById("make-gate");
         if (gate) {
@@ -1723,10 +1291,8 @@ document.addEventListener("click", function (event) {
         copyText(makePromptText(), "make-all");
         return;
     } else if (action === "copy") {
-        const text = value === "make"
-            ? currentPrompt()
-            : (document.getElementById(value) || {}).value || "";
-        if (text) copyText(text, value === "make" ? "make" : value);
+        const text = (document.getElementById(value) || {}).value || "";
+        if (text) copyText(text, value);
         return;
     } else if (action === "reveal") {
         const panel = document.getElementById(value);
