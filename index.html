@@ -561,8 +561,25 @@ const PLAY = [
 
 let state = loadState();
 
+function emptyMakeDraft() {
+    return { role: "", task: "", limit: "" };
+}
+
+function emptyMakeDrafts() {
+    return { pri: emptyMakeDraft(), sec: emptyMakeDraft() };
+}
+
+function readMakeDraftBox(raw) {
+    if (!raw || typeof raw !== "object") return emptyMakeDraft();
+    return {
+        role: typeof raw.role === "string" ? raw.role : "",
+        task: typeof raw.task === "string" ? raw.task : "",
+        limit: typeof raw.limit === "string" ? raw.limit : ""
+    };
+}
+
 function loadState() {
-    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", copyMsg: "", lockError: "", makeRole: "", makeTask: "", makeLimit: "", makeExample: "" };
+    const base = { activity: "prompt", helperBand: "", band: "", page: "hub", playMode: "", playId: "", copyMsg: "", lockError: "", makeRole: "", makeTask: "", makeLimit: "", makeExample: "", makeDraft: emptyMakeDrafts() };
     try {
         const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "{}");
         if (saved.activity === "prompt" || saved.activity === "helper" || saved.activity === "make") base.activity = saved.activity;
@@ -579,6 +596,16 @@ function loadState() {
         if (typeof saved.makeTask === "string") base.makeTask = saved.makeTask;
         if (typeof saved.makeLimit === "string") base.makeLimit = saved.makeLimit;
         if (["blank", "base"].indexOf(saved.makeExample) >= 0 || MAKE_EXAMPLES_PRI.concat(MAKE_EXAMPLES_SEC).some(function (item) { return item.id === saved.makeExample; })) base.makeExample = saved.makeExample;
+        if (saved.makeDraft && typeof saved.makeDraft === "object") {
+            base.makeDraft = {
+                pri: readMakeDraftBox(saved.makeDraft.pri),
+                sec: readMakeDraftBox(saved.makeDraft.sec)
+            };
+        } else if (!saved.makeExample || saved.makeExample === "blank") {
+            const box = { role: base.makeRole, task: base.makeTask, limit: base.makeLimit };
+            if (base.band === "sec") base.makeDraft.sec = box;
+            else if (base.band === "pri") base.makeDraft.pri = box;
+        }
     } catch (e) {}
     return base;
 }
@@ -594,7 +621,8 @@ function saveState() {
         makeRole: state.makeRole,
         makeTask: state.makeTask,
         makeLimit: state.makeLimit,
-        makeExample: state.makeExample
+        makeExample: state.makeExample,
+        makeDraft: state.makeDraft
     }));
 }
 
@@ -627,12 +655,7 @@ function rememberGates(row) {
     GATE_KEYS.forEach(function (key) { gates[key] = !!row[key]; });
     if (state.activity === "helper" && !gates.game && !gates.game_prompt) state.activity = "prompt";
     if (state.activity === "make" && !gates.make) state.activity = "prompt";
-    if (!gates.make_help && state.makeExample === "base") {
-        state.makeRole = "";
-        state.makeTask = "";
-        state.makeLimit = "";
-        state.makeExample = "";
-    }
+    if (!gates.make_help && state.makeExample === "base") restoreMakeDraft(state.band);
     render();
 }
 
@@ -1033,6 +1056,31 @@ function splitMakePrompt(text) {
     return { role: body(src.replace(/^# 角色\n/, "").replace(/^# Role\n/, "")), task: "", limit: "" };
 }
 
+function isMakeBlank() {
+    return !state.makeExample || state.makeExample === "blank";
+}
+
+function snapshotMakeDraft(band) {
+    const key = band || state.band;
+    if (key !== "pri" && key !== "sec") return;
+    if (!isMakeBlank()) return;
+    if (!state.makeDraft) state.makeDraft = emptyMakeDrafts();
+    state.makeDraft[key] = {
+        role: state.makeRole || "",
+        task: state.makeTask || "",
+        limit: state.makeLimit || ""
+    };
+}
+
+function restoreMakeDraft(band) {
+    const key = band || state.band;
+    const box = (key === "pri" || key === "sec") && state.makeDraft ? state.makeDraft[key] : emptyMakeDraft();
+    state.makeRole = box && box.role || "";
+    state.makeTask = box && box.task || "";
+    state.makeLimit = box && box.limit || "";
+    state.makeExample = "blank";
+}
+
 function syncMakeFields() {
     const whole = document.getElementById("make-prompt");
     if (whole) {
@@ -1048,6 +1096,7 @@ function syncMakeFields() {
     if (role) state.makeRole = role.value;
     if (task) state.makeTask = task.value;
     if (limit) state.makeLimit = limit.value;
+    snapshotMakeDraft(state.band);
 }
 
 function makePromptText() {
@@ -1077,7 +1126,7 @@ function renderMake() {
         ? ""
         : '<button type="button" class="pill-btn" data-action="open-make-help">' + escapeHtml(tx("需要幫忙")) + "</button>";
     const guideBtn = '<button type="button" class="pill-btn' + (gates.make_help && state.makeExample === "base" ? " on" : "") + '" data-action="make-base"' + (gates.make_help ? "" : " disabled") + ">" + escapeHtml(tx("AI指導")) + "</button>";
-    const blankBtn = '<button type="button" class="pill-btn' + (state.makeExample === "blank" ? " on" : "") + '" data-action="make-blank">' + escapeHtml(tx("空白版")) + "</button>";
+    const blankBtn = '<button type="button" class="pill-btn' + (isMakeBlank() ? " on" : "") + '" data-action="make-blank">' + escapeHtml(tx("空白版")) + "</button>";
     const modal = helped
         ? ""
         : '<div class="modal-back" id="make-gate" data-action="close-make-help" hidden>' +
@@ -1123,12 +1172,7 @@ function renderHome() {
 function render() {
     if (state.activity === "helper" && !gates.game && !gates.game_prompt) state.activity = "prompt";
     if (state.activity === "make" && !gates.make) state.activity = "prompt";
-    if (!gates.make_help && state.makeExample === "base") {
-        state.makeRole = "";
-        state.makeTask = "";
-        state.makeLimit = "";
-        state.makeExample = "";
-    }
+    if (!gates.make_help && state.makeExample === "base") restoreMakeDraft(state.band);
     const scrollY = window.scrollY;
     const viewKey = state.activity + "|" + state.helperBand + "|" + state.band + "|" + state.playId + "|" + state.makeExample;
     const keepScroll = state._viewKey === viewKey;
@@ -1224,6 +1268,7 @@ document.addEventListener("click", function (event) {
     syncMakeFields();
     if (action !== "copy-make") state.copyMsg = "";
     if (action === "home") {
+        snapshotMakeDraft(state.band);
         state.band = "";
     } else if (action === "activity") {
         if (value === "helper" && !gates.game && !gates.game_prompt) return;
@@ -1233,11 +1278,9 @@ document.addEventListener("click", function (event) {
         state.helperBand = value;
     } else if (action === "band") {
         if (state.band !== value) {
+            snapshotMakeDraft(state.band);
             state.band = value;
-            state.makeRole = "";
-            state.makeTask = "";
-            state.makeLimit = "";
-            state.makeExample = "";
+            restoreMakeDraft(value);
         }
     } else if (action === "open") {
         state.page = value;
@@ -1273,10 +1316,7 @@ document.addEventListener("click", function (event) {
             return;
         }
     } else if (action === "make-blank") {
-        state.makeRole = "";
-        state.makeTask = "";
-        state.makeLimit = "";
-        state.makeExample = "blank";
+        restoreMakeDraft(state.band);
     } else if (action === "make-base") {
         if (!gates.make_help) return;
         applyMakePrompt(makeScaffold(), "base");
@@ -1340,6 +1380,13 @@ document.addEventListener("keydown", function (event) {
     if (insideLockedCopy(event.target) || selected) event.preventDefault();
 }, true);
 
+document.getElementById("app").addEventListener("input", function (event) {
+    const id = event.target && event.target.id;
+    if (id !== "make-role" && id !== "make-task" && id !== "make-limit" && id !== "make-prompt") return;
+    syncMakeFields();
+    saveState();
+});
+
 document.getElementById("app").addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
         const gate = document.getElementById("make-gate");
@@ -1388,6 +1435,7 @@ function refreshMakeForLang() {
 }
 
 window.onLangChange = function () {
+    syncMakeFields();
     applyChrome();
     refreshMakeForLang();
     render();
