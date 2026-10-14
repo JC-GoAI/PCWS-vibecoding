@@ -50,11 +50,11 @@
         "關閉": "Close",
         "請按「複製全部」，整份貼到 Gemini 對話，再按 AI 的問題一步步構思遊戲。": "Tap Copy all, paste the whole prompt into a Gemini chat, then follow the AI's questions to design the game.",
         "你希望 AI 是甚麼身份？例如：擅長製作哪一科教育遊戲的前端工程師？": "What role should the AI take? For example: a front-end engineer who makes educational games for one subject.",
-        "遊戲叫甚麼名字？畫面像甚麼？想要甚麼風格？遊戲機制可以寫四點：玩家是誰、要做甚麼動作？答對和答錯分別發生甚麼，遊戲幾時結束？連續答對有甚麼獎勵，難度怎樣提升？題目從哪裡來，玩完看到甚麼？": "What is the game called? What should the screen look like, and what style do you want? Write four points about the mechanics: who is the player and what do they do? What happens for a right or wrong answer, and when does the game end? What reward is there for a streak, and how does the difficulty rise? Where do the questions come from, and what do you see at the end?",
-        "用甚麼語言、給哪個年級？要支援滑鼠、觸控、手機和電腦嗎？程式要不要放在單一檔案？答案和動畫有甚麼規則？": "Which language and year level? Should it support mouse, touch, phone and computer? Should the program be one file? What rules apply to answers and animation?",
+        "遊戲叫甚麼名字？畫面像甚麼？想要甚麼風格？遊戲玩法是怎樣的？": "What is the game called? What should the screen look like? What style do you want? How does the game play?",
+        "用甚麼語言？給哪個年級？要支援滑鼠、觸控、手機和電腦嗎？還有甚麼規則？": "What language? Which year level? Should it support mouse, touch, phone and computer? Any other rules?",
         "# 角色": "# Role",
-        "# 背景與任務": "# Background and task",
-        "# 指導與限制": "# Instructions and limits",
+        "# 背景與任務": "# Context & Task",
+        "# 指導與限制": "# Instructions & Constraints",
         "複製全部": "Copy all",
         "英文科 小鳥救援": "English: Bird Rescue",
         "數學科 超級市場": "Mathematics: Supermarket",
@@ -84,13 +84,7 @@
         "找不到開關記錄。請確認 workshop_gates 有一行 id 為 1 的資料。": "No switch record was found. Check that workshop_gates has a row with id 1.",
         "已登入，但未能更改開關。請到 Supabase 的 SQL Editor 執行：": "You are signed in, but the switch could not be changed. In the Supabase SQL Editor, run:",
         "登入失敗。請核對電郵和密碼。": "Sign-in failed. Check the email and password.",
-        "語言": "Language",
-        "小四": "P4",
-        "小五": "P5",
-        "小六": "P6",
-        "中一": "S1",
-        "中二": "S2",
-        "中三": "S3"
+        "語言": "Language"
     };
     var BLOCKS = {
         "gamePrompt": [
