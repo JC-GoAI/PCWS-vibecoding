@@ -349,6 +349,46 @@
             border-radius: 12px;
         }
     }
+    @media (max-width: 640px) {
+        body.playing-game {
+            height: 100dvh;
+            max-height: 100dvh;
+            overflow: hidden;
+        }
+        body.playing-game #app {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+        }
+        body.playing-game .column {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 8px;
+        }
+        body.playing-game .back-row,
+        body.playing-game .seg-bar { flex: 0 0 auto; }
+        body.playing-game .game-frame {
+            flex: 1 1 auto;
+            height: auto;
+            min-height: 0;
+        }
+        body.playing-game .game-tools {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        body.playing-game .game-tools .ghost-btn {
+            flex: 1 1 0;
+            min-height: 40px;
+            padding: 4px 6px;
+            font-size: 0.72rem;
+            line-height: 1.25;
+        }
+    }
     </style>
 </head>
 <body>

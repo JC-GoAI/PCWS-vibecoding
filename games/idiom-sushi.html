@@ -37,7 +37,7 @@
     }
     .order-panel { flex: 0 0 auto; overflow: visible; }
     .belt-panel { flex: 0 0 auto; }
-    .explain-card { flex: 1 1 auto; min-height: 0; overflow: auto; }
+      .explain-card { flex: 1 1 auto; min-height: 0; overflow: auto; }
     /* Cute Candy Palette Variables */
     :root {
       --bg-cream: #FFFDF7;
@@ -117,27 +117,35 @@
     }
     #startModal > div, #gameOverModal > div { margin-top: auto; margin-bottom: auto; }
     @media (max-width: 640px) {
-      .game-topbar { flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px 8px; }
-      .game-topbar h1 { font-size: 1rem; line-height: 1.2; white-space: nowrap; }
+      .game-topbar { flex-wrap: wrap; align-items: center; gap: 2px; padding: 4px 8px; }
+      .game-topbar h1 { font-size: 1rem; line-height: 1.15; white-space: nowrap; }
       .brand-lock { flex: 1 1 100%; }
+      .brand-lock > span { font-size: 1.25rem; }
       .game-topbar .top-sub { display: none; }
       .hud-row { width: 100%; justify-content: flex-end; gap: 4px; }
-      .hud-row > button { flex: 0 0 auto; }
-      .hud-chip { min-width: 0; flex: 0 0 auto; padding-left: 6px; padding-right: 6px; }
+      .hud-row > button { flex: 0 0 auto; padding: 4px; }
+      .hud-chip { min-width: 0; flex: 0 0 auto; padding: 0 6px; }
       .hud-chip .hud-label { display: none; }
-      .order-panel { flex-direction: column !important; align-items: stretch; gap: 6px; padding: 8px; overflow: visible; }
+      #comboText, #scoreText, #timerText { font-size: 1rem; }
+      .order-panel { flex-direction: column !important; align-items: stretch; gap: 2px; padding: 4px !important; overflow: visible; }
       .customer-block { flex-direction: row !important; width: 100%; align-items: center; }
       .customer-block #customerAvatarContainer { display: none; }
-      .customer-block > div:first-child { width: 100%; margin: 0; }
+      .customer-block > div:first-child { width: 100%; margin: 0 0 2px; height: 1rem; }
       #explanationBox { display: none; }
-      .speech-bubble { min-height: 0; padding: 8px 10px; overflow: visible; }
-      #sentenceContainer { overflow: visible; }
-      #conveyorTrackArea { height: 132px; }
+      .speech-bubble { min-height: 0 !important; padding: 6px 8px !important; overflow: visible; }
+      .order-head { flex-wrap: wrap; align-items: flex-start; gap: 4px; margin-bottom: 2px; }
+      #sentenceContainer { overflow: visible; font-size: 0.95rem; line-height: 1.35; padding-top: 0; padding-bottom: 0; }
+      .belt-panel { padding: 6px 8px !important; }
+      .prop-bar { flex-wrap: nowrap; align-items: center; gap: 6px; margin-bottom: 4px; }
+      .prop-actions { flex-wrap: nowrap; justify-content: flex-end; }
+      #conveyorTrackArea { height: 108px; }
+      #platesStage > div { height: 100px !important; width: 116px !important; }
       .belt-foot { display: none !important; }
-      .game-main { padding: 8px; gap: 6px; }
-      .order-head { flex-wrap: wrap; align-items: flex-start; gap: 6px; }
-      .prop-bar { flex-wrap: wrap; align-items: center; gap: 8px; }
-      .prop-actions { flex-wrap: wrap; justify-content: flex-end; }
+      .game-main { padding: 4px !important; gap: 2px; }
+      .explain-card { flex: 0 0 auto; overflow: visible; padding: 4px 8px !important; }
+      .explain-card #centerIconBadge { width: 28px; height: 28px; font-size: 0.95rem; }
+      #centerExplanationText { font-size: 0.75rem; line-height: 1.3; }
+      #centerExplanationCard .uppercase { display: none; }
     }
   </style>
 </head>

@@ -1027,13 +1027,9 @@
         content += renderWordDetectChallenge(station);
       }
 
-      // 底部常駐：返回圖片與反饋提示
       content += `
         <div id="challenge-feedback" class="mt-4 hidden p-3 rounded-xl text-sm font-medium"></div>
-        <div class="mt-5 flex items-center justify-between gap-2 border-t border-amber-900/10 pt-3">
-          <button onclick="returnToMapPreview()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-amber-800 bg-amber-100/60 hover:bg-amber-100 transition flex items-center gap-1.5">
-            <span>🗺️</span> 返回圖片查看
-          </button>
+        <div class="mt-5 border-t border-amber-900/10 pt-3 text-right">
           <span class="text-[11px] text-stone-500">依據教育局課本注釋字解為唯一標準</span>
         </div>
       `;
@@ -1684,10 +1680,7 @@
           ${station.knowledge}
         </div>
 
-        <div class="flex justify-between items-center gap-2">
-          <button onclick="returnToMapPreview()" class="px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl text-xs sm:text-sm font-bold transition">
-            返回圖片
-          </button>
+        <div class="flex justify-end items-center gap-2">
           <button onclick="closeModal()" class="px-5 py-2 bg-amber-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow hover:bg-amber-700 transition">
             完成溫習
           </button>
