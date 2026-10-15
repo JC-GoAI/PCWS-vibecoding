@@ -380,6 +380,8 @@
   <script>
     // --- 學習內容數據庫（嚴格依據建議篇章課本注釋與原文）---
     const CHAPTER_SOURCE = "資料來源：香港教育局課程發展處中國語文教育組編著：《積學涵泳——中國語文課程文言經典建議篇章（初中）》，中華教育：2022年8月，香港。";
+    const EDB_BOOKLET_URL = "https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/Booklet_KS3_uploadver2.pdf";
+    const CHAPTER_IMAGE_SRC = "peach-blossom-chapter.jpg";
     const STATIONS_DATA = [
       {
         id: 1,
@@ -1557,7 +1559,7 @@
                 <span>📖</span>
                 <span>線上雙頁全覽</span>
               </button>
-              <a href="https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-white hover:bg-amber-100/70 border border-amber-300 text-amber-950 font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition">
+              <a href="${EDB_BOOKLET_URL}" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-white hover:bg-amber-100/70 border border-amber-300 text-amber-950 font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition">
                 <span>🔗</span>
                 <span>建議篇章原檔 (PDF)</span>
               </a>
@@ -1693,260 +1695,39 @@
       modal.classList.remove('hidden');
     }
 
-    // 生成《桃花源記》課本高解析度雙頁圖像畫布
+    // 課本第 30-31 頁掃描圖：下載 PDF／PNG 及線上預覽
     function ensureUiFont() {
       if (!document.fonts || !document.fonts.load) return Promise.resolve();
       return document.fonts.load('700 38px "Noto Sans HK"').catch(function () {});
     }
 
-    function createEdbTextbookCanvas() {
+    function loadChapterImage() {
+      return new Promise(function (resolve, reject) {
+        const img = new Image();
+        img.onload = function () { resolve(img); };
+        img.onerror = function () { reject(new Error('chapter image missing')); };
+        img.src = CHAPTER_IMAGE_SRC;
+      });
+    }
+
+    function chapterImageToCanvas(img) {
       const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      // 設置 2400 x 1580 高清畫質，長寬比貼合兩頁課本
-      canvas.width = 2400;
-      canvas.height = 1580;
-
-      // 1. 溫潤宣紙與課本底色
-      ctx.fillStyle = '#faf6ef';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // 書脊中線陰影
-      const gradMid = ctx.createLinearGradient(1200 - 30, 0, 1200 + 30, 0);
-      gradMid.addColorStop(0, 'rgba(180, 150, 120, 0.02)');
-      gradMid.addColorStop(0.5, 'rgba(150, 120, 90, 0.12)');
-      gradMid.addColorStop(1, 'rgba(180, 150, 120, 0.02)');
-      ctx.fillStyle = gradMid;
-      ctx.fillRect(1170, 0, 60, canvas.height);
-
-      // 2. 左側古雅棕金色側書籤 (Page 30)
-      ctx.fillStyle = '#b78943';
-      ctx.beginPath();
-      ctx.roundRect(0, 0, 110, 880, [0, 0, 32, 0]);
-      ctx.fill();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 50px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
-      ctx.textAlign = 'center';
-      const titleChars = ['桃', '花', '源', '記'];
-      titleChars.forEach((c, idx) => {
-        ctx.fillText(c, 55, 160 + idx * 75);
-      });
-
-      ctx.font = '30px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
-      ctx.fillStyle = '#fceada';
-      ctx.fillText('陶', 55, 530);
-      ctx.fillText('潛', 55, 575);
-
-      // 3. 左頁 (Page 30) 原文正文
-      ctx.fillStyle = '#2b231d';
-      ctx.textAlign = 'left';
-      ctx.font = '38px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
-
-      const leftParagraphs = [
-        "晉太元中，武陵人捕魚為業。緣溪行，",
-        "忘路之遠近。忽逢桃花林，夾岸數百步，中",
-        "無雜樹，芳草鮮美，落英繽紛，漁人甚異",
-        "之。復前行，欲窮其林。",
-        "",
-        "林盡水源，便得一山。山有小口，彷",
-        "彿若有光。便舍船，從口入。初極狹，才通",
-        "人。復行數十步，豁然開朗，土地平曠，屋",
-        "舍儼然，有良田、美池、桑竹之屬，阡陌交",
-        "通，雞犬相聞。其中往來種作，男女衣著，",
-        "悉如外人。黃髮垂髫，並怡然自樂。",
-        "",
-        "見漁人，乃大驚，問所從來。具答之。",
-        "便要還家，設酒殺雞作食。村中聞有此人，",
-        "咸來問訊。自云：先世避秦時亂，率妻子",
-        "邑人來此絕境，不復出焉，遂與外人間隔。",
-        "問今是何世，乃不知有漢，無論魏、晉。此",
-        "人一一為具言所聞，皆歎惋。餘人各復延至",
-        "其家，皆出酒食。停數日，辭去。此中人語",
-        "云：「不足為外人道也。」"
-      ];
-
-      let startY = 145;
-      const leftX = 180;
-      leftParagraphs.forEach((line) => {
-        if (line === "") {
-          startY += 26;
-        } else {
-          ctx.fillText(line, leftX, startY);
-          startY += 58;
-        }
-      });
-
-      // 4. 左頁底部水墨桃花林意象淡繪
-      ctx.fillStyle = '#9fb99b';
-      ctx.beginPath();
-      ctx.ellipse(340, 1500, 280, 80, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#c5d8bf';
-      ctx.beginPath();
-      ctx.ellipse(580, 1520, 220, 70, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 粉嫩桃花簇
-      const petalSpots = [
-        { x: 230, y: 1400, r: 18 }, { x: 260, y: 1380, r: 24 }, { x: 300, y: 1395, r: 20 },
-        { x: 420, y: 1430, r: 22 }, { x: 460, y: 1410, r: 26 }, { x: 500, y: 1435, r: 20 }
-      ];
-      petalSpots.forEach(pt => {
-        ctx.fillStyle = 'rgba(235, 120, 135, 0.45)';
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // 頁碼 30
-      ctx.strokeStyle = '#c0a882';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(60, 1495, 26, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.fillStyle = '#5c4530';
-      ctx.font = 'bold 24px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('30', 60, 1503);
-
-      // 5. 右頁 (Page 31) 原文後半段
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#2b231d';
-      ctx.font = '38px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
-
-      const rightParagraphs = [
-        "既出，得其船，便扶向路，處處誌之。",
-        "及郡下，詣太守，說如此。太守即遣人隨其",
-        "往，尋向所誌，遂迷不復得路。",
-        "",
-        "南陽劉子驥，高尚士也，聞之，欣然規",
-        "往，未果，尋病終。後遂無問津者。"
-      ];
-
-      let rStartY = 145;
-      const rightX = 1300;
-      rightParagraphs.forEach((line) => {
-        if (line === "") {
-          rStartY += 26;
-        } else {
-          ctx.fillText(line, rightX, rStartY);
-          rStartY += 58;
-        }
-      });
-
-      // 6. 右頁雙欄注釋 (① ~ ㉑) 課本正統排版
-      ctx.font = '24px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
-      const col1Notes = [
-        "① 太元：東晉孝武帝司馬曜年號。",
-        "② 落英：落花。繽紛：繁雜。此處",
-        "   形容飄落的花朵，千姿百態。",
-        "③ 窮：窮盡，作動詞用。",
-        "④ 舍：通「捨」，捨棄。",
-        "⑤ 才：僅。",
-        "⑥ 儼然：形容房屋排列整齊。",
-        "⑦ 阡陌：田間的縱橫小路，以區隔",
-        "   田畝。《風俗通》云：「南北曰",
-        "   阡，東西曰陌。」交通：交錯相",
-        "   通，四通八達。",
-        "⑧ 雞犬相聞：此句源於《老子》就",
-        "   「小國寡民」的構想：「鄰國相",
-        "   望，雞犬之聲相聞，民至老死，",
-        "   不相往來。」",
-        "⑨ 外人：方外或塵外之人。",
-        "⑩ 黃髮：指老人，因其髮已由白轉",
-        "   黃。垂髫：指年幼者，因其多並",
-        "   髻為飾。髫：小童未束髻，額前",
-        "   垂下的頭髮。粵[條]，[tiu4]；",
-        "   普[tiáo]。"
-      ];
-
-      const col2Notes = [
-        "⑪ 具：通「俱」，全部。",
-        "⑫ 要：通「邀」，邀約、邀請。粵",
-        "   [邀]，[jiu1]；普[yāo]。",
-        "⑬ 妻子：妻子及子女。絕境：與世",
-        "   人隔絕之境。",
-        "⑭ 外人：此處指桃花源以外的人，",
-        "   與上文「悉如外人」之「外人」的",
-        "   意思不同。",
-        "⑮ 無論：更不必說。",
-        "⑯ 不足為外人道：不值得對外面的",
-        "   人說。",
-        "⑰ 扶：沿着、順着。向路：即舊",
-        "   路，謂昔日來時之路。",
-        "⑱ 詣：前往，引申為拜訪。粵",
-        "   [藝]，[ngai6]；普[yì]。",
-        "⑲ 規往：謀劃前往。",
-        "⑳ 尋：不久。",
-        "㉑ 問津：詢問渡口之所在，引申為",
-        "   尋訪或探求的意思。津：渡口。"
-      ];
-
-      // 注釋左欄
-      let noteY1 = 660;
-      col1Notes.forEach(txt => {
-        if (txt.includes('①') || txt.includes('②') || txt.includes('③') || txt.includes('④') || txt.includes('⑤') || txt.includes('⑥') || txt.includes('⑦') || txt.includes('⑧') || txt.includes('⑨') || txt.includes('⑩')) {
-          ctx.fillStyle = '#0f6b92';
-        } else {
-          ctx.fillStyle = '#44372e';
-        }
-        ctx.fillText(txt, 1260, noteY1);
-        noteY1 += 39;
-      });
-
-      // 注釋右欄
-      let noteY2 = 660;
-      col2Notes.forEach(txt => {
-        if (txt.includes('⑪') || txt.includes('⑫') || txt.includes('⑬') || txt.includes('⑭') || txt.includes('⑮') || txt.includes('⑯') || txt.includes('⑰') || txt.includes('⑱') || txt.includes('⑲') || txt.includes('⑳') || txt.includes('㉑')) {
-          ctx.fillStyle = '#0f6b92';
-        } else {
-          ctx.fillStyle = '#44372e';
-        }
-        ctx.fillText(txt, 1830, noteY2);
-        noteY2 += 39;
-      });
-
-      // 7. 頁腳與右下角標註
-      ctx.fillStyle = '#5c4530';
-      ctx.font = '24px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
-      ctx.textAlign = 'right';
-      ctx.fillText('桃花源記 | 陶潛    31', 2320, 1515);
-
-      ctx.fillStyle = '#6b5a48';
-      ctx.font = '16px "Noto Sans HK", "PingFang HK", "PingFang TC", "Microsoft JhengHei", sans-serif';
-      ctx.textAlign = 'left';
-      const sourceMax = 2100;
-      let sourceLine = '';
-      let sourceY = 1552;
-      const sourceX = 180;
-      CHAPTER_SOURCE.split('').forEach(function (ch) {
-        const trial = sourceLine + ch;
-        if (ctx.measureText(trial).width > sourceMax && sourceLine) {
-          ctx.fillText(sourceLine, sourceX, sourceY);
-          sourceLine = ch;
-          sourceY += 22;
-        } else {
-          sourceLine = trial;
-        }
-      });
-      if (sourceLine) ctx.fillText(sourceLine, sourceX, sourceY);
-
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0);
       return canvas;
     }
 
-    // 觸發生成並下載建議篇章標準雙頁 PDF 檔案
     async function downloadEdbChapterPDF() {
       try {
-        showFloatingNotice('正在生成《桃花源記》課本 PDF...');
-        await ensureUiFont();
-        const canvas = createEdbTextbookCanvas();
+        showFloatingNotice('正在準備《桃花源記》課本 PDF...');
+        const img = await loadChapterImage();
+        const canvas = chapterImageToCanvas(img);
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
-        // 使用 jsPDF 生成 A4 橫向 (Landscape) PDF
         const { jsPDF } = window.jspdf;
         if (!jsPDF) {
-          // 若 CDN 加載受限，回退至直接在新分頁開啟或官方下載
-          window.open('https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf', '_blank');
+          window.open(EDB_BOOKLET_URL, '_blank');
           return;
         }
 
@@ -1958,9 +1739,7 @@
 
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
-
-        // 保持 2400:1580 比例居中置入 PDF
-        const imgRatio = 2400 / 1580;
+        const imgRatio = canvas.width / canvas.height;
         let renderW = pdfWidth;
         let renderH = pdfWidth / imgRatio;
         let posX = 0;
@@ -1980,17 +1759,15 @@
         showFloatingNotice('《桃花源記》建議篇章 PDF 下載完成！');
       } catch (err) {
         console.error('PDF generation error:', err);
-        // 回退直接開啟建議篇章原檔 PDF
-        window.open('https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf', '_blank');
+        window.open(EDB_BOOKLET_URL, '_blank');
       }
     }
 
-    // 觸發下載課本篇章高清圖片
     async function downloadEdbChapterImage() {
       try {
-        showFloatingNotice('正在生成《桃花源記》課本高清圖檔...');
-        await ensureUiFont();
-        const canvas = createEdbTextbookCanvas();
+        showFloatingNotice('正在準備《桃花源記》課本題圖...');
+        const img = await loadChapterImage();
+        const canvas = chapterImageToCanvas(img);
         const dataUrl = canvas.toDataURL('image/png');
 
         const link = document.createElement('a');
@@ -2008,14 +1785,16 @@
       }
     }
 
-    // 線上高清預覽課本篇章模態窗
     async function previewEdbChapterModal() {
       const modal = document.getElementById('modal-container');
       const card = document.getElementById('modal-card');
-
-      await ensureUiFont();
-      const canvas = createEdbTextbookCanvas();
-      const dataUrl = canvas.toDataURL('image/png');
+      let dataUrl = CHAPTER_IMAGE_SRC;
+      try {
+        const img = await loadChapterImage();
+        dataUrl = chapterImageToCanvas(img).toDataURL('image/png');
+      } catch (err) {
+        console.error('Preview image error:', err);
+      }
       card.classList.add('chapter-wide');
 
       card.innerHTML = `
@@ -2046,7 +1825,7 @@
             <span>🖼️</span>
             <span>儲存 PNG 圖</span>
           </a>
-          <a href="https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/chi-edu/recommended-passages/KS3_06.pdf" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-amber-100 border border-amber-300 text-amber-950 font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-1.5 transition">
+          <a href="${EDB_BOOKLET_URL}" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-amber-100 border border-amber-300 text-amber-950 font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-1.5 transition">
             <span>🏛️</span>
             <span>建議篇章原檔 (PDF)</span>
           </a>

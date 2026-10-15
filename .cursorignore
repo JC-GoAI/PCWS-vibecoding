@@ -14,6 +14,7 @@ config/secrets.*
 *.docx
 *.jpg
 *.png
+!games/peach-blossom-chapter.jpg
 private/
 
 # 4. 隔離數據庫與日誌檔案
