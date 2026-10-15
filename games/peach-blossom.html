@@ -185,10 +185,14 @@
       flex-direction: column;
       overflow: hidden;
     }
-    #chapter-preview-frame {
+    #chapter-preview-wrap {
+      position: relative;
       flex: 0 1 auto;
       min-height: 140px;
-      max-height: calc(min(94dvh, 94vh) - 16.5rem);
+    }
+    #chapter-preview-frame {
+      min-height: 140px;
+      max-height: calc(min(94dvh, 94vh) - 13rem);
       overflow: auto;
       touch-action: none;
     }
@@ -197,6 +201,43 @@
       height: auto;
       user-select: none;
       -webkit-user-drag: none;
+    }
+    .chapter-zoom-hud {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 2;
+    }
+    #chapter-preview-wrap:hover .chapter-zoom-hud,
+    #chapter-preview-wrap:focus-within .chapter-zoom-hud {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    @media (hover: none) {
+      .chapter-zoom-hud {
+        opacity: 0;
+      }
+    }
+    .chapter-zoom-hud button {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(180, 140, 80, 0.55);
+      background: rgba(255, 252, 246, 0.94);
+      color: #3f2d1c;
+      font-weight: 800;
+      font-size: 1.15rem;
+      line-height: 1;
+      box-shadow: 0 6px 16px rgba(60, 40, 16, 0.18);
+    }
+    .chapter-zoom-hud button:hover {
+      background: #fff;
     }
     #modal-container, #modal-card, #start-modal {
       touch-action: pan-y;
@@ -1806,17 +1847,15 @@
     function getChapterPreviewEls() {
       return {
         frame: document.getElementById('chapter-preview-frame'),
-        img: document.getElementById('chapter-preview-img'),
-        hint: document.getElementById('chapter-zoom-hint'),
-        label: document.getElementById('chapter-zoom-label')
+        img: document.getElementById('chapter-preview-img')
       };
     }
 
     function fitChapterPreviewImage() {
-      const { frame, img, hint, label } = getChapterPreviewEls();
+      const { frame, img } = getChapterPreviewEls();
       if (!frame || !img || !img.naturalWidth) return;
       const pad = 16;
-      const maxH = Math.min(window.innerHeight * 0.94, window.innerHeight) - 280;
+      const maxH = Math.min(window.innerHeight * 0.94, window.innerHeight) - 220;
       const fw = Math.max(40, frame.clientWidth - pad);
       const fh = Math.max(40, maxH - pad);
       const fit = Math.min(fw / img.naturalWidth, fh / img.naturalHeight);
@@ -1829,15 +1868,6 @@
       frame.style.alignItems = fitted ? 'center' : 'flex-start';
       frame.style.justifyContent = fitted ? 'center' : 'flex-start';
       frame.style.touchAction = fitted ? 'none' : 'pan-x pan-y';
-      img.classList.toggle('cursor-zoom-in', fitted);
-      img.classList.toggle('cursor-zoom-out', !fitted);
-      img.title = fitted ? '點擊或用 + 放大' : '可拖動查看；點擊再放大，或按「睇晒全圖」';
-      if (label) label.textContent = Math.round(chapterPreviewZoom * 100) + '%';
-      if (hint) {
-        hint.textContent = fitted
-          ? '已顯示整張課本雙頁。用 +/−、滾輪或雙指放大縮細。'
-          : '可拖動查看細節。按「睇晒全圖」還原。';
-      }
     }
 
     function setChapterPreviewZoom(next, pivot) {
@@ -1878,13 +1908,6 @@
     function bindChapterPreviewZoom() {
       const { frame, img } = getChapterPreviewEls();
       if (!frame || !img) return;
-      img.addEventListener('click', function (e) {
-        if (chapterPreviewZoom >= CHAPTER_ZOOM_MAX) {
-          resetChapterPreviewZoom();
-          return;
-        }
-        setChapterPreviewZoom(chapterPreviewZoom + CHAPTER_ZOOM_STEP, { x: e.clientX, y: e.clientY });
-      });
       frame.addEventListener('wheel', function (e) {
         e.preventDefault();
         const dir = e.deltaY > 0 ? -1 : 1;
@@ -1929,19 +1952,15 @@
 
         <p class="text-xs text-stone-700 leading-relaxed mb-3 shrink-0">${CHAPTER_SOURCE}</p>
 
-        <div id="chapter-preview-frame" class="p-2 bg-stone-100/80 rounded-2xl border border-amber-200 shadow-inner flex items-center justify-center">
-          <img id="chapter-preview-img" alt="《桃花源記》建議篇章課本圖文" class="rounded-lg shadow cursor-zoom-in" title="點擊或用 + 放大">
+        <div id="chapter-preview-wrap">
+          <div id="chapter-preview-frame" class="p-2 bg-stone-100/80 rounded-2xl border border-amber-200 shadow-inner flex items-center justify-center">
+            <img id="chapter-preview-img" alt="《桃花源記》建議篇章課本圖文" class="rounded-lg shadow">
+          </div>
+          <div class="chapter-zoom-hud">
+            <button type="button" onclick="nudgeChapterPreviewZoom(-1)" aria-label="縮小">−</button>
+            <button type="button" onclick="nudgeChapterPreviewZoom(1)" aria-label="放大">+</button>
+          </div>
         </div>
-
-        <div class="shrink-0 mt-2 flex flex-wrap items-center justify-center gap-2">
-          <button type="button" onclick="nudgeChapterPreviewZoom(-1)" class="w-9 h-9 rounded-xl bg-white border border-amber-300 text-amber-950 font-bold shadow-sm hover:bg-amber-100">−</button>
-          <button type="button" onclick="resetChapterPreviewZoom()" class="px-3 h-9 rounded-xl bg-amber-100 border border-amber-300 text-amber-950 text-xs font-bold shadow-sm hover:bg-amber-200">睇晒全圖</button>
-          <span id="chapter-zoom-label" class="text-xs font-bold text-stone-600 min-w-[3rem] text-center">100%</span>
-          <button type="button" onclick="nudgeChapterPreviewZoom(1)" class="w-9 h-9 rounded-xl bg-white border border-amber-300 text-amber-950 font-bold shadow-sm hover:bg-amber-100">+</button>
-        </div>
-        <p id="chapter-zoom-hint" class="text-xs text-stone-500 text-center mt-1.5 shrink-0">
-          已顯示整張課本雙頁。用 +/−、滾輪或雙指放大縮細。
-        </p>
 
         <div class="mt-3 flex flex-col sm:flex-row gap-2.5 shrink-0">
           <button onclick="downloadEdbChapterPDF()" class="w-full py-2.5 bg-gradient-to-r from-rose-700 to-rose-800 hover:from-rose-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
