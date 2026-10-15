@@ -188,13 +188,21 @@
     #chapter-preview-wrap {
       position: relative;
       flex: 0 1 auto;
-      min-height: 140px;
+      min-height: 120px;
+      overflow: hidden;
+      margin-bottom: 10px;
     }
     #chapter-preview-frame {
       min-height: 140px;
-      max-height: calc(min(94dvh, 94vh) - 13rem);
+      max-height: 100%;
       overflow: auto;
       touch-action: none;
+    }
+    #chapter-preview-actions {
+      position: relative;
+      z-index: 3;
+      background: #fffdf8;
+      padding-top: 0.35rem;
     }
     #chapter-preview-img {
       max-width: none;
@@ -1851,20 +1859,40 @@
       };
     }
 
+    function availableChapterFrameHeight() {
+      const card = document.getElementById('modal-card');
+      const wrap = document.getElementById('chapter-preview-wrap');
+      if (!card || !wrap) return 280;
+      let used = 0;
+      Array.from(card.children).forEach(function (el) {
+        if (el === wrap) return;
+        const st = getComputedStyle(el);
+        used += el.offsetHeight + (parseFloat(st.marginTop) || 0) + (parseFloat(st.marginBottom) || 0);
+      });
+      const cs = getComputedStyle(card);
+      const padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+      return Math.max(120, card.clientHeight - used - padY - 16);
+    }
+
     function fitChapterPreviewImage() {
       const { frame, img } = getChapterPreviewEls();
+      const wrap = document.getElementById('chapter-preview-wrap');
       if (!frame || !img || !img.naturalWidth) return;
       const pad = 16;
-      const maxH = Math.min(window.innerHeight * 0.94, window.innerHeight) - 220;
+      const maxH = availableChapterFrameHeight();
       const fw = Math.max(40, frame.clientWidth - pad);
       const fh = Math.max(40, maxH - pad);
-      const fit = Math.min(fw / img.naturalWidth, fh / img.naturalHeight);
-      const w = img.naturalWidth * fit * chapterPreviewZoom;
+      const contain = Math.min(fw / img.naturalWidth, fh / img.naturalHeight);
+      const fitted = chapterPreviewZoom <= 1.01;
+      const scale = fitted ? contain * 0.9 : contain * chapterPreviewZoom;
+      const w = img.naturalWidth * scale;
+      const h = img.naturalHeight * scale;
       img.style.width = w + 'px';
       img.style.height = 'auto';
       img.style.maxWidth = 'none';
-      const fitted = chapterPreviewZoom <= 1.01;
-      frame.style.height = fitted ? (Math.round(img.naturalHeight * fit) + pad + 8) + 'px' : '';
+      const boxH = fitted ? Math.round(h) + pad : maxH;
+      frame.style.height = boxH + 'px';
+      if (wrap) wrap.style.height = boxH + 'px';
       frame.style.alignItems = fitted ? 'center' : 'flex-start';
       frame.style.justifyContent = fitted ? 'center' : 'flex-start';
       frame.style.touchAction = fitted ? 'none' : 'pan-x pan-y';
@@ -1962,7 +1990,7 @@
           </div>
         </div>
 
-        <div class="mt-3 flex flex-col sm:flex-row gap-2.5 shrink-0">
+        <div id="chapter-preview-actions" class="mt-2 flex flex-col sm:flex-row gap-2.5 shrink-0">
           <button onclick="downloadEdbChapterPDF()" class="w-full py-2.5 bg-gradient-to-r from-rose-700 to-rose-800 hover:from-rose-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
             <span>📑</span>
             <span>下載建議篇章 PDF (A4 規格)</span>
