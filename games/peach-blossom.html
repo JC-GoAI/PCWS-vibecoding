@@ -178,14 +178,25 @@
     }
 
     #modal-card.chapter-wide {
-      max-width: min(1100px, 96vw);
+      width: min(1400px, 96vw);
+      max-width: min(1400px, 96vw);
+      max-height: min(94dvh, 94vh);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
-    #chapter-preview-frame.zoomed {
-      max-height: 78vh;
+    #chapter-preview-frame {
+      flex: 0 1 auto;
+      min-height: 140px;
+      max-height: calc(min(94dvh, 94vh) - 16.5rem);
+      overflow: auto;
+      touch-action: none;
     }
-    #chapter-preview-frame.zoomed img {
+    #chapter-preview-img {
       max-width: none;
-      width: min(1680px, 220%);
+      height: auto;
+      user-select: none;
+      -webkit-user-drag: none;
     }
     #modal-container, #modal-card, #start-modal {
       touch-action: pan-y;
@@ -1785,20 +1796,130 @@
       }
     }
 
+    let chapterPreviewZoom = 1;
+    let chapterPinchStartDist = 0;
+    let chapterPinchStartZoom = 1;
+    const CHAPTER_ZOOM_MIN = 1;
+    const CHAPTER_ZOOM_MAX = 5;
+    const CHAPTER_ZOOM_STEP = 0.35;
+
+    function getChapterPreviewEls() {
+      return {
+        frame: document.getElementById('chapter-preview-frame'),
+        img: document.getElementById('chapter-preview-img'),
+        hint: document.getElementById('chapter-zoom-hint'),
+        label: document.getElementById('chapter-zoom-label')
+      };
+    }
+
+    function fitChapterPreviewImage() {
+      const { frame, img, hint, label } = getChapterPreviewEls();
+      if (!frame || !img || !img.naturalWidth) return;
+      const pad = 16;
+      const maxH = Math.min(window.innerHeight * 0.94, window.innerHeight) - 280;
+      const fw = Math.max(40, frame.clientWidth - pad);
+      const fh = Math.max(40, maxH - pad);
+      const fit = Math.min(fw / img.naturalWidth, fh / img.naturalHeight);
+      const w = img.naturalWidth * fit * chapterPreviewZoom;
+      img.style.width = w + 'px';
+      img.style.height = 'auto';
+      img.style.maxWidth = 'none';
+      const fitted = chapterPreviewZoom <= 1.01;
+      frame.style.height = fitted ? (Math.round(img.naturalHeight * fit) + pad + 8) + 'px' : '';
+      frame.style.alignItems = fitted ? 'center' : 'flex-start';
+      frame.style.justifyContent = fitted ? 'center' : 'flex-start';
+      frame.style.touchAction = fitted ? 'none' : 'pan-x pan-y';
+      img.classList.toggle('cursor-zoom-in', fitted);
+      img.classList.toggle('cursor-zoom-out', !fitted);
+      img.title = fitted ? '點擊或用 + 放大' : '可拖動查看；點擊再放大，或按「睇晒全圖」';
+      if (label) label.textContent = Math.round(chapterPreviewZoom * 100) + '%';
+      if (hint) {
+        hint.textContent = fitted
+          ? '已顯示整張課本雙頁。用 +/−、滾輪或雙指放大縮細。'
+          : '可拖動查看細節。按「睇晒全圖」還原。';
+      }
+    }
+
+    function setChapterPreviewZoom(next, pivot) {
+      const { frame, img } = getChapterPreviewEls();
+      if (!frame || !img || !img.naturalWidth) return;
+      const prev = chapterPreviewZoom;
+      chapterPreviewZoom = Math.min(CHAPTER_ZOOM_MAX, Math.max(CHAPTER_ZOOM_MIN, next));
+      if (Math.abs(chapterPreviewZoom - prev) < 0.001) {
+        fitChapterPreviewImage();
+        return;
+      }
+      const rect = frame.getBoundingClientRect();
+      const px = pivot && Number.isFinite(pivot.x) ? pivot.x : rect.left + frame.clientWidth / 2;
+      const py = pivot && Number.isFinite(pivot.y) ? pivot.y : rect.top + frame.clientHeight / 2;
+      const imgX = frame.scrollLeft + (px - rect.left);
+      const imgY = frame.scrollTop + (py - rect.top);
+      const ratio = img.offsetWidth ? imgX / img.offsetWidth : 0.5;
+      const ratioY = img.offsetHeight ? imgY / img.offsetHeight : 0.5;
+      fitChapterPreviewImage();
+      frame.scrollLeft = ratio * img.offsetWidth - (px - rect.left);
+      frame.scrollTop = ratioY * img.offsetHeight - (py - rect.top);
+    }
+
+    function nudgeChapterPreviewZoom(dir) {
+      setChapterPreviewZoom(chapterPreviewZoom + dir * CHAPTER_ZOOM_STEP);
+    }
+
+    function resetChapterPreviewZoom() {
+      chapterPreviewZoom = 1;
+      fitChapterPreviewImage();
+      const { frame } = getChapterPreviewEls();
+      if (frame) {
+        frame.scrollLeft = 0;
+        frame.scrollTop = 0;
+      }
+    }
+
+    function bindChapterPreviewZoom() {
+      const { frame, img } = getChapterPreviewEls();
+      if (!frame || !img) return;
+      img.addEventListener('click', function (e) {
+        if (chapterPreviewZoom >= CHAPTER_ZOOM_MAX) {
+          resetChapterPreviewZoom();
+          return;
+        }
+        setChapterPreviewZoom(chapterPreviewZoom + CHAPTER_ZOOM_STEP, { x: e.clientX, y: e.clientY });
+      });
+      frame.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        const dir = e.deltaY > 0 ? -1 : 1;
+        setChapterPreviewZoom(chapterPreviewZoom + dir * CHAPTER_ZOOM_STEP, { x: e.clientX, y: e.clientY });
+      }, { passive: false });
+      frame.addEventListener('touchstart', function (e) {
+        if (e.touches.length === 2) {
+          const a = e.touches[0];
+          const b = e.touches[1];
+          chapterPinchStartDist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+          chapterPinchStartZoom = chapterPreviewZoom;
+        }
+      }, { passive: true });
+      frame.addEventListener('touchmove', function (e) {
+        if (e.touches.length !== 2) return;
+        e.preventDefault();
+        const a = e.touches[0];
+        const b = e.touches[1];
+        const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+        if (!chapterPinchStartDist) return;
+        setChapterPreviewZoom(
+          chapterPinchStartZoom * (dist / chapterPinchStartDist),
+          { x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 }
+        );
+      }, { passive: false });
+    }
+
     async function previewEdbChapterModal() {
       const modal = document.getElementById('modal-container');
       const card = document.getElementById('modal-card');
-      let dataUrl = CHAPTER_IMAGE_SRC;
-      try {
-        const img = await loadChapterImage();
-        dataUrl = chapterImageToCanvas(img).toDataURL('image/png');
-      } catch (err) {
-        console.error('Preview image error:', err);
-      }
+      chapterPreviewZoom = 1;
       card.classList.add('chapter-wide');
 
       card.innerHTML = `
-        <div class="flex items-center justify-between pb-3 border-b border-amber-900/15 mb-3">
+        <div class="flex items-center justify-between pb-3 border-b border-amber-900/15 mb-3 shrink-0">
           <div>
             <span class="text-xs uppercase tracking-wider text-rose-800 font-bold bg-rose-100/70 px-2.5 py-0.5 rounded-md">建議篇章</span>
             <h2 class="text-xl sm:text-2xl font-bold text-amber-950 mt-0.5 font-calligraphy">《桃花源記》課本全頁典藏圖</h2>
@@ -1806,54 +1927,50 @@
           <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-900 hover:bg-amber-200 flex items-center justify-center font-bold text-sm transition">✕</button>
         </div>
 
-        <p class="text-xs text-stone-700 leading-relaxed mb-3">${CHAPTER_SOURCE}</p>
+        <p class="text-xs text-stone-700 leading-relaxed mb-3 shrink-0">${CHAPTER_SOURCE}</p>
 
-        <div id="chapter-preview-frame" class="p-2 bg-stone-100/80 rounded-2xl border border-amber-200 shadow-inner max-h-[62vh] overflow-auto flex items-center justify-center">
-          <img id="chapter-preview-img" alt="《桃花源記》建議篇章課本圖文" class="max-w-full h-auto rounded-lg shadow cursor-zoom-in" title="點擊放大圖片">
+        <div id="chapter-preview-frame" class="p-2 bg-stone-100/80 rounded-2xl border border-amber-200 shadow-inner flex items-center justify-center">
+          <img id="chapter-preview-img" alt="《桃花源記》建議篇章課本圖文" class="rounded-lg shadow cursor-zoom-in" title="點擊或用 + 放大">
         </div>
 
-        <p id="chapter-zoom-hint" class="text-xs text-stone-500 text-center mt-2">
-          點擊圖片可在此視窗放大，再點一次還原。手機可長按圖片儲存至相簿。
+        <div class="shrink-0 mt-2 flex flex-wrap items-center justify-center gap-2">
+          <button type="button" onclick="nudgeChapterPreviewZoom(-1)" class="w-9 h-9 rounded-xl bg-white border border-amber-300 text-amber-950 font-bold shadow-sm hover:bg-amber-100">−</button>
+          <button type="button" onclick="resetChapterPreviewZoom()" class="px-3 h-9 rounded-xl bg-amber-100 border border-amber-300 text-amber-950 text-xs font-bold shadow-sm hover:bg-amber-200">睇晒全圖</button>
+          <span id="chapter-zoom-label" class="text-xs font-bold text-stone-600 min-w-[3rem] text-center">100%</span>
+          <button type="button" onclick="nudgeChapterPreviewZoom(1)" class="w-9 h-9 rounded-xl bg-white border border-amber-300 text-amber-950 font-bold shadow-sm hover:bg-amber-100">+</button>
+        </div>
+        <p id="chapter-zoom-hint" class="text-xs text-stone-500 text-center mt-1.5 shrink-0">
+          已顯示整張課本雙頁。用 +/−、滾輪或雙指放大縮細。
         </p>
 
-        <div class="mt-4 flex flex-col sm:flex-row gap-2.5">
+        <div class="mt-3 flex flex-col sm:flex-row gap-2.5 shrink-0">
           <button onclick="downloadEdbChapterPDF()" class="w-full py-2.5 bg-gradient-to-r from-rose-700 to-rose-800 hover:from-rose-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
             <span>📑</span>
             <span>下載建議篇章 PDF (A4 規格)</span>
           </button>
-          <a id="chapter-png-link" download="積學涵泳_桃花源記_建議篇章.png" class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
+          <button type="button" onclick="downloadEdbChapterImage()" class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-600 text-white font-bold text-sm rounded-xl shadow active:scale-98 transition flex items-center justify-center gap-1.5">
             <span>🖼️</span>
             <span>儲存 PNG 圖</span>
-          </a>
+          </button>
           <a href="${EDB_BOOKLET_URL}" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-amber-100 border border-amber-300 text-amber-950 font-bold text-sm rounded-xl shadow-sm flex items-center justify-center gap-1.5 transition">
             <span>🏛️</span>
             <span>建議篇章原檔 (PDF)</span>
           </a>
         </div>
       `;
-      document.getElementById('chapter-preview-img').src = dataUrl;
-      document.getElementById('chapter-preview-img').addEventListener('click', toggleChapterImageZoom);
-      document.getElementById('chapter-png-link').href = dataUrl;
+      const previewImg = document.getElementById('chapter-preview-img');
+      const applyFit = function () {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(fitChapterPreviewImage);
+        });
+      };
+      previewImg.onload = applyFit;
+      previewImg.src = CHAPTER_IMAGE_SRC;
+      bindChapterPreviewZoom();
       modal.classList.remove('hidden');
-    }
-
-    function toggleChapterImageZoom() {
-      const frame = document.getElementById('chapter-preview-frame');
-      const img = document.getElementById('chapter-preview-img');
-      const hint = document.getElementById('chapter-zoom-hint');
-      if (!frame || !img) return;
-      const zoomed = frame.classList.toggle('zoomed');
-      frame.style.alignItems = zoomed ? 'flex-start' : 'center';
-      frame.style.justifyContent = zoomed ? 'flex-start' : 'center';
-      img.classList.toggle('max-w-full', !zoomed);
-      img.classList.toggle('cursor-zoom-in', !zoomed);
-      img.classList.toggle('cursor-zoom-out', zoomed);
-      img.title = zoomed ? '點擊還原大小' : '點擊放大圖片';
-      if (hint) {
-        hint.textContent = zoomed
-          ? '已放大，可在框內捲動查看。再點圖片還原。'
-          : '點擊圖片可在此視窗放大，再點一次還原。手機可長按圖片儲存至相簿。';
-      }
+      if (previewImg.complete) applyFit();
+      setTimeout(applyFit, 50);
+      setTimeout(applyFit, 200);
     }
 
     function closeModal() {
@@ -2073,6 +2190,7 @@
 
     window.addEventListener('resize', () => {
       focusCurrentStation();
+      if (document.getElementById('chapter-preview-img')) fitChapterPreviewImage();
     });
 
     window.onload = function() {
